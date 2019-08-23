@@ -137,7 +137,7 @@ def update_rose(community):
     c_name = communities.loc[community]["place"]
 
     rose_layout = {
-        "title": "Wind Speed Distribution, 2008-2015, " + c_name,
+        "title": "Wind Speed Distribution, 1980-2015, " + c_name,
         "height": 700,
         "margin": {"l": 0, "r": 0, "b": 100, "t": 50},
         "legend": {
@@ -245,7 +245,7 @@ def update_rose_monthly(community):
     )
     fig.update_layout(
         title=dict(
-            text="Monthly Wind Speed Distribution, " + c_name,
+            text="Monthly Wind Speed Distribution, 1980-2015, " + c_name,
             font=dict(family="Open Sans"),
         ),
         margin=dict(l=50, t=100, r=50, b=0),

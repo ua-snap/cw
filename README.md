@@ -26,4 +26,4 @@ eb init
 eb deploy
 ```
 
-It'll be necessary to set the `REQUESTS_PATHNAME_PREFIX`, `GTAG_ID` and `MAPBOX_ACCESS_TOKEN` as appropriate on the EB instance.
+It'll be necessary to set the `REQUESTS_PATHNAME_PREFIX` and `GTAG_ID` as appropriate on the EB instance.
