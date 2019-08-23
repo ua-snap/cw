@@ -1,0 +1,62 @@
+# pylint: disable=invalid-name, import-error
+"""
+
+Contains common lookup tables between GUI/application code
+
+"""
+import os
+import pandas as pd
+import plotly.graph_objs as go
+
+communities = pd.read_csv("places.csv", index_col="sid")
+
+months_lut = {
+    1: "January",
+    2: "February",
+    3: "March",
+    4: "April",
+    5: "May",
+    6: "June",
+    7: "July",
+    8: "August",
+    9: "September",
+    10: "October",
+    11: "November",
+    12: "December",
+}
+
+# This trace is shared so we can highlight specific communities.
+map_communities_trace = go.Scattermapbox(
+    lat=communities.loc[:, "latitude"],
+    lon=communities.loc[:, "longitude"],
+    mode="markers",
+    marker={"size": 15, "color": "rgb(80,80,80)"},
+    line={"color": "rgb(0, 0, 0)", "width": 2},
+    text=communities.place,
+    hoverinfo="text",
+)
+
+map_layout = go.Layout(
+    autosize=True,
+    hovermode="closest",
+    mapbox=dict(
+        style="stamen-terrain",
+        zoom=3,
+        center=dict(lat=65, lon=-155)),
+    showlegend=False,
+    margin=dict(l=0, r=0, t=0, b=0),
+)
+
+# The lowest bound excludes actual 0 (calm) readings,
+# this is deliberate.
+speed_ranges = {
+    "0-6": {"range": [0.001, 6], "color": "#f1eef6"},
+    "6-10": {"range": [6, 10], "color": "#d0d1e6"},
+    "10-14": {"range": [10, 14], "color": "#a6bddb"},
+    "14-18": {"range": [14, 18], "color": "#74a9cf"},
+    "18-22": {"range": [18, 22], "color": "#2b8cbe"},
+    "22+": {
+        "range": [22, 1000],  # let's hope the upper bound is sufficient :-)
+        "color": "#045a8d",
+    },
+}

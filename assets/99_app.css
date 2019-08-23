@@ -1,0 +1,70 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,700&subset=latin-ext');
+@import url('https://fonts.googleapis.com/css?family=Cardo:400,400i,700&subset=latin-ext');
+
+html, body {
+	font-family: 'Cardo';
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: 'Open Sans';
+}
+
+/*
+Not sure why, but need to hide this SVG to prevent
+unwanted background from being shown behind the
+wind roses in Plotly.
+*/
+g.bglayer {
+	display: none !important;
+}
+
+/* We want vertical Checklists always. */
+.control label.checkbox {
+	display: block;
+}
+
+.header {
+	background-color: rgba(239, 241, 226, 1.00);
+	padding: 0;
+}
+
+.header--section {
+	margin-top: -1rem;
+}
+
+.header--section h1 {
+	padding-top: .8rem;
+}
+
+.header--logo {
+	float: left;
+	padding-right: 2rem;
+}
+
+.header--snap-link a {
+	height: 5.4em;
+	display: block;
+	z-index: 1000;
+}
+
+.header--snap-link img {
+	height: 5.4em;
+}
+
+.footer p {
+	width: 50%;
+	margin: 1em auto;
+}
+
+.footer a {
+	display: inline-block;
+}
+
+.footer a img {
+	height: 5em;
+	margin: 1em 1.5em;
+}
+
+._dash-undo-redo {
+	display: none;
+}
