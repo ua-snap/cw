@@ -108,8 +108,8 @@ for station_name, station in groups:
     t = pd.DataFrame(columns=mean_cols)
     station_grouped_by_month = station.groupby(station["month"])
     t = t.assign(
-        mean=station_grouped_by_month.mean()["speed"],
-        sd=station_grouped_by_month.std()["speed"],
+        mean=station_grouped_by_month.mean()["speed"].apply(lambda x: round(x, 1)),
+        sd=station_grouped_by_month.std()["speed"].apply(lambda x: round(x, 1)),
         station=station_name,
     )
     t = t.assign(month = t.index)
@@ -159,6 +159,8 @@ for station_name, station in groups:
 
     # Monthly data.
     station_grouped_by_month = station.groupby(station["month"])
+    # TODO -- can this be rewritten to avoid looping
+    # over the groupby?  If so, it'd be much much faster.
     for month, station_by_month in station_grouped_by_month:
         acc = pd.DataFrame(columns=proc_cols)
         t = chunk_to_rose(station_by_month, acc)

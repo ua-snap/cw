@@ -149,6 +149,10 @@ main_layout = html.Div(
             className='section graph',
             children=[
                 dcc.Graph(
+                    id='means',
+                    figure=go.Figure()
+                ),
+                dcc.Graph(
                     id='rose',
                     figure=go.Figure()
                 ),

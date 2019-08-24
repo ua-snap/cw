@@ -10,16 +10,11 @@ import dash
 from dash.dependencies import Input, Output
 import pandas as pd
 from gui import layout
-from luts import (
-    communities,
-    map_communities_trace,
-    map_layout,
-    speed_ranges,
-    months_lut,
-)
+import luts
 
 # Read pickled data blobs and other items used from env
 data = pd.read_pickle("roses.pickle")
+means = pd.read_pickle("means.pickle")
 
 # We set the requests_pathname_prefix to enable
 # custom URLs.
@@ -80,7 +75,7 @@ def update_place_dropdown(selected_on_map):
     # map click handles.
     # TODO look at customdata property here
     if selected_on_map is not None:
-        c = communities[communities["place"] == selected_on_map["points"][0]["text"]]
+        c = luts.communities[luts.communities["place"] == selected_on_map["points"][0]["text"]]
         return c.index.tolist()[0]
     # Return a default
     return "PAFA"
@@ -91,18 +86,18 @@ def update_selected_community_on_map(community):
     """ Draw a second trace on the map with one community highlighted. """
     return {
         "data": [
-            map_communities_trace,
+            luts.map_communities_trace,
             go.Scattermapbox(
-                lat=[communities.loc[community]["latitude"]],
-                lon=[communities.loc[community]["longitude"]],
+                lat=[luts.communities.loc[community]["latitude"]],
+                lon=[luts.communities.loc[community]["longitude"]],
                 mode="markers",
                 marker={"size": 20, "color": "rgb(207, 38, 47)"},
                 line={"color": "rgb(0, 0, 0)", "width": 2},
-                text=communities.loc[community]["place"],
+                text=luts.communities.loc[community]["place"],
                 hoverinfo="text",
             ),
         ],
-        "layout": map_layout,
+        "layout": luts.map_layout,
     }
 
 
@@ -112,7 +107,7 @@ def get_rose_traces(d, traces, month, showlegend=False):
     Month is used to tie the subplot to the formatting
     chunks in the multiple-subplot graph.
     """
-    for sr, sr_info in speed_ranges.items():
+    for sr, sr_info in luts.speed_ranges.items():
         dcr = d.loc[(d["speed_range"] == sr)]
         props = dict(
             r=dcr["frequency"].tolist(),
@@ -120,9 +115,49 @@ def get_rose_traces(d, traces, month, showlegend=False):
             name=sr,
             marker_color=sr_info["color"],
             showlegend=showlegend,
-            legendgroup="legend"
+            legendgroup="legend",
         )
         traces.append(go.Barpolar(props))
+
+
+@app.callback(Output("means", "figure"), [Input("communities-dropdown", "value")])
+def update_means(community):
+    """ Create a bar plot of average wind speeds. """
+
+    d = means.loc[(means["station"] == community)]
+    c_name = luts.communities.loc[community]["place"]
+
+    fig = go.Figure(
+        layout=dict(
+            title=dict(
+                text="Average monthly wind speed (mph), 1980-2015, " + c_name,
+                font=dict(family="Open Sans"),
+            ),
+            margin=dict(l=0, t=100, r=0, b=100),
+            showlegend=True,
+            legend=dict(x=0, y=0, orientation="h"),
+            height=550,
+            paper_bgcolor="#fff",
+            plot_bgcolor="#fff",
+        ),
+        data=[
+            go.Bar(
+                name="Average wind speed (mph)",
+                marker=dict(
+                    color=luts.speed_ranges["14-18"]["color"],
+                ),
+                x=[month for num, month in luts.months_lut.items()],
+                y=d["mean"],
+                error_y=dict(
+                    array=d["sd"],
+                    visible=True,
+                    color=luts.speed_ranges["22+"]["color"]
+                )
+            )
+        ],
+    )
+
+    return fig
 
 
 @app.callback(Output("rose", "figure"), [Input("communities-dropdown", "value")])
@@ -134,21 +169,15 @@ def update_rose(community):
     d = data.loc[(data["sid"] == community) & (data["month"] == 0)]
     get_rose_traces(d, traces, "", True)
 
-    c_name = communities.loc[community]["place"]
+    c_name = luts.communities.loc[community]["place"]
 
     rose_layout = {
         "title": "Wind Speed Distribution, 1980-2015, " + c_name,
         "height": 700,
         "margin": {"l": 0, "r": 0, "b": 100, "t": 50},
-        "legend": {
-            "orientation": "h",
-            "x": 0,
-            "y": 1
-        },
+        "legend": {"orientation": "h", "x": 0, "y": 1},
         "polar": {
-            "legend": {
-                "orientation": "h"
-            },
+            "legend": {"orientation": "h"},
             "angularaxis": {
                 "rotation": 90,
                 "direction": "clockwise",
@@ -183,10 +212,7 @@ def update_rose_monthly(community):
     """
     Create a grid of subplots for all wind roses.
     """
-    subplot_spec = dict(
-        type="polar",
-        t=0.01
-    )
+    subplot_spec = dict(type="polar", t=0.01)
     fig = make_subplots(
         rows=4,
         cols=3,
@@ -198,13 +224,13 @@ def update_rose_monthly(community):
             [subplot_spec, subplot_spec, subplot_spec],
             [subplot_spec, subplot_spec, subplot_spec],
         ],
-        subplot_titles=list(months_lut.values()),
+        subplot_titles=list(luts.months_lut.values()),
     )
 
     month = 1
     for i in range(1, 5):
         for j in range(1, 4):
-            if_show_legend = (month == 1) # only show the first legend
+            if_show_legend = month == 1  # only show the first legend
             traces = []
             d = data.loc[(data["sid"] == community) & (data["month"] == month)]
             get_rose_traces(d, traces, month, if_show_legend)
@@ -218,7 +244,7 @@ def update_rose_monthly(community):
         i["y"] = i["y"] + 0.01
         i["font"] = dict(size=12, color="#444")
 
-    c_name = communities.loc[community]["place"]
+    c_name = luts.communities.loc[community]["place"]
 
     polar_props = dict(
         bgcolor="#fff",
@@ -250,11 +276,7 @@ def update_rose_monthly(community):
         ),
         margin=dict(l=50, t=100, r=50, b=0),
         font_size=10,
-        legend=dict(
-            x=0,
-            y=0,
-            orientation="h"
-        ),
+        legend=dict(x=0, y=0, orientation="h"),
         height=1500,
         paper_bgcolor="#fff",
         plot_bgcolor="#fff",
