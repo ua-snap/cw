@@ -9,6 +9,7 @@ data/*
 stations.pickle
 stations.csv
 roses.csv
+means.csv
 
 ### Default Python stuff to ignore
 

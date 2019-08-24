@@ -11,10 +11,10 @@ data = pd.DataFrame(columns=cols)
 
 def chunk_to_rose(sgroup, accumulator):
     """
-	Given a subset of data, group by direction and speed.
-	Return accumulator of whatever the results of the
-	incoming chunk are.
-	"""
+    Given a subset of data, group by direction and speed.
+    Return accumulator of whatever the results of the
+    incoming chunk are.
+    """
 
     # Assign directions to bins.
     # We'll use the exceptional 'NaN' class to represent
@@ -42,7 +42,7 @@ def chunk_to_rose(sgroup, accumulator):
             full_count = len(sgroup.index)
             frequency = 0
             if full_count > 0:
-            	frequency = round(((count / full_count) * 100), 2)
+                frequency = round(((count / full_count) * 100), 2)
 
             accumulator = accumulator.append(
                 {
@@ -50,7 +50,7 @@ def chunk_to_rose(sgroup, accumulator):
                     "direction_class": direction,
                     "speed_range": bucket,
                     "count": count,
-                    "frequency": frequency
+                    "frequency": frequency,
                 },
                 ignore_index=True,
             )
@@ -59,12 +59,12 @@ def chunk_to_rose(sgroup, accumulator):
 
 
 # Make this skippable during dev
-preprocess = True
+preprocess = False
 
 print("Looking for station CSV files in ", directory)
 
-print("*** Preprocessing station data for wind roses... ***")
 if preprocess:
+    print("*** Preprocessing station data for wind roses & averages... ***")
     for filename in os.listdir(directory):
         d = pd.read_csv(os.path.join(directory, filename))
 
@@ -79,13 +79,12 @@ if preprocess:
         # for the wind roses.
         d = d[d["drct"] != 0]
 
+        # TODO: get & count "calm winds"
         # TODO -- keep a count of these for display
         d = d[d["sped_adj"] != 0]
 
         # Pull month out of t_round column.
-        d = d.assign(
-            month=pd.to_numeric(d["t_round"].str.slice(5,7))
-        )
+        d = d.assign(month=pd.to_numeric(d["t_round"].str.slice(5, 7)))
         d = d.drop(columns=["t_round"])
 
         # Rename remaining columns
@@ -99,7 +98,31 @@ if preprocess:
 if preprocess == False:
     data = pd.read_pickle("stations.pickle")
 
+
+print("*** Preprocessing monthly averages ***")
+
+mean_cols = ["station", "mean", "month", "sd"]
+means = pd.DataFrame(columns=mean_cols)
+groups = data.groupby(["sid"])
+for station_name, station in groups:
+    t = pd.DataFrame(columns=mean_cols)
+    station_grouped_by_month = station.groupby(station["month"])
+    t = t.assign(
+        mean=station_grouped_by_month.mean()["speed"],
+        sd=station_grouped_by_month.std()["speed"],
+        station=station_name,
+    )
+    t = t.assign(month = t.index)
+    means = means.append(t)
+
+means.reset_index()
+means.to_pickle("means.pickle")
+means.to_csv("means.csv")
+
+exit()
+
 print("*** Preprocessing wind rose frequency counts... ***")
+
 
 """
 
@@ -131,12 +154,12 @@ for station_name, station in groups:
     # Yearly data.
     acc = pd.DataFrame(columns=proc_cols)
     t = chunk_to_rose(station, acc)
-    t = t.assign(month=0) # year
+    t = t.assign(month=0)  # year
     rose_data = rose_data.append(t)
 
     # Monthly data.
-    stations_grouped_by_month = station.groupby(station["month"])
-    for month, station_by_month in stations_grouped_by_month:
+    station_grouped_by_month = station.groupby(station["month"])
+    for month, station_by_month in station_grouped_by_month:
         acc = pd.DataFrame(columns=proc_cols)
         t = chunk_to_rose(station_by_month, acc)
         t = t.assign(month=month)
