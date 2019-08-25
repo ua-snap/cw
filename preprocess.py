@@ -7,7 +7,7 @@ from luts import speed_ranges
 directory = "./data/station"
 cols = ["sid", "direction", "speed", "month"]
 data = pd.DataFrame(columns=cols)
-
+mean_data = pd.DataFrame(columns=cols)
 
 def chunk_to_rose(sgroup, accumulator):
     """
@@ -59,7 +59,7 @@ def chunk_to_rose(sgroup, accumulator):
 
 
 # Make this skippable during dev
-preprocess = False
+preprocess = True
 
 print("Looking for station CSV files in ", directory)
 
@@ -71,6 +71,10 @@ if preprocess:
         # Throw away columns we won't use, and null values
         d = d.drop(columns=["sped", "t_actual"])
         d = d.dropna()
+
+        # Copy for slightly different treatment of
+        # station data for averages
+        m = d.copy()
 
         # Toss rows where direction is 0, because
         # this represents unclear direction.  Otherwise,
@@ -85,25 +89,31 @@ if preprocess:
 
         # Pull month out of t_round column.
         d = d.assign(month=pd.to_numeric(d["t_round"].str.slice(5, 7)))
+        m = m.assign(month=pd.to_numeric(m["t_round"].str.slice(5, 7)))
         d = d.drop(columns=["t_round"])
+        m = m.drop(columns=["t_round"])
 
         # Rename remaining columns
         d.columns = cols
+        m.columns = cols
         data = data.append(d)
+        mean_data = data.append(m)
 
     data.to_pickle("stations.pickle")
     data.to_csv("stations.csv")
+    mean_data.to_pickle("mean_stations.pickle")
+    mean_data.to_csv("mean_stations.csv")
 
 # If we skipped the ingest, read that output.
 if preprocess == False:
     data = pd.read_pickle("stations.pickle")
-
+    mean_data = pd.read_pickle("mean_stations.pickle")
 
 print("*** Preprocessing monthly averages ***")
 
 mean_cols = ["station", "mean", "month", "sd"]
 means = pd.DataFrame(columns=mean_cols)
-groups = data.groupby(["sid"])
+groups = mean_data.groupby(["sid"])
 for station_name, station in groups:
     t = pd.DataFrame(columns=mean_cols)
     station_grouped_by_month = station.groupby(station["month"])
