@@ -74,7 +74,7 @@ if preprocess:
 
         # Copy for slightly different treatment of
         # station data for averages
-        m = d.copy()
+        m = d.copy(deep=True)
 
         # Toss rows where direction is 0, because
         # this represents unclear direction.  Otherwise,
@@ -97,7 +97,7 @@ if preprocess:
         d.columns = cols
         m.columns = cols
         data = data.append(d)
-        mean_data = data.append(m)
+        mean_data = mean_data.append(m)
 
     data.to_pickle("stations.pickle")
     data.to_csv("stations.csv")

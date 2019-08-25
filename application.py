@@ -150,6 +150,9 @@ def update_means(community):
                 y=d["mean"],
                 error_y=dict(
                     array=d["sd"],
+                    # Don't show "negative" (lower) wind speed SD because
+                    # it can sink below 0.
+                    arrayminus=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                     visible=True,
                     color=luts.speed_ranges["22+"]["color"]
                 )
