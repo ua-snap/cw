@@ -9,6 +9,7 @@ from plotly.subplots import make_subplots
 import dash
 from dash.dependencies import Input, Output
 import pandas as pd
+import numpy as np
 from gui import layout
 import luts
 
@@ -75,7 +76,9 @@ def update_place_dropdown(selected_on_map):
     # map click handles.
     # TODO look at customdata property here
     if selected_on_map is not None:
-        c = luts.communities[luts.communities["place"] == selected_on_map["points"][0]["text"]]
+        c = luts.communities[
+            luts.communities["place"] == selected_on_map["points"][0]["text"]
+        ]
         return c.index.tolist()[0]
     # Return a default
     return "PAFA"
@@ -125,6 +128,11 @@ def update_means(community):
     """ Create a bar plot of average wind speeds. """
 
     d = means.loc[(means["station"] == community)]
+
+    # If the standard deviation is greater than the
+    # mean, ensure it doesn't descend below zero
+    d = d.assign(lower_bound=np.where((d["mean"] - d["sd"] > 0), d["sd"], d["mean"]))
+
     c_name = luts.communities.loc[community]["place"]
 
     fig = go.Figure(
@@ -143,19 +151,15 @@ def update_means(community):
         data=[
             go.Bar(
                 name="Average wind speed (mph)",
-                marker=dict(
-                    color=luts.speed_ranges["14-18"]["color"],
-                ),
+                marker=dict(color=luts.speed_ranges["14-18"]["color"]),
                 x=[month for num, month in luts.months_lut.items()],
                 y=d["mean"],
                 error_y=dict(
                     array=d["sd"],
-                    # Don't show "negative" (lower) wind speed SD because
-                    # it can sink below 0.
-                    arrayminus=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    arrayminus=d["lower_bound"],
                     visible=True,
-                    color=luts.speed_ranges["22+"]["color"]
-                )
+                    color=luts.speed_ranges["22+"]["color"],
+                ),
             )
         ],
     )
