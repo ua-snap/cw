@@ -152,6 +152,8 @@ main_layout = html.Div(
                     id='means',
                     figure=go.Figure()
                 ),
+                html.H3("Wind roses", className="title is-3"),
+                html.P("Center hole size shows frequency of calm conditions.", className="content is-size-5"),
                 dcc.Graph(
                     id='rose',
                     figure=go.Figure()

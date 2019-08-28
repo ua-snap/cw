@@ -16,6 +16,7 @@ import luts
 # Read pickled data blobs and other items used from env
 data = pd.read_pickle("roses.pickle")
 means = pd.read_pickle("means.pickle")
+calms = pd.read_pickle("calms.pickle")
 
 # We set the requests_pathname_prefix to enable
 # custom URLs.
@@ -169,12 +170,17 @@ def update_means(community):
 
 @app.callback(Output("rose", "figure"), [Input("communities-dropdown", "value")])
 def update_rose(community):
-    """ Generate wind rose for selected community """
+    """ Generate cumulative wind rose for selected community """
     traces = []
 
     # Subset for community & 0=year
     d = data.loc[(data["sid"] == community) & (data["month"] == 0)]
     get_rose_traces(d, traces, "", True)
+
+    # Compute % calm, use this to modify the hole size
+    c = calms[calms["sid"] == community]
+    c_mean = c.mean()
+    c_mean = round(c_mean["percent"], 1)
 
     c_name = luts.communities.loc[community]["place"]
 
@@ -183,6 +189,16 @@ def update_rose(community):
         "height": 700,
         "margin": {"l": 0, "r": 0, "b": 100, "t": 50},
         "legend": {"orientation": "h", "x": 0, "y": 1},
+        "annotations": [
+            {
+                "x": 0.5,
+                "y": 0.5,
+                "showarrow": False,
+                "text": str(c_mean) + r"% calm",
+                "xref": "paper",
+                "yref": "paper"
+            }
+        ],
         "polar": {
             "legend": {"orientation": "h"},
             "angularaxis": {
@@ -200,12 +216,17 @@ def update_rose(community):
             "radialaxis": {
                 "color": "#888",
                 "gridcolor": "#efefef",
-                "title": {"text": "Frequency"},
-                "ticks": "",  # hide tick marks
+                "title": {"text": "Frequency", "side": "right"},
+                "ticksuffix": "%",
+                "showticksuffix": "last",
+                "tickcolor": "rgba(0, 0, 0, 0)",
+                "tick0": 0,
+                "dtick": 3,
+                "ticklen": 10,
                 "showline": False,  # hide the dark axis line
                 "tickfont": {"color": "#444"},
             },
-            "hole": 0.1,
+            "hole": c_mean / 100,
         },
     }
 
@@ -219,6 +240,8 @@ def update_rose_monthly(community):
     """
     Create a grid of subplots for all wind roses.
     """
+
+    # t = top margin in % of figure.
     subplot_spec = dict(type="polar", t=0.01)
     fig = make_subplots(
         rows=4,
@@ -253,6 +276,13 @@ def update_rose_monthly(community):
 
     c_name = luts.communities.loc[community]["place"]
 
+    # Generate calms.  Subset by community, re-index
+    # for easy access, preprocess percent hole size,
+    # drop unused columns.
+    c = calms[calms["sid"] == community]
+    c = c.reset_index()
+    c = c.assign(percent=c["percent"] / 100)
+
     polar_props = dict(
         bgcolor="#fff",
         angularaxis=dict(
@@ -260,6 +290,8 @@ def update_rose_monthly(community):
             tickvals=[0, 45, 90, 135, 180, 225, 270, 315],
             ticktext=["N", "NE", "E", "SE", "S", "SW", "W", "NW"],
             tickfont=dict(color="#444", size=10),
+            ticksuffix="%",
+            showticksuffix="last",
             showline=False,  # no boundary circles
             color="#888",  # set most colors to #888
             gridcolor="#efefef",
@@ -269,16 +301,16 @@ def update_rose_monthly(community):
         radialaxis=dict(
             color="#888",
             gridcolor="#efefef",
-            title=dict(text="Frequency (%)"),
             ticks="",  # hide tick marks
+            tick0=0,
+            dtick=3,
             showline=False,  # hide the dark axis line
             tickfont=dict(color="#444"),
-        ),
-        hole=0.1,
+        )
     )
     fig.update_layout(
         title=dict(
-            text="Monthly Wind Speed Distribution, 1980-2015, " + c_name,
+            text="Monthly Wind Speed/Direction Distribution (%), 1980-2015, " + c_name,
             font=dict(family="Open Sans"),
         ),
         margin=dict(l=50, t=100, r=50, b=0),
@@ -289,19 +321,20 @@ def update_rose_monthly(community):
         plot_bgcolor="#fff",
         # We need to explicitly define the rotations
         # we need for each named subplot.
-        polar=polar_props,
-        polar1=polar_props,
-        polar2=polar_props,
-        polar3=polar_props,
-        polar4=polar_props,
-        polar5=polar_props,
-        polar6=polar_props,
-        polar7=polar_props,
-        polar8=polar_props,
-        polar9=polar_props,
-        polar10=polar_props,
-        polar11=polar_props,
-        polar12=polar_props,
+        # TODO is there a more elegant way to
+        # generate this list of things?
+        polar1={**polar_props, **{"hole": c.iloc[0]["percent"]}},
+        polar2={**polar_props, **{"hole": c.iloc[1]["percent"]}},
+        polar3={**polar_props, **{"hole": c.iloc[2]["percent"]}},
+        polar4={**polar_props, **{"hole": c.iloc[3]["percent"]}},
+        polar5={**polar_props, **{"hole": c.iloc[4]["percent"]}},
+        polar6={**polar_props, **{"hole": c.iloc[5]["percent"]}},
+        polar7={**polar_props, **{"hole": c.iloc[6]["percent"]}},
+        polar8={**polar_props, **{"hole": c.iloc[7]["percent"]}},
+        polar9={**polar_props, **{"hole": c.iloc[8]["percent"]}},
+        polar10={**polar_props, **{"hole": c.iloc[9]["percent"]}},
+        polar11={**polar_props, **{"hole": c.iloc[10]["percent"]}},
+        polar12={**polar_props, **{"hole": c.iloc[11]["percent"]}}
     )
     return fig
 

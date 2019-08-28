@@ -1,5 +1,6 @@
 # pylint: disable=all
 import pandas as pd
+import dask.dataframe as dd
 import os
 from datetime import datetime
 from luts import speed_ranges
@@ -9,8 +10,126 @@ cols = ["sid", "direction", "speed", "month"]
 data = pd.DataFrame(columns=cols)
 mean_data = pd.DataFrame(columns=cols)
 
+def preprocess_stations():
+    """
+    This produces two (large) files which combine
+    all the individual station files into one tidy table.
+
+    stations.pickle is ready to be processed into the wind roses.
+    Values with direction=0 or speed=0 are dropped to avoid
+    north bias.
+
+    mean_stations.pickle includes direction=0 and speed=0.
+
+    For both, any rows with N/A values are dropped.
+    """
+    if preprocess:
+        print("*** Preprocessing station data for wind roses & averages... ***")
+        print("Looking for station CSV files in ", directory)
+
+        for filename in os.listdir(directory):
+            d = pd.read_csv(os.path.join(directory, filename))
+
+            # Throw away columns we won't use, and null values
+            d = d.drop(columns=["sped", "t_actual"])
+            d = d.dropna()
+
+            # Copy for slightly different treatment of
+            # station data for averages
+            m = d.copy(deep=True)
+
+            # Toss rows where direction is 0, because
+            # this represents unclear direction.  Otherwise,
+            # the data has a "north bias."  Also drop
+            # values where the speed is 0 (calm)
+            # for the wind roses.
+            d = d[d["drct"] != 0]
+            d = d[d["sped_adj"] != 0]
+
+            # Pull month out of t_round column.
+            d = d.assign(month=pd.to_numeric(d["t_round"].str.slice(5, 7)))
+            m = m.assign(month=pd.to_numeric(m["t_round"].str.slice(5, 7)))
+            m = m.assign(year=pd.to_numeric(m["t_round"].str.slice(0, 4)))
+            d = d.drop(columns=["t_round"])
+            m = m.drop(columns=["t_round"])
+
+            # Rename remaining columns
+            d.columns = cols
+            m.columns = cols
+            data = data.append(d)
+            mean_data = mean_data.append(m)
+
+        data.to_pickle("stations.pickle")
+        data.to_csv("stations.csv")
+        mean_data.to_pickle("mean_stations.pickle")
+        mean_data.to_csv("mean_stations.csv")
+
+def process_monthly_averages(mean_data):
+    """
+
+    Prepare data for Monthly Averages chart.
+    In addition to the mean, we need to generate:
+
+    standard deviation of the 35 monthly averages
+        - compute averages for each month for each year
+        - compute std dev across these
+
+    standard deviation of all hourly values in a calendar month
+        - group all data by month, compute std across this set
+
+    """
+    print("*** Preprocessing monthly averages ***")
+
+    mean_cols = ["station", "mean", "month", "sd"]
+    means = pd.DataFrame(columns=mean_cols)
+    groups = mean_data.groupby(["sid"])
+    for station_name, station in groups:
+        t = pd.DataFrame(columns=mean_cols)
+        station_grouped_by_month = station.groupby(station["month"])
+        t = t.assign(
+            mean=station_grouped_by_month.mean()["speed"].apply(lambda x: round(x, 1)),
+            sd=station_grouped_by_month.std()["speed"].apply(lambda x: round(x, 1)),
+            station=station_name,
+        )
+        t = t.assign(month = t.index)
+        means = means.append(t)
+
+    means.reset_index()
+    means.to_pickle("means.pickle")
+    means.to_csv("means.csv")
+
+def process_calm(mean_data):
+    """
+    For each station/year/month, generate a count
+    of # of calm measurements.
+    """
+    print("*** Generating calm counts... ***")
+
+    # Create temporary structure which holds
+    # total wind counts and counts where calm to compute
+    # % of calm measurements.
+    calms = pd.DataFrame(columns=["sid", "total", "calm", "percent"])
+
+    # 67 partitions is arbitrary (= # of stations).
+    # Dask will figure it out.
+    t = mean_data.groupby(["sid", "month"]).size().reset_index().compute()
+    calms = t
+
+    # Drop all rows with nonzero wind or direction
+    d = mean_data[mean_data["direction"] == 0]
+    d = d.groupby(["sid", "month"]).size().reset_index().compute()
+
+    calms = calms.assign(calm=d[[0]])
+    calms.columns=["sid", "month", "total", "calm"]
+    calms = calms.assign(percent=round(calms["calm"] / calms["total"], 3) * 100)
+    calms.to_csv("calms.csv")
+    calms.to_pickle("calms.pickle")
+
 def chunk_to_rose(sgroup, accumulator):
     """
+    Builds data suitable for Plotly's wind roses from
+    a subset of data.
+
     Given a subset of data, group by direction and speed.
     Return accumulator of whatever the results of the
     incoming chunk are.
@@ -57,126 +176,61 @@ def chunk_to_rose(sgroup, accumulator):
 
     return accumulator
 
+def process_roses(data):
+    """
+    For each station we need one trace for each direction.
 
-# Make this skippable during dev
-preprocess = True
+    Each direction has a data series containing the frequency
+    of winds within a certain range.
 
-print("Looking for station CSV files in ", directory)
+    Columns:
 
-if preprocess:
-    print("*** Preprocessing station data for wind roses & averages... ***")
-    for filename in os.listdir(directory):
-        d = pd.read_csv(os.path.join(directory, filename))
+    sid - stationid
+    direction_class - number between 0 and 35.  0 represents
+       directions between 360-005º (north), and so forth by 10 degree
+       intervals.
+    speed_range - text fragment from luts.py for the speed class
+    month - 0 for year, 1-12 for month
 
-        # Throw away columns we won't use, and null values
-        d = d.drop(columns=["sped", "t_actual"])
-        d = d.dropna()
+    """
+    print("*** Preprocessing wind rose frequency counts... ***")
 
-        # Copy for slightly different treatment of
-        # station data for averages
-        m = d.copy(deep=True)
+    proc_cols = ["sid", "direction_class", "speed_range", "count", "month"]
+    rose_data = pd.DataFrame(columns=proc_cols)
 
-        # Toss rows where direction is 0, because
-        # this represents unclear direction.  Otherwise,
-        # the data has a "north bias."  Also drop
-        # values where the speed is 0 (calm)
-        # for the wind roses.
-        d = d[d["drct"] != 0]
+    # Bin into 36 categories.
+    bins = list(range(5, 356, 10))
+    bin_names = list(range(1, 36))
 
-        # TODO: get & count "calm winds"
-        # TODO -- keep a count of these for display
-        d = d[d["sped_adj"] != 0]
-
-        # Pull month out of t_round column.
-        d = d.assign(month=pd.to_numeric(d["t_round"].str.slice(5, 7)))
-        m = m.assign(month=pd.to_numeric(m["t_round"].str.slice(5, 7)))
-        d = d.drop(columns=["t_round"])
-        m = m.drop(columns=["t_round"])
-
-        # Rename remaining columns
-        d.columns = cols
-        m.columns = cols
-        data = data.append(d)
-        mean_data = mean_data.append(m)
-
-    data.to_pickle("stations.pickle")
-    data.to_csv("stations.csv")
-    mean_data.to_pickle("mean_stations.pickle")
-    mean_data.to_csv("mean_stations.csv")
-
-# If we skipped the ingest, read that output.
-if preprocess == False:
-    data = pd.read_pickle("stations.pickle")
-    mean_data = pd.read_pickle("mean_stations.pickle")
-
-print("*** Preprocessing monthly averages ***")
-
-mean_cols = ["station", "mean", "month", "sd"]
-means = pd.DataFrame(columns=mean_cols)
-groups = mean_data.groupby(["sid"])
-for station_name, station in groups:
-    t = pd.DataFrame(columns=mean_cols)
-    station_grouped_by_month = station.groupby(station["month"])
-    t = t.assign(
-        mean=station_grouped_by_month.mean()["speed"].apply(lambda x: round(x, 1)),
-        sd=station_grouped_by_month.std()["speed"].apply(lambda x: round(x, 1)),
-        station=station_name,
-    )
-    t = t.assign(month = t.index)
-    means = means.append(t)
-
-means.reset_index()
-means.to_pickle("means.pickle")
-means.to_csv("means.csv")
-
-exit()
-
-print("*** Preprocessing wind rose frequency counts... ***")
-
-
-"""
-
-For each station we need one trace for each direction.
-
-Each direction has a data series containing the frequency
-of winds within a certain range.
-
-Columns:
-
-sid - stationid
-direction_class - number between 0 and 35.  0 represents
-   directions between 360-005º (north), and so forth by 10 degree
-   intervals.
-speed_range - text fragment from luts.py for the speed class
-month - 0 for year, 1-12 for month
-
-"""
-
-proc_cols = ["sid", "direction_class", "speed_range", "count", "month"]
-rose_data = pd.DataFrame(columns=proc_cols)
-
-# Bin into 36 categories.
-bins = list(range(5, 356, 10))
-bin_names = list(range(1, 36))
-
-groups = data.groupby(["sid"])
-for station_name, station in groups:
-    # Yearly data.
-    acc = pd.DataFrame(columns=proc_cols)
-    t = chunk_to_rose(station, acc)
-    t = t.assign(month=0)  # year
-    rose_data = rose_data.append(t)
-
-    # Monthly data.
-    station_grouped_by_month = station.groupby(station["month"])
-    # TODO -- can this be rewritten to avoid looping
-    # over the groupby?  If so, it'd be much much faster.
-    for month, station_by_month in station_grouped_by_month:
+    groups = data.groupby(["sid"])
+    for station_name, station in groups:
+        # Yearly data.
         acc = pd.DataFrame(columns=proc_cols)
-        t = chunk_to_rose(station_by_month, acc)
-        t = t.assign(month=month)
+        t = chunk_to_rose(station, acc)
+        t = t.assign(month=0)  # year
         rose_data = rose_data.append(t)
 
+        # Monthly data.
+        station_grouped_by_month = station.groupby(station["month"])
+        # TODO -- can this be rewritten to avoid looping
+        # over the groupby?  If so, it'd be much much faster.
+        for month, station_by_month in station_grouped_by_month:
+            acc = pd.DataFrame(columns=proc_cols)
+            t = chunk_to_rose(station_by_month, acc)
+            t = t.assign(month=month)
+            rose_data = rose_data.append(t)
 
-rose_data.to_pickle("roses.pickle")
-rose_data.to_csv("roses.csv")
+    rose_data.to_pickle("roses.pickle")
+    rose_data.to_csv("roses.csv")
+
+# Make this skippable during dev
+preprocess = False
+
+if preprocess:
+    preprocess_stations()
+
+data = pd.read_pickle("stations.pickle")
+mean_data = dd.read_csv("mean_stations.csv")
+
+process_calm(mean_data)
+

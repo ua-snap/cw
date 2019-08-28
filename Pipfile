@@ -11,6 +11,7 @@ dash-core-components = "*"
 plotly = "*"
 dash_dangerously_set_inner_html = "*"
 pandas = "*"
+dask = {extras = ["dataframe"],version = "*"}
 
 [dev-packages]
 flask = "*"
