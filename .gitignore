@@ -6,13 +6,10 @@
 
 # Raw data
 data/*
-stations.pickle
+
+# These are too big.
 stations.csv
-roses.csv
-means.csv
-mean_stations.pickle
 mean_stations.csv
-calms.csv
 
 ### Default Python stuff to ignore
 

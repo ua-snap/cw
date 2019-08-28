@@ -7,25 +7,26 @@ from luts import speed_ranges
 
 directory = "./data/station"
 cols = ["sid", "direction", "speed", "month"]
-data = pd.DataFrame(columns=cols)
-mean_data = pd.DataFrame(columns=cols)
 
 def preprocess_stations():
     """
     This produces two (large) files which combine
     all the individual station files into one tidy table.
 
-    stations.pickle is ready to be processed into the wind roses.
+    stations.csv is ready to be processed into the wind roses.
     Values with direction=0 or speed=0 are dropped to avoid
     north bias.
 
-    mean_stations.pickle includes direction=0 and speed=0.
+    mean_stations.csv includes direction=0 and speed=0.
 
     For both, any rows with N/A values are dropped.
     """
     if preprocess:
         print("*** Preprocessing station data for wind roses & averages... ***")
         print("Looking for station CSV files in ", directory)
+
+        data = pd.DataFrame(columns=cols)
+        mean_data = pd.DataFrame(columns=cols)
 
         for filename in os.listdir(directory):
             d = pd.read_csv(os.path.join(directory, filename))
@@ -55,15 +56,14 @@ def preprocess_stations():
 
             # Rename remaining columns
             d.columns = cols
-            m.columns = cols
+            m.columns = ["sid", "direction", "speed", "month", "year"]
             data = data.append(d)
             mean_data = mean_data.append(m)
 
-        data.to_pickle("stations.pickle")
         data.to_csv("stations.csv")
-        mean_data.to_pickle("mean_stations.pickle")
         mean_data.to_csv("mean_stations.csv")
 
+# Needs Pandas DF not Dask
 def process_monthly_averages(mean_data):
     """
 
@@ -95,8 +95,23 @@ def process_monthly_averages(mean_data):
         means = means.append(t)
 
     means.reset_index()
-    means.to_pickle("means.pickle")
     means.to_csv("means.csv")
+
+def averages_by_month(mean_data):
+    """
+    Compute averages for each month by year.
+    """
+    print("*** Precomputing monthly averages by year... ***")
+    d = mean_data.groupby(["sid", "year", "month"]).mean().compute()
+
+    # Drop indices and get table in good shape for writing
+    d = d.reset_index()
+    d = d.drop(["direction"], axis=1)
+    # Weird code -- drop the prior index, which is unnamed
+    d = d.loc[:, ~d.columns.str.contains('^Unnamed')]
+    d = d.astype({"year":"int16", "month":"int16"})
+    d = d.assign(speed=round(d["speed"], 1))
+    d.to_csv("monthly_averages.csv")
 
 def process_calm(mean_data):
     """
@@ -123,7 +138,6 @@ def process_calm(mean_data):
     calms.columns=["sid", "month", "total", "calm"]
     calms = calms.assign(percent=round(calms["calm"] / calms["total"], 3) * 100)
     calms.to_csv("calms.csv")
-    calms.to_pickle("calms.pickle")
 
 def chunk_to_rose(sgroup, accumulator):
     """
@@ -220,7 +234,6 @@ def process_roses(data):
             t = t.assign(month=month)
             rose_data = rose_data.append(t)
 
-    rose_data.to_pickle("roses.pickle")
     rose_data.to_csv("roses.csv")
 
 # Make this skippable during dev
@@ -229,8 +242,8 @@ preprocess = False
 if preprocess:
     preprocess_stations()
 
-data = pd.read_pickle("stations.pickle")
+data = pd.read_csv("stations.csv", index_col=[0])
 mean_data = dd.read_csv("mean_stations.csv")
 
-process_calm(mean_data)
-
+# process_calm(mean_data)
+averages_by_month(mean_data)

@@ -13,10 +13,11 @@ import numpy as np
 from gui import layout
 import luts
 
-# Read pickled data blobs and other items used from env
-data = pd.read_pickle("roses.pickle")
-means = pd.read_pickle("means.pickle")
-calms = pd.read_pickle("calms.pickle")
+# Read data blobs and other items used from env
+data = pd.read_csv("roses.csv")
+means = pd.read_csv("means.csv")
+calms = pd.read_csv("calms.csv")
+monthly_means = pd.read_csv("monthly_averages.csv")
 
 # We set the requests_pathname_prefix to enable
 # custom URLs.
@@ -124,6 +125,44 @@ def get_rose_traces(d, traces, month, showlegend=False):
         traces.append(go.Barpolar(props))
 
 
+@app.callback(Output("means_box", "figure"), [Input("communities-dropdown", "value")])
+def update_box_plots(community):
+    """ Generate box plot for monthly averages """
+
+    d = monthly_means.loc[(monthly_means["sid"] == community)]
+    c_name = luts.communities.loc[community]["place"]
+    return go.Figure(
+        layout=dict(
+            title="Average monthly wind speed (mph), 1980-2015, " + c_name,
+            showlegend=False,
+            boxmode="group",
+            legend={"font": {"family": "Open Sans", "size": 10}},
+            yaxis={"title": "Wind speed (mph)"},
+            height=550,
+            margin={"l": 50, "r": 50, "b": 50, "t": 50, "pad": 4},
+            xaxis=dict(
+                tickvals=list(range(1, 13)),
+                ticktext=["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+            )
+        ),
+        data=[
+            go.Box(
+                name="Average wind speed",
+                boxpoints="all",
+                jitter=0.3,
+                x=d.month,
+                y=d.speed,
+                marker=dict(
+                    color='rgb(9,56,125)'
+                ),
+                line=dict(
+                    color='rgb(9,56,125)'
+                )
+            )
+        ],
+    )
+
+
 @app.callback(Output("means", "figure"), [Input("communities-dropdown", "value")])
 def update_means(community):
     """ Create a bar plot of average wind speeds. """
@@ -196,7 +235,7 @@ def update_rose(community):
                 "showarrow": False,
                 "text": str(c_mean) + r"% calm",
                 "xref": "paper",
-                "yref": "paper"
+                "yref": "paper",
             }
         ],
         "polar": {
@@ -306,7 +345,7 @@ def update_rose_monthly(community):
             dtick=3,
             showline=False,  # hide the dark axis line
             tickfont=dict(color="#444"),
-        )
+        ),
     )
     fig.update_layout(
         title=dict(
@@ -334,7 +373,7 @@ def update_rose_monthly(community):
         polar9={**polar_props, **{"hole": c.iloc[8]["percent"]}},
         polar10={**polar_props, **{"hole": c.iloc[9]["percent"]}},
         polar11={**polar_props, **{"hole": c.iloc[10]["percent"]}},
-        polar12={**polar_props, **{"hole": c.iloc[11]["percent"]}}
+        polar12={**polar_props, **{"hole": c.iloc[11]["percent"]}},
     )
     return fig
 
