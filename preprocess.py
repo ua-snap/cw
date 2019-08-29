@@ -97,6 +97,7 @@ def process_monthly_averages(mean_data):
     means.reset_index()
     means.to_csv("means.csv")
 
+# Needs Dask DF not Pandas.
 def averages_by_month(mean_data):
     """
     Compute averages for each month by year.
@@ -113,6 +114,7 @@ def averages_by_month(mean_data):
     d = d.assign(speed=round(d["speed"], 1))
     d.to_csv("monthly_averages.csv")
 
+# Requires Dask DF, not Pandas
 def process_calm(mean_data):
     """
     For each station/year/month, generate a count
@@ -131,7 +133,7 @@ def process_calm(mean_data):
     calms = t
 
     # Drop all rows with nonzero wind or direction
-    d = mean_data[mean_data["direction"] == 0]
+    d = mean_data[(mean_data["direction"] == 0) | (mean_data["speed"] == 0)]
     d = d.groupby(["sid", "month"]).size().reset_index().compute()
 
     calms = calms.assign(calm=d[[0]])
@@ -245,5 +247,5 @@ if preprocess:
 data = pd.read_csv("stations.csv", index_col=[0])
 mean_data = dd.read_csv("mean_stations.csv")
 
-# process_calm(mean_data)
-averages_by_month(mean_data)
+process_calm(mean_data)
+# averages_by_month(mean_data)
