@@ -255,7 +255,6 @@ def update_rose(community):
             "radialaxis": {
                 "color": "#888",
                 "gridcolor": "#efefef",
-                "title": {"text": "Frequency", "side": "right"},
                 "ticksuffix": "%",
                 "showticksuffix": "last",
                 "tickcolor": "rgba(0, 0, 0, 0)",
