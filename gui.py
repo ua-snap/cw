@@ -7,7 +7,7 @@ import json
 import plotly.graph_objs as go
 import dash_core_components as dcc
 import dash_html_components as html
-from luts import communities, months_lut, map_communities_trace, map_layout
+from luts import communities, months, map_communities_trace, map_layout
 
 path_prefix = os.environ["REQUESTS_PATHNAME_PREFIX"]
 
@@ -133,6 +133,11 @@ main_layout = html.Div(
         html.Div(
             className="section graph",
             children=[
+                html.H3("Average wind speeds by month", className="title is-3"),
+                html.P(
+                    "This chart shows monthly averages for each year.",
+                    className="content is-size-5"
+                ),
                 dcc.Graph(id="means_box", figure=go.Figure()),
                 dcc.Graph(id="means", figure=go.Figure()),
                 html.H3("Wind roses", className="title is-3"),

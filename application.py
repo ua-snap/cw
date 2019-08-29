@@ -141,8 +141,8 @@ def update_box_plots(community):
             height=550,
             margin={"l": 50, "r": 50, "b": 50, "t": 50, "pad": 4},
             xaxis=dict(
-                tickvals=list(range(1, 13)),
-                ticktext=["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+                tickvals=list(luts.months.keys()),
+                ticktext=list(luts.months.values())
             )
         ),
         data=[
@@ -153,10 +153,10 @@ def update_box_plots(community):
                 x=d.month,
                 y=d.speed,
                 marker=dict(
-                    color='rgb(9,56,125)'
+                    color=luts.speed_ranges["22+"]["color"]
                 ),
                 line=dict(
-                    color='rgb(9,56,125)'
+                    color=luts.speed_ranges["22+"]["color"]
                 )
             )
         ],
@@ -192,7 +192,7 @@ def update_means(community):
             go.Bar(
                 name="Average wind speed (mph)",
                 marker=dict(color=luts.speed_ranges["14-18"]["color"]),
-                x=[month for num, month in luts.months_lut.items()],
+                x=[month for num, month in luts.months.items()],
                 y=d["mean"],
                 error_y=dict(
                     array=d["sd"],
@@ -293,7 +293,7 @@ def update_rose_monthly(community):
             [subplot_spec, subplot_spec, subplot_spec],
             [subplot_spec, subplot_spec, subplot_spec],
         ],
-        subplot_titles=list(luts.months_lut.values()),
+        subplot_titles=list(luts.months.values()),
     )
 
     month = 1

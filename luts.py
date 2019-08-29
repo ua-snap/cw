@@ -10,7 +10,7 @@ import plotly.graph_objs as go
 
 communities = pd.read_csv("places.csv", index_col="sid")
 
-months_lut = {
+months = {
     1: "January",
     2: "February",
     3: "March",
@@ -50,13 +50,13 @@ map_layout = go.Layout(
 # The lowest bound excludes actual 0 (calm) readings,
 # this is deliberate.
 speed_ranges = {
-    "0-6": {"range": [0.001, 6], "color": "#f1eef6"},
-    "6-10": {"range": [6, 10], "color": "#d0d1e6"},
-    "10-14": {"range": [10, 14], "color": "#a6bddb"},
-    "14-18": {"range": [14, 18], "color": "#74a9cf"},
-    "18-22": {"range": [18, 22], "color": "#2b8cbe"},
+    "0-6": {"range": [0.001, 6], "color": "#d0d1e6"},
+    "6-10": {"range": [6, 10], "color": "#a6bddb"},
+    "10-14": {"range": [10, 14], "color": "#74a9cf"},
+    "14-18": {"range": [14, 18], "color": "#3690c0"},
+    "18-22": {"range": [18, 22], "color": "#0570b0"},
     "22+": {
         "range": [22, 1000],  # let's hope the upper bound is sufficient :-)
-        "color": "#045a8d",
+        "color": "#034e7b",
     },
 }
