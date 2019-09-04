@@ -54,7 +54,7 @@ header_section = html.Div(
                                     className="title is-3",
                                 ),
                                 html.H2(
-                                    "Explore historical and modeled wind data for Alaskan communities.  Choose a community to get started.",
+                                    "Explore historical and modeled wind data for Alaskan communities",
                                     className="subtitle is-5",
                                 ),
                             ],
@@ -129,6 +129,24 @@ form_fields = html.Div(
 main_layout = html.Div(
     className="container",
     children=[
+        html.Div(
+            className="section",
+            children=[
+                html.P(
+                    """
+                Choose a community from the list or map below to see wind data.  We are gathering feedback about how to extend this app, click the button below to give us your ideas!
+            """,
+                    className="content is-size-5",
+                ),
+                html.A(
+                    "Tell us how to enhance this app",
+                    className="button is-link",
+                    rel="external",
+                    target="_blank",
+                    href="http://snap.uaf.edu",
+                ),
+            ],
+        ),
         html.Div(className="section section--form", children=[form_fields]),
         html.Div(
             className="section graph",
@@ -136,7 +154,7 @@ main_layout = html.Div(
                 html.H3("Average wind speeds by month", className="title is-3"),
                 html.P(
                     "This chart shows monthly averages for each year.",
-                    className="content is-size-5"
+                    className="content is-size-5",
                 ),
                 dcc.Graph(id="means_box", figure=go.Figure()),
                 html.H3("Wind roses", className="title is-3"),
