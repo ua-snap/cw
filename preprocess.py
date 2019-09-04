@@ -92,17 +92,11 @@ def process_calm(mean_data):
     # Create temporary structure which holds
     # total wind counts and counts where calm to compute
     # % of calm measurements.
-    # TODO can this line be removed?  looks like it's
-    # overridden later
-    calms = pd.DataFrame(columns=["sid", "total", "calm", "percent"])
-
-    # 67 partitions is arbitrary (= # of stations).
-    # Dask will figure it out.
     t = mean_data.groupby(["sid", "month"]).size().reset_index().compute()
     calms = t
 
-    # Drop all rows with nonzero wind or direction
-    d = mean_data[(mean_data["direction"] == 0) | (mean_data["speed"] == 0)]
+    # Only keep rows where speed == 0
+    d = mean_data[(mean_data["speed"] == 0)]
     d = d.groupby(["sid", "month"]).size().reset_index().compute()
 
     calms = calms.assign(calm=d[[0]])
@@ -218,3 +212,4 @@ mean_data = dd.read_csv("mean_stations.csv")
 
 process_calm(mean_data)
 # averages_by_month(mean_data)
+# process_roses(data)
