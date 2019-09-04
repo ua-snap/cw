@@ -4,6 +4,7 @@ Community Winds app
 
 # pylint: disable=invalid-name, line-too-long, too-many-arguments
 import os
+import copy
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 import dash
@@ -68,7 +69,6 @@ app.index_string = f"""
 app.title = "Community Winds"
 app.layout = layout
 
-
 @app.callback(Output("communities-dropdown", "value"), [Input("map", "clickData")])
 def update_place_dropdown(selected_on_map):
     """ If user clicks on the map, update the drop down. """
@@ -105,6 +105,23 @@ def update_selected_community_on_map(community):
         "layout": luts.map_layout,
     }
 
+def get_rose_calm_month_annotations(titles, calm):
+    """
+    Return a list of correctly-positioned %calm indicators
+    for the monthly wind rose charts.
+    Take the already-generated list of titles and use
+    that pixel geometry to position the %calm info.
+    """
+    calm_annotations = copy.deepcopy(titles)
+
+    k = 0
+    for anno in calm_annotations:
+        anno["y"] = anno["y"] - 0.1225
+        anno["font"] = {"color":"#000", "size":10}
+        anno["text"] = str(round(calm.iloc[k]["percent"] * 100, 1)) + "%"
+        k += 1
+
+    return calm_annotations
 
 def get_rose_traces(d, traces, month, showlegend=False):
     """
@@ -312,6 +329,7 @@ def update_rose_monthly(community):
         i["y"] = i["y"] + 0.01
         i["font"] = dict(size=12, color="#444")
 
+
     c_name = luts.communities.loc[community]["place"]
 
     # Generate calms.  Subset by community, re-index
@@ -321,6 +339,10 @@ def update_rose_monthly(community):
     c = c.reset_index()
     c = c.assign(percent=c["percent"] / 100)
 
+    # Get calms as annotations, then merge
+    # them into the subgraph title annotations
+    fig["layout"]["annotations"] = fig["layout"]["annotations"] + get_rose_calm_month_annotations(fig["layout"]["annotations"], c)
+
     polar_props = dict(
         bgcolor="#fff",
         angularaxis=dict(
@@ -328,7 +350,6 @@ def update_rose_monthly(community):
             tickvals=[0, 45, 90, 135, 180, 225, 270, 315],
             ticktext=["N", "NE", "E", "SE", "S", "SW", "W", "NW"],
             tickfont=dict(color="#444", size=10),
-            ticksuffix="%",
             showticksuffix="last",
             showline=False,  # no boundary circles
             color="#888",  # set most colors to #888
@@ -339,9 +360,10 @@ def update_rose_monthly(community):
         radialaxis=dict(
             color="#888",
             gridcolor="#efefef",
-            ticks="",  # hide tick marks
-            tick0=0,
+            tick0=1,
             dtick=3,
+            ticksuffix="%",
+            showticksuffix="last",
             showline=False,  # hide the dark axis line
             tickfont=dict(color="#444"),
         ),
