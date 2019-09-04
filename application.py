@@ -117,7 +117,12 @@ def get_rose_calm_month_annotations(titles, calm):
     for anno in calm_annotations:
         anno["y"] = anno["y"] - 0.1225
         anno["font"] = {"color":"#000", "size":10}
-        anno["text"] = str(round(calm.iloc[k]["percent"] * 100, 1)) + "%"
+        calm_text = str(int(round(calm.iloc[k]["percent"] * 100))) + "%"
+        if calm.iloc[k]["percent"] > .2:
+            # If there's enough room, add the "calm" text fragment
+            calm_text += " calm"
+
+        anno["text"] = calm_text
         k += 1
 
     return calm_annotations
@@ -134,6 +139,7 @@ def get_rose_traces(d, traces, month, showlegend=False):
             r=dcr["frequency"].tolist(),
             theta=pd.to_numeric(dcr["direction_class"]) * 10,
             name=sr + " mph",
+            hovertemplate="%{r} %{fullData.name} winds from %{theta}<extra></extra>",
             marker_color=sr_info["color"],
             showlegend=showlegend,
             legendgroup="legend",
@@ -167,6 +173,8 @@ def update_box_plots(community):
                 fillcolor=luts.speed_ranges["10-14"]["color"],
                 x=d.month,
                 y=d.speed,
+                meta=d.year,
+                hovertemplate="%{x} %{meta}: %{y} mph",
                 marker=dict(
                     color=luts.speed_ranges["22+"]["color"]
                 ),
@@ -190,7 +198,7 @@ def update_rose(community):
     # Compute % calm, use this to modify the hole size
     c = calms[calms["sid"] == community]
     c_mean = c.mean()
-    c_mean = round(c_mean["percent"], 1)
+    c_mean = int(round(c_mean["percent"]))
 
     c_name = luts.communities.loc[community]["place"]
 
@@ -315,7 +323,7 @@ def update_rose_monthly(community):
             color="#888",
             gridcolor="#efefef",
             tickangle=0,
-            tick0=3,
+            tick0=1,
             dtick=3,
             ticksuffix="%",
             showticksuffix="last",
