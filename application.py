@@ -133,7 +133,7 @@ def get_rose_traces(d, traces, month, showlegend=False):
         props = dict(
             r=dcr["frequency"].tolist(),
             theta=pd.to_numeric(dcr["direction_class"]) * 10,
-            name=sr,
+            name=sr + " mph",
             marker_color=sr_info["color"],
             showlegend=showlegend,
             legendgroup="legend",
@@ -153,7 +153,7 @@ def update_box_plots(community):
             showlegend=False,
             boxmode="group",
             legend={"font": {"family": "Open Sans", "size": 10}},
-            yaxis={"title": "Wind speed (mph)"},
+            yaxis={"title": "Wind speed (mph)", "rangemode":"tozero"},
             height=550,
             margin={"l": 50, "r": 50, "b": 50, "t": 50, "pad": 4},
             xaxis=dict(
@@ -164,8 +164,7 @@ def update_box_plots(community):
         data=[
             go.Box(
                 name="Average wind speed",
-                boxpoints="all",
-                jitter=0.3,
+                fillcolor=luts.speed_ranges["10-14"]["color"],
                 x=d.month,
                 y=d.speed,
                 marker=dict(
@@ -315,7 +314,8 @@ def update_rose_monthly(community):
         radialaxis=dict(
             color="#888",
             gridcolor="#efefef",
-            tick0=1,
+            tickangle=0,
+            tick0=3,
             dtick=3,
             ticksuffix="%",
             showticksuffix="last",
