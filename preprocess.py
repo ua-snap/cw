@@ -63,39 +63,6 @@ def preprocess_stations():
         data.to_csv("stations.csv")
         mean_data.to_csv("mean_stations.csv")
 
-# Needs Pandas DF not Dask
-def process_monthly_averages(mean_data):
-    """
-
-    Prepare data for Monthly Averages chart.
-    In addition to the mean, we need to generate:
-
-    standard deviation of the 35 monthly averages
-        - compute averages for each month for each year
-        - compute std dev across these
-
-    standard deviation of all hourly values in a calendar month
-        - group all data by month, compute std across this set
-
-    """
-    print("*** Preprocessing monthly averages ***")
-
-    mean_cols = ["station", "mean", "month", "sd"]
-    means = pd.DataFrame(columns=mean_cols)
-    groups = mean_data.groupby(["sid"])
-    for station_name, station in groups:
-        t = pd.DataFrame(columns=mean_cols)
-        station_grouped_by_month = station.groupby(station["month"])
-        t = t.assign(
-            mean=station_grouped_by_month.mean()["speed"].apply(lambda x: round(x, 1)),
-            sd=station_grouped_by_month.std()["speed"].apply(lambda x: round(x, 1)),
-            station=station_name,
-        )
-        t = t.assign(month = t.index)
-        means = means.append(t)
-
-    means.reset_index()
-    means.to_csv("means.csv")
 
 # Needs Dask DF not Pandas.
 def averages_by_month(mean_data):
@@ -125,6 +92,8 @@ def process_calm(mean_data):
     # Create temporary structure which holds
     # total wind counts and counts where calm to compute
     # % of calm measurements.
+    # TODO can this line be removed?  looks like it's
+    # overridden later
     calms = pd.DataFrame(columns=["sid", "total", "calm", "percent"])
 
     # 67 partitions is arbitrary (= # of stations).

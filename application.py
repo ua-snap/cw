@@ -16,7 +16,6 @@ import luts
 
 # Read data blobs and other items used from env
 data = pd.read_csv("roses.csv")
-means = pd.read_csv("means.csv")
 calms = pd.read_csv("calms.csv")
 monthly_means = pd.read_csv("monthly_averages.csv")
 
@@ -178,50 +177,6 @@ def update_box_plots(community):
             )
         ],
     )
-
-
-@app.callback(Output("means", "figure"), [Input("communities-dropdown", "value")])
-def update_means(community):
-    """ Create a bar plot of average wind speeds. """
-
-    d = means.loc[(means["station"] == community)]
-
-    # If the standard deviation is greater than the
-    # mean, ensure it doesn't descend below zero
-    d = d.assign(lower_bound=np.where((d["mean"] - d["sd"] > 0), d["sd"], d["mean"]))
-
-    c_name = luts.communities.loc[community]["place"]
-
-    fig = go.Figure(
-        layout=dict(
-            title=dict(
-                text="Average monthly wind speed (mph), 1980-2015, " + c_name,
-                font=dict(family="Open Sans"),
-            ),
-            margin=dict(l=0, t=100, r=0, b=100),
-            showlegend=True,
-            legend=dict(x=0, y=0, orientation="h"),
-            height=550,
-            paper_bgcolor="#fff",
-            plot_bgcolor="#fff",
-        ),
-        data=[
-            go.Bar(
-                name="Average wind speed (mph)",
-                marker=dict(color=luts.speed_ranges["14-18"]["color"]),
-                x=[month for num, month in luts.months.items()],
-                y=d["mean"],
-                error_y=dict(
-                    array=d["sd"],
-                    arrayminus=d["lower_bound"],
-                    visible=True,
-                    color=luts.speed_ranges["22+"]["color"],
-                ),
-            )
-        ],
-    )
-
-    return fig
 
 
 @app.callback(Output("rose", "figure"), [Input("communities-dropdown", "value")])
