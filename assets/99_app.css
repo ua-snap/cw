@@ -24,7 +24,7 @@ g.bglayer {
 }
 
 .header {
-	background-color: rgba(239, 241, 226, 1.00);
+	background-color: #DDE4F2;
 	padding: 0;
 }
 
@@ -51,6 +51,47 @@ g.bglayer {
 	height: 5.4em;
 }
 
+
+.section.survey-link {
+	margin: -3ex 0;
+	padding-bottom: 0;
+}
+
+.section.survey-link a.button {
+	font-family: 'Open Sans';
+	font-weight: 500;
+}
+
+#communities-dropdown {
+	width: 20em;
+}
+
+div.Select-control {
+	border: 1px solid #888;
+	box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+#map {
+	width: 40em;
+}
+
+div.section.section--form {
+	padding-bottom: 0;
+}
+
+h3.title--rose {
+	margin-top: 1em;
+}
+
+#rose_monthly {
+	margin-top: -3em;
+}
+
+.help-text p {
+	max-width: 40em;
+}
+
+
 .footer p {
 	width: 50%;
 	margin: 1em auto;
@@ -64,6 +105,7 @@ g.bglayer {
 	height: 5em;
 	margin: 1em 1.5em;
 }
+
 
 ._dash-undo-redo {
 	display: none;

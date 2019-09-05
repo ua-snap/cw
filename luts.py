@@ -41,8 +41,8 @@ map_layout = go.Layout(
     hovermode="closest",
     mapbox=dict(
         style="stamen-terrain",
-        zoom=3,
-        center=dict(lat=65, lon=-155)),
+        zoom=2.5,
+        center=dict(lat=63, lon=-160)),
     showlegend=False,
     margin=dict(l=0, r=0, t=0, b=0),
 )

@@ -155,7 +155,10 @@ def update_box_plots(community):
     c_name = luts.communities.loc[community]["place"]
     return go.Figure(
         layout=dict(
-            title="Average monthly wind speed (mph), 1980-2015, " + c_name,
+            title=dict(
+                text="Average monthly wind speed, 1980-2015, " + c_name,
+                x=0.5,
+            ),
             showlegend=False,
             boxmode="group",
             legend={"font": {"family": "Open Sans", "size": 10}},
@@ -290,6 +293,7 @@ def update_rose_monthly(community):
     for i in fig["layout"]["annotations"]:
         i["y"] = i["y"] + 0.01
         i["font"] = dict(size=12, color="#444")
+        i["text"] = "<b>" + i["text"] + "</b>"
 
 
     c_name = luts.communities.loc[community]["place"]
@@ -333,8 +337,9 @@ def update_rose_monthly(community):
     )
     fig.update_layout(
         title=dict(
-            text="Monthly Wind Speed/Direction Distribution (%), 1980-2015, " + c_name,
-            font=dict(family="Open Sans"),
+            text="Monthly Wind Speed/Direction Distribution, 1980-2015, " + c_name,
+            font=dict(family="Open Sans", size=18),
+            x=0.5,
         ),
         margin=dict(l=50, t=100, r=50, b=0),
         font_size=10,
