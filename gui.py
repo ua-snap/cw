@@ -54,7 +54,7 @@ header_section = html.Div(
                                     className="title is-3",
                                 ),
                                 html.H2(
-                                    "Explore historical and modeled wind data for Alaska communities",
+                                    "Explore historical wind data for Alaska communities",
                                     className="subtitle is-5",
                                 ),
                             ],
