@@ -178,19 +178,35 @@ help_text = html.Div(
                 dcc.Markdown(
                     """
 
-### Source of wind data
+#### About these wind data
 
-Wind information for Alaska is presented based on the hourly wind reports from 67 observing sites around the state (see map).  For inclusion in the display tool, a station was required to have reported four or more hourly winds on at least 75% of the days in the 35-year period, 1981-2015.  Nearly all the sites are at airports.  Over the last two decades, most stations have been automated and are now part of either the ASOS (Automated Surface Observing System) network or the AWOS (Automated Weather Observing System) network operated by the Federal Aviation Administration.
+ * **Source**: [Iowa Environmental Mesonet](https://mesonet.agron.iastate.edu/request/download.phtml?network=AK_ASOS) run by Iowa State University. Houses data collected by the [Automated Surface Observing System](https://www.ncdc.noaa.gov/data-access/land-based-station-data/land-based-datasets/automated-surface-observing-system-asos) network and the [Automated Weather Observing System](https://www.ncdc.noaa.gov/data-access/land-based-station-data/land-based-datasets/automated-weather-observing-system-awos).
+ * **Measurement frequency**: Varies between locations, from every 5 minutes to every 3 hours. Winds were measured hourly in most cases; speeds were averaged to the nearest hour in cases where measurements were more frequent.
+ * **Observing site criteria**: We use data from 67 observing sites located across Alaska, mostly at airports (see map). For inclusion here, a station must have made 4 or more hourly wind measurements on at least 75% of the days during the period 1980-2015.
 
-### Data processing: Quality-control
+#### Data processing and quality control
 
-Because the instruments, their heights above the surface (now 10 meters), or their precise locations have undergone changes at some sites since 1980, the data from all stations were subjected to homogeneity tests.  If the wind speeds at a station showed a statistically significant change from one portion of the record to the next, the data prior to the change were adjusted by quantile mapping, a typical method for correcting biased meteorological data.  28 of the 67 stations underwent this type of adjustment.  Four of the stations displayed two discontinuities, in which case the quantile mapping adjustment to the later period was applied twice. Additional quality-control steps included removal of obviously erroneous reports (e.g., wind speeds exceeding 100 mph) and the removal of short-duration (< 6 hours) spikes in which an hourly wind speed was at least 30 mph greater than in immediately preceding and subsequent hours.
+ * Data were adjusted for homogeneity because some instrument heights (now 10 m) and/or precise locations have changed since 1980.
+ * Wind speeds at 28 stations showed a statistically significant change from one part of the record to the next. Therefore we adjusted the data prior to the change using quantile mapping, a typical method for correcting biased meteorological data.
+ * Four stations displayed two discontinuities. For these, we applied the quantile mapping adjustments to the later period.
+ * We also removed obviously wrong reports (e.g., wind speeds exceeding 100 mph) and short-duration (< 6 hour) spikes in which an hourly wind speed was at least 30 mph greater than in the immediately preceding and subsequent hours.
 
-### Displayed information
+#### About the data displays
 
-The displays for each site are designed to highlight the average (climatological) wind speed and direction.  The first display is a composite of box plots of the average monthly wind speeds (mph) by calendar month.  The averages (horizontal lines within boxes) are based on all the hourly reports for a particular calendar month.  The boxes represent the 25%/75% ranges of the monthly averages for the 35 different years.  The whiskers represent the full ranges of the monthly averages for the different years.
+Displays are designed to highlight average (climatological) wind speed (mph) and direction for a location.
 
-The second display consists of wind roses showing the distributions of wind by direction and speed.  The spokes point in the compass direction from which the wind was blowing (i.e., a spoke to the right denotes a wind from the east; a spoke pointing downward denotes a wind from the south).  There are 36 spokes, corresponding to the wind direction code in the hourly wind reports (01, 02,…36).  The concentric circles in each plot denote frequencies of occurrence (3%, 6%, 9%,…).   For each directional spoke, the frequencies of wind speeds in various ranges are displayed.  As shown in the legend to the left of the annual wind rose, darker shades of blue represent progressively higher wind speed categories (lightest shading for winds of 0-6 mph, darkest shading for winds of 22 mph or higher).  The frequency of calm wind reports (speed = 0) is indicated in the open circle at the center of each wind rose.
+**Average wind speeds by month**. A summary of box plots of average monthly wind speeds by month for the entire 35-year time span.
+
+ * Boxes represent the 25% and 75% ranges of monthly averages over 35 years.
+ * Averages (horizontal lines within boxes) are based on all hourly reports for a month.
+ * “Whiskers” (vertical lines above and below boxes) represent full ranges of typical variation of monthly averages for the different years, extended to the minimum and maximum points contained within 1.5 of the interquartile range (IQR, which is the height of the box shown).Points outside 1.5 IQR are considered outliers and drawn as points.
+ * Dots indicate outliers, or individual values outside the normal variation (outside of 1.5 IQR)
+
+**Wind frequency by direction and speed**. A collection of “wind roses” showing distributions of wind by speed and direction at the location of interest.
+
+ * The “spokes” in the rose point in the compass direction from which the wind was blowing (i.e., a spoke pointing to the right denotes a wind from the east).
+ * There are 36 spokes corresponding to the wind direction code in the hourly wind reports (01, 02, … 3).
+ * For each spoke, we display frequencies of wind speed occurrence (1%, 4%, 10%, &hellip;). These are denoted by concentric circles within each wind rose.
 
                 """,
                     className="is-size-5 content",
