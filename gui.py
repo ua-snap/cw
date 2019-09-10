@@ -153,16 +153,33 @@ main_layout = html.Div(
             children=[
                 html.Hr(),
                 html.H3("Average wind speeds by month", className="title is-4"),
-                html.P(
-                    "This chart shows monthly averages for each year.",
-                    className="content is-size-5",
+                dcc.Markdown(
+                    """
+
+Below is a series of box plots of average monthly wind speeds for the entire 35-year time span.
+
+ * Boxes represent the 25% and 75% ranges of monthly averages over 35 years.
+ * Averages (horizontal lines within boxes) are based on all hourly reports for a month.
+ * “Whiskers” (vertical lines above and below boxes) represent full ranges of typical variation of monthly averages for the different years, extended to the minimum and maximum points contained within 1.5 of the interquartile range (IQR, which is the height of the box shown).Points outside 1.5 IQR are considered outliers and drawn as points.
+ * Dots indicate outliers, or individual values outside the normal variation (outside of 1.5 IQR)
+ """,
+ className="content help-text is-size-6"
                 ),
                 dcc.Graph(id="means_box", figure=go.Figure(), config=luts.fig_configs),
                 html.Hr(),
                 html.H3("Wind frequency by direction and speed", className="title is-4 title--rose"),
-                html.P(
-                    "Center hole size shows frequency of calm conditions.",
-                    className="content is-size-5",
+                dcc.Markdown(
+                    """
+
+Below is a collection of “wind roses” showing distributions of wind by speed and direction at the location of interest.
+
+ * The “spokes” in the rose point in the compass direction from which the wind was blowing (i.e., a spoke pointing to the right denotes a wind from the east).
+ * There are 36 spokes corresponding to the wind direction code in the hourly wind reports (01, 02, … 3).
+ * For each spoke, we display frequencies of wind speed occurrence (1%, 4%, 10%, &hellip;). These are denoted by concentric circles within each wind rose.
+ * The % of calm winds is shown by the size of the hole in the center of the wind rose.
+
+ """,
+                    className="content help-text is-size-6",
                 ),
                 dcc.Graph(id="rose", figure=go.Figure(), config=luts.fig_configs),
                 dcc.Graph(id="rose_monthly", figure=go.Figure(), config=luts.fig_configs),
@@ -192,23 +209,6 @@ help_text = html.Div(
  * Wind speeds at 28 stations showed a statistically significant change from one part of the record to the next. Therefore we adjusted the data prior to the change using quantile mapping, a typical method for correcting biased meteorological data.
  * Four stations displayed two discontinuities. For these, we applied the quantile mapping adjustments to the later period.
  * We also removed obviously wrong reports (e.g., wind speeds exceeding 100 mph) and short-duration (< 6 hour) spikes in which an hourly wind speed was at least 30 mph greater than in the immediately preceding and subsequent hours.
-
-#### About the data displays
-
-Displays are designed to highlight average (climatological) wind speed (mph) and direction for a location.
-
-**Average wind speeds by month**. A summary of box plots of average monthly wind speeds by month for the entire 35-year time span.
-
- * Boxes represent the 25% and 75% ranges of monthly averages over 35 years.
- * Averages (horizontal lines within boxes) are based on all hourly reports for a month.
- * “Whiskers” (vertical lines above and below boxes) represent full ranges of typical variation of monthly averages for the different years, extended to the minimum and maximum points contained within 1.5 of the interquartile range (IQR, which is the height of the box shown).Points outside 1.5 IQR are considered outliers and drawn as points.
- * Dots indicate outliers, or individual values outside the normal variation (outside of 1.5 IQR)
-
-**Wind frequency by direction and speed**. A collection of “wind roses” showing distributions of wind by speed and direction at the location of interest.
-
- * The “spokes” in the rose point in the compass direction from which the wind was blowing (i.e., a spoke pointing to the right denotes a wind from the east).
- * There are 36 spokes corresponding to the wind direction code in the hourly wind reports (01, 02, … 3).
- * For each spoke, we display frequencies of wind speed occurrence (1%, 4%, 10%, &hellip;). These are denoted by concentric circles within each wind rose.
 
                 """,
                     className="is-size-5 content",

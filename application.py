@@ -301,7 +301,7 @@ def update_rose_monthly(community):
     fig = make_subplots(
         rows=4,
         cols=3,
-        horizontal_spacing=0,
+        horizontal_spacing=0.01,
         vertical_spacing=0.04,
         specs=[
             [subplot_spec, subplot_spec, subplot_spec],
