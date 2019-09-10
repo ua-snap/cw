@@ -151,12 +151,14 @@ main_layout = html.Div(
         html.Div(
             className="section graph",
             children=[
+                html.Hr(),
                 html.H3("Average wind speeds by month", className="title is-4"),
                 html.P(
                     "This chart shows monthly averages for each year.",
                     className="content is-size-5",
                 ),
                 dcc.Graph(id="means_box", figure=go.Figure(), config=luts.fig_configs),
+                html.Hr(),
                 html.H3("Wind frequency by direction and speed", className="title is-4 title--rose"),
                 html.P(
                     "Center hole size shows frequency of calm conditions.",
