@@ -1,20 +1,20 @@
 """
 NWT Mine site future climate tool
 """
-# pylint: disable=invalid-name, import-error
+# pylint: disable=invalid-name, import-error, line-too-long
 import os
 import json
 import plotly.graph_objs as go
 import dash_core_components as dcc
 import dash_html_components as html
-from luts import communities, months, map_communities_trace, map_layout
+import luts
 
 path_prefix = os.environ["REQUESTS_PATHNAME_PREFIX"]
 
 # Google analytics tag
 gtag_id = os.environ["GTAG_ID"]
 
-map_figure = go.Figure({"data": [map_communities_trace], "layout": map_layout})
+map_figure = go.Figure({"data": [luts.map_communities_trace], "layout": luts.map_layout})
 
 # We want this HTML structure to get the full-width background color:
 # <div class="header">
@@ -111,7 +111,7 @@ communities_dropdown_field = html.Div(
                     id="communities-dropdown",
                     options=[
                         {"label": community.place, "value": index}
-                        for index, community in communities.iterrows()
+                        for index, community in luts.communities.iterrows()
                     ],
                     value="PAFA",
                 )
@@ -156,14 +156,14 @@ main_layout = html.Div(
                     "This chart shows monthly averages for each year.",
                     className="content is-size-5",
                 ),
-                dcc.Graph(id="means_box", figure=go.Figure()),
+                dcc.Graph(id="means_box", figure=go.Figure(), config=luts.fig_configs),
                 html.H3("Wind frequency by direction and speed", className="title is-4 title--rose"),
                 html.P(
                     "Center hole size shows frequency of calm conditions.",
                     className="content is-size-5",
                 ),
-                dcc.Graph(id="rose", figure=go.Figure()),
-                dcc.Graph(id="rose_monthly", figure=go.Figure()),
+                dcc.Graph(id="rose", figure=go.Figure(), config=luts.fig_configs),
+                dcc.Graph(id="rose_monthly", figure=go.Figure(), config=luts.fig_configs),
             ],
         ),
     ],

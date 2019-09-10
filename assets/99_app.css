@@ -87,7 +87,8 @@ h3.title--rose {
 	margin-top: -3em;
 }
 
-.help-text p {
+.help-text {
+	font-size: 1rem;
 	max-width: 40em;
 }
 

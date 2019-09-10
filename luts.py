@@ -39,12 +39,37 @@ map_communities_trace = go.Scattermapbox(
 map_layout = go.Layout(
     autosize=True,
     hovermode="closest",
-    mapbox=dict(
-        style="stamen-terrain",
-        zoom=2.5,
-        center=dict(lat=63, lon=-160)),
+    mapbox=dict(style="stamen-terrain", zoom=2.5, center=dict(lat=63, lon=-160)),
     showlegend=False,
     margin=dict(l=0, r=0, t=0, b=0),
+)
+
+
+# Common configuration for graph figures
+fig_download_configs = dict(filename="winds", width="1280", scale=2)
+fig_configs = dict(
+    displayModeBar=True,
+    showSendToCloud=False,
+    toImageButtonOptions=fig_download_configs,
+    modeBarButtonsToRemove=[
+        "zoom2d",
+        "pan2d",
+        "select2d",
+        "lasso2d",
+        "zoomIn2d",
+        "zoomOut2d",
+        "autoScale2d",
+        "resetScale2d",
+        "hoverClosestCartesian",
+        "hoverCompareCartesian",
+        "hoverClosestPie",
+        "hoverClosest3d",
+        "hoverClosestGl2d",
+        "hoverClosestGeo",
+        "toggleHover",
+        "toggleSpikelines",
+    ],
+    displaylogo=False,
 )
 
 # The lowest bound excludes actual 0 (calm) readings,

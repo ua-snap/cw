@@ -104,6 +104,41 @@ def update_selected_community_on_map(community):
         "layout": luts.map_layout,
     }
 
+
+
+@app.callback(Output("means_box", "config"), [Input("communities-dropdown", "value")])
+def update_export_filenames(community):
+    """ Update filename for file exports """
+    c_name = luts.communities.loc[community]["place"]
+    configs = luts.fig_configs
+    i_configs = luts.fig_download_configs
+    i_configs["filename"] = c_name + " Average Wind Speeds, 1980-2015"
+    configs["toImageButtonOptions"] = i_configs
+    return configs
+
+@app.callback(Output("rose", "config"), [Input("communities-dropdown", "value")])
+def update_rose_export_filenames(community):
+    """ Update filename for file exports """
+    c_name = luts.communities.loc[community]["place"]
+    configs = luts.fig_configs
+    i_configs = luts.fig_download_configs
+    i_configs["filename"] = c_name + " Wind Frequency and Strength by Direction, 1980-2015"
+    i_configs["width"] = "1280"
+    i_configs["height"] = "1280"
+    configs["toImageButtonOptions"] = i_configs
+    return configs
+
+@app.callback(Output("rose_monthly", "config"), [Input("communities-dropdown", "value")])
+def update_monthly_rose_export_filenames(community):
+    """ Update filename for file exports """
+    c_name = luts.communities.loc[community]["place"]
+    configs = luts.fig_configs
+    i_configs = luts.fig_download_configs
+    i_configs["filename"] = c_name + " Monthly Wind Frequency and Strength by Direction, 1980-2015"
+    i_configs["width"] = "1024"
+    configs["toImageButtonOptions"] = i_configs
+    return configs
+
 def get_rose_calm_month_annotations(titles, calm):
     """
     Return a list of correctly-positioned %calm indicators
