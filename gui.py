@@ -161,7 +161,7 @@ Below is a series of box plots of average monthly wind speeds for the entire 35-
  * Boxes represent the 25% and 75% ranges of monthly averages over 35 years.
  * Averages (horizontal lines within boxes) are based on all hourly reports for a month.
  * “Whiskers” (vertical lines above and below boxes) represent full ranges of typical variation of monthly averages for the different years, extended to the minimum and maximum points contained within 1.5 of the interquartile range (IQR, which is the height of the box shown).
- * Dots indicate outliers, or individual values outside the normal variation (outside of 1.5 IQR).
+ * Dots indicate outliers, or individual values outside the normal variation (1.5 IQR).
  """,
  className="content help-text is-size-6"
                 ),
