@@ -5,6 +5,7 @@ Community Winds app
 # pylint: disable=invalid-name, line-too-long, too-many-arguments
 import os
 import copy
+import math
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 import dash
@@ -169,6 +170,8 @@ def get_rose_traces(d, traces, month, showlegend=False):
     Month is used to tie the subplot to the formatting
     chunks in the multiple-subplot graph.
     """
+
+    # Directly mutate the `traces` array.
     for sr, sr_info in luts.speed_ranges.items():
         dcr = d.loc[(d["speed_range"] == sr)]
         props = dict(
@@ -181,6 +184,11 @@ def get_rose_traces(d, traces, month, showlegend=False):
             legendgroup="legend",
         )
         traces.append(go.Barpolar(props))
+
+    # Compute the maximum extent of any particular
+    # petal on the wind rose.
+    max_petal = d.groupby(["direction_class"]).sum().max()
+    return max_petal
 
 
 @app.callback(Output("means_box", "figure"), [Input("communities-dropdown", "value")])
@@ -313,16 +321,25 @@ def update_rose_monthly(community):
         subplot_titles=list(luts.months.values()),
     )
 
+    max_axes = pd.DataFrame()
     month = 1
     for i in range(1, 5):
         for j in range(1, 4):
             if_show_legend = month == 1  # only show the first legend
             traces = []
             d = data.loc[(data["sid"] == community) & (data["month"] == month)]
-            get_rose_traces(d, traces, month, if_show_legend)
+            max_axes = max_axes.append(get_rose_traces(d, traces, month, if_show_legend), ignore_index=True)
             for trace in traces:
                 fig.add_trace(trace, row=i, col=j)
             month += 1
+
+    # Determine maximum r-axis and r-step.
+    # Adding one and using floor(/2.5) was the
+    # result of experimenting with values that yielded
+    # about 3 steps in most cases, with a little headroom
+    # for the r-axis outer ring.
+    rmax = max_axes.max()["frequency"] + 1
+    rstep = math.floor(rmax / 2.5)
 
     # Apply formatting to subplot titles,
     # which are actually annotations.
@@ -330,7 +347,6 @@ def update_rose_monthly(community):
         i["y"] = i["y"] + 0.01
         i["font"] = dict(size=12, color="#444")
         i["text"] = "<b>" + i["text"] + "</b>"
-
 
     c_name = luts.communities.loc[community]["place"]
 
@@ -363,8 +379,9 @@ def update_rose_monthly(community):
             color="#888",
             gridcolor="#efefef",
             tickangle=0,
+            range=[0, rmax],
             tick0=1,
-            dtick=3,
+            dtick=rstep,
             ticksuffix="%",
             showticksuffix="last",
             showline=False,  # hide the dark axis line
