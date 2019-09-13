@@ -138,6 +138,7 @@ def update_monthly_rose_export_filenames(community):
     i_configs = luts.fig_download_configs
     i_configs["filename"] = c_name + " Monthly Wind Frequency and Strength by Direction, 1980-2015"
     i_configs["width"] = "1024"
+    i_configs["height"] = "1280"
     configs["toImageButtonOptions"] = i_configs
     return configs
 
