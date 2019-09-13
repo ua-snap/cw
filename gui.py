@@ -138,8 +138,9 @@ main_layout = html.Div(
         html.Div(
             className="section survey-link",
             children=[
+                html.P("This tool visualizes hourly wind data recorded between 1980-2015 for 67 Alaskan communities.", className="content is-size-4"),
                 html.A(
-                    "Let us know how we can make this app better",
+                    "Let us know how we can make this tool better",
                     className="button is-link is-medium",
                     rel="external",
                     target="_blank",
