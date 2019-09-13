@@ -113,6 +113,7 @@ def update_export_filenames(community):
     configs = luts.fig_configs
     i_configs = luts.fig_download_configs
     i_configs["filename"] = c_name + " Average Wind Speeds, 1980-2015"
+    i_configs["height"] = "640"
     configs["toImageButtonOptions"] = i_configs
     return configs
 
