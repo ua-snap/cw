@@ -52,6 +52,33 @@ app.index_string = f"""
         </script>
         {{%metas%}}
         <title>{{%title%}}</title>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- Schema.org markup for Google+ -->
+        <meta itemprop="name" content="Alaska Community Wind Tool">
+        <meta itemprop="description" content="Explore historical wind data for Alaska communities">
+        <meta itemprop="image" content="http://windtool.accap.uaf.edu/assets/wind-rose.png">
+
+        <!-- Twitter Card data -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:site" content="@SNAPandACCAP">
+        <meta name="twitter:title" content="Alaska Community Wind Tool">
+        <meta name="twitter:description" content="Explore historical wind data for Alaska communities">
+        <meta name="twitter:creator" content="@SNAPandACCAP">
+        <!-- Twitter summary card with large image must be at least 280x150px -->
+        <meta name="twitter:image:src" content="http://windtool.accap.uaf.edu/assets/wind-rose.png">
+
+        <!-- Open Graph data -->
+        <meta property="og:title" content="Alaska Community Wind Tool" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="http://windtool.accap.uaf.edu" />
+        <meta property="og:image" content="http://windtool.accap.uaf.edu/assets/wind-rose.png" />
+        <meta property="og:description" content="Explore historical wind data for Alaska communities" />
+        <meta property="og:site_name" content="Alaska Community Wind Tool" />
+
+        <link rel="alternate" hreflang="en" href="http://windtool.accap.uaf.edu" />
+        <link rel="canonical" href="http://windtool.accap.uaf.edu"/>
         {{%favicon%}}
         {{%css%}}
     </head>
