@@ -93,7 +93,7 @@ app.index_string = f"""
 </html>
 """
 
-app.title = "Community Winds"
+app.title = "Alaska Community Wind Tool"
 app.layout = layout
 
 @app.callback(Output("communities-dropdown", "value"), [Input("map", "clickData")])
