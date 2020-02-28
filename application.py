@@ -19,6 +19,7 @@ import luts
 data = pd.read_csv("roses.csv")
 calms = pd.read_csv("calms.csv")
 monthly_means = pd.read_csv("monthly_averages.csv")
+thresholds = pd.read_csv("WRF_hwe.csv")
 
 app = dash.Dash(__name__)
 
@@ -87,6 +88,7 @@ app.index_string = f"""
 app.title = "Alaska Community Wind Tool"
 app.layout = layout
 
+
 @app.callback(Output("communities-dropdown", "value"), [Input("map", "clickData")])
 def update_place_dropdown(selected_on_map):
     """ If user clicks on the map, update the drop down. """
@@ -124,7 +126,6 @@ def update_selected_community_on_map(community):
     }
 
 
-
 @app.callback(Output("means_box", "config"), [Input("communities-dropdown", "value")])
 def update_export_filenames(community):
     """ Update filename for file exports """
@@ -136,29 +137,38 @@ def update_export_filenames(community):
     configs["toImageButtonOptions"] = i_configs
     return configs
 
+
 @app.callback(Output("rose", "config"), [Input("communities-dropdown", "value")])
 def update_rose_export_filenames(community):
     """ Update filename for file exports """
     c_name = luts.communities.loc[community]["place"]
     configs = luts.fig_configs
     i_configs = luts.fig_download_configs
-    i_configs["filename"] = c_name + " Wind Frequency and Strength by Direction, 1980-2015"
+    i_configs["filename"] = (
+        c_name + " Wind Frequency and Strength by Direction, 1980-2015"
+    )
     i_configs["width"] = "1280"
     i_configs["height"] = "1280"
     configs["toImageButtonOptions"] = i_configs
     return configs
 
-@app.callback(Output("rose_monthly", "config"), [Input("communities-dropdown", "value")])
+
+@app.callback(
+    Output("rose_monthly", "config"), [Input("communities-dropdown", "value")]
+)
 def update_monthly_rose_export_filenames(community):
     """ Update filename for file exports """
     c_name = luts.communities.loc[community]["place"]
     configs = luts.fig_configs
     i_configs = luts.fig_download_configs
-    i_configs["filename"] = c_name + " Monthly Wind Frequency and Strength by Direction, 1980-2015"
+    i_configs["filename"] = (
+        c_name + " Monthly Wind Frequency and Strength by Direction, 1980-2015"
+    )
     i_configs["width"] = "1024"
     i_configs["height"] = "1280"
     configs["toImageButtonOptions"] = i_configs
     return configs
+
 
 def get_rose_calm_month_annotations(titles, calm):
     """
@@ -172,9 +182,9 @@ def get_rose_calm_month_annotations(titles, calm):
     k = 0
     for anno in calm_annotations:
         anno["y"] = anno["y"] - 0.1225
-        anno["font"] = {"color":"#000", "size":10}
+        anno["font"] = {"color": "#000", "size": 10}
         calm_text = str(int(round(calm.iloc[k]["percent"] * 100))) + "%"
-        if calm.iloc[k]["percent"] > .2:
+        if calm.iloc[k]["percent"] > 0.2:
             # If there's enough room, add the "calm" text fragment
             calm_text += " calm"
 
@@ -182,6 +192,7 @@ def get_rose_calm_month_annotations(titles, calm):
         k += 1
 
     return calm_annotations
+
 
 def get_rose_traces(d, traces, month, showlegend=False):
     """
@@ -218,20 +229,16 @@ def update_box_plots(community):
     c_name = luts.communities.loc[community]["place"]
     return go.Figure(
         layout=dict(
-            title=dict(
-                text="Average monthly wind speed, 1980-2015, " + c_name,
-                x=0.5,
-            ),
+            title=dict(text="Average monthly wind speed, 1980-2015, " + c_name, x=0.5),
             showlegend=False,
             boxmode="group",
             legend={"font": {"family": "Open Sans", "size": 10}},
-            yaxis={"title": "Wind speed (mph)", "rangemode":"tozero"},
+            yaxis={"title": "Wind speed (mph)", "rangemode": "tozero"},
             height=550,
             margin={"l": 50, "r": 50, "b": 50, "t": 50, "pad": 4},
             xaxis=dict(
-                tickvals=list(luts.months.keys()),
-                ticktext=list(luts.months.values())
-            )
+                tickvals=list(luts.months.keys()), ticktext=list(luts.months.values())
+            ),
         ),
         data=[
             go.Box(
@@ -241,12 +248,8 @@ def update_box_plots(community):
                 y=d.speed,
                 meta=d.year,
                 hovertemplate="%{x} %{meta}: %{y} mph",
-                marker=dict(
-                    color=luts.speed_ranges["22+"]["color"]
-                ),
-                line=dict(
-                    color=luts.speed_ranges["22+"]["color"]
-                )
+                marker=dict(color=luts.speed_ranges["22+"]["color"]),
+                line=dict(color=luts.speed_ranges["22+"]["color"]),
             )
         ],
     )
@@ -347,7 +350,9 @@ def update_rose_monthly(community):
             if_show_legend = month == 1  # only show the first legend
             traces = []
             d = data.loc[(data["sid"] == community) & (data["month"] == month)]
-            max_axes = max_axes.append(get_rose_traces(d, traces, month, if_show_legend), ignore_index=True)
+            max_axes = max_axes.append(
+                get_rose_traces(d, traces, month, if_show_legend), ignore_index=True
+            )
             for trace in traces:
                 fig.add_trace(trace, row=i, col=j)
             month += 1
@@ -378,7 +383,9 @@ def update_rose_monthly(community):
 
     # Get calms as annotations, then merge
     # them into the subgraph title annotations
-    fig["layout"]["annotations"] = fig["layout"]["annotations"] + get_rose_calm_month_annotations(fig["layout"]["annotations"], c)
+    fig["layout"]["annotations"] = fig["layout"][
+        "annotations"
+    ] + get_rose_calm_month_annotations(fig["layout"]["annotations"], c)
 
     polar_props = dict(
         bgcolor="#fff",
@@ -437,6 +444,57 @@ def update_rose_monthly(community):
         polar12={**polar_props, **{"hole": c.iloc[11]["percent"]}},
     )
     return fig
+
+
+@app.callback(
+    Output("threshold_graph", "figure"),
+    [
+        Input("communities-dropdown", "value"),
+        Input("windspeed-dropdown", "value"),
+        Input("duration-dropdown", "value"),
+        Input("gcm-dropdown", "value"),
+    ],
+)
+def update_threshold_graph(community, windspeed, duration, gcm):
+    """
+    Build chart / visualiztion of threshold/durations
+    from model data.
+    """
+
+    c_name = luts.communities.loc[community]["place"]
+
+    # Filter by community, windspeed and duration/
+    t = thresholds.loc[
+        (thresholds["stid"] == community)
+        & (thresholds["ws_thr"] == windspeed)
+        & (thresholds["dur_thr"] == duration)
+        & ((thresholds["gcm"] == gcm) | (thresholds["gcm"] == "ERA"))
+    ]
+
+    # Group matching events into two-decade buckets
+    t = t.groupby(["ts"]).agg(["count"])
+
+    return go.Figure(
+        layout=dict(
+            title=dict(
+                text="Projected wind event frequency, 1980-2100, "
+                + c_name
+                + "<br>"
+                + "ERA/"
+                + gcm
+                + ", "
+                + luts.windspeeds[windspeed]
+                + ", "
+                + luts.durations[duration],
+                x=0.5,
+            ),
+            legend={"font": {"family": "Open Sans", "size": 10}},
+            yaxis={"title": "Events"},
+            height=550,
+            margin={"l": 50, "r": 50, "b": 50, "t": 50, "pad": 4},
+        ),
+        data=[go.Bar(name="Average wind speed", x=t.index, y=t["gcm"]["count"])],
+    )
 
 
 if __name__ == "__main__":
