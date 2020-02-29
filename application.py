@@ -20,20 +20,11 @@ data = pd.read_csv("roses.csv")
 calms = pd.read_csv("calms.csv")
 monthly_means = pd.read_csv("monthly_averages.csv")
 
-# We set the requests_pathname_prefix to enable
-# custom URLs.
-# https://community.plot.ly/t/dash-error-loading-layout/8139/6
-app = dash.Dash(
-    __name__, requests_pathname_prefix=os.environ["REQUESTS_PATHNAME_PREFIX"]
-)
+app = dash.Dash(__name__)
 
 # AWS Elastic Beanstalk looks for application by default,
 # if this variable (application) isn't set you will get a WSGI error.
 application = app.server
-
-# The next config sets a relative base path so we can deploy
-# with custom URLs.
-# https://community.plot.ly/t/dash-error-loading-layout/8139/6
 
 # Customize this layout to include Google Analytics
 gtag_id = os.environ["GTAG_ID"]
