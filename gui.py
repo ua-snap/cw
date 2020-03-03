@@ -141,27 +141,6 @@ gcm_dropdown_field = html.Div(
     ],
 )
 
-year_dropdown_field = html.Div(
-    className="field",
-    children=[
-        html.Label("Select Year", className="label"),
-        html.Div(
-            className="control",
-            children=[
-                dcc.Dropdown(
-                    id="year",
-                    options=[
-                    {"label": year, "value": year}
-                        for year in
-                        [1980, 2000, 2020, 2040, 2060, 2080]
-                    ],
-                    value="1980",
-                )
-            ],
-        ),
-    ],
-)
-
 windspeed_threshold_dropdown_field = html.Div(
     className="field",
     children=[
@@ -290,10 +269,6 @@ Below is a collection of “wind roses” showing distributions of wind by speed
                 duration_threshold_dropdown_field,
                 dcc.Graph(
                     id="threshold_graph", figure=go.Figure(), config=luts.fig_configs
-                ),
-                year_dropdown_field,
-                dcc.Graph(
-                    id="threshold_3dgraph", figure=go.Figure(), config=luts.fig_configs
                 ),
             ],
         ),
