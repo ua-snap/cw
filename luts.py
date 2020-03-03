@@ -10,28 +10,6 @@ import plotly.graph_objs as go
 
 communities = pd.read_csv("places.csv", index_col="sid")
 
-windspeeds = {
-    25: "25mph or greater",
-    30: "30mph+",
-    35: "35mph+",
-    40: "40mph+",
-    45: "45mph+",
-    50: "50mph+",
-}
-
-durations = {
-    1: "1 continuous hour or more",
-    6: "6+ hours",
-    12: "12+ hours",
-    24: "24+ hours",
-    48: "48+ hours",
-}
-
-gcms = {
-    "CCSM4": "CCSM4",
-    "CM3": "CM3",
-}
-
 months = {
     1: "January",
     2: "February",
