@@ -227,11 +227,24 @@ def update_box_plots(community):
 
     d = monthly_means.loc[(monthly_means["sid"] == community)]
     c_name = luts.communities.loc[community]["place"]
+
+    # Exploratory code which charts future data.
+    # This could be pre-processed into a performant version.
+    future = pd.read_csv("./data/wrf_adj/CCSM4_" + community + ".csv")
+    df = future
+    df["ts"] = pd.to_datetime(df["ts"])
+    df.index = pd.DatetimeIndex(df.ts)
+    # Do we omit ERA?
+    # dk = df[df.gcm == "CCSM4"]
+    dk = df.groupby([df.index.year, df.index.month]).mean().round(1)
+    dk.index.names = ["year", "month"]
+    dk = dk.reset_index()
+
     return go.Figure(
         layout=dict(
             title=dict(text="Average monthly wind speed, 1980-2015, " + c_name, x=0.5),
-            showlegend=False,
             boxmode="group",
+            legend_orientation="h",
             legend={"font": {"family": "Open Sans", "size": 10}},
             yaxis={"title": "Wind speed (mph)", "rangemode": "tozero"},
             height=550,
@@ -242,7 +255,7 @@ def update_box_plots(community):
         ),
         data=[
             go.Box(
-                name="Average wind speed",
+                name="Observed average wind speed, 1980-2015",
                 fillcolor=luts.speed_ranges["10-14"]["color"],
                 x=d.month,
                 y=d.speed,
@@ -250,7 +263,14 @@ def update_box_plots(community):
                 hovertemplate="%{x} %{meta}: %{y} mph",
                 marker=dict(color=luts.speed_ranges["22+"]["color"]),
                 line=dict(color=luts.speed_ranges["22+"]["color"]),
-            )
+            ),
+            go.Box(
+                name="Modeled wind speed, 1980-2100",
+                x=dk.month,
+                y=dk.ws,
+                meta=dk.year,
+                hovertemplate="%{x} %{meta}: %{y} mph",
+            ),
         ],
     )
 
@@ -450,12 +470,11 @@ def update_rose_monthly(community):
     Output("threshold_graph", "figure"),
     [
         Input("communities-dropdown", "value"),
-        Input("windspeed-dropdown", "value"),
         Input("duration-dropdown", "value"),
         Input("gcm-dropdown", "value"),
     ],
 )
-def update_threshold_graph(community, windspeed, duration, gcm):
+def update_threshold_graph(community, duration, gcm):
     """
     Build chart / visualiztion of threshold/durations
     from model data.
@@ -464,15 +483,21 @@ def update_threshold_graph(community, windspeed, duration, gcm):
     c_name = luts.communities.loc[community]["place"]
 
     # Filter by community, windspeed and duration/
-    t = thresholds.loc[
+    dt = thresholds.loc[
         (thresholds["stid"] == community)
-        & (thresholds["ws_thr"] == windspeed)
         & (thresholds["dur_thr"] == duration)
         & ((thresholds["gcm"] == gcm) | (thresholds["gcm"] == "ERA"))
     ]
+    dk = dt.groupby(["ts", "ws_thr"]).count().reset_index()
 
-    # Group matching events into two-decade buckets
-    t = t.groupby(["ts"]).agg(["count"])
+    traces = []
+    for ws, name in luts.windspeeds.items():
+        k = dk.loc[dk.ws_thr == ws]
+        traces.append(go.Bar(
+            name=name,
+            x=k.ts,
+            y=k.dur_thr
+        ))
 
     return go.Figure(
         layout=dict(
@@ -483,17 +508,16 @@ def update_threshold_graph(community, windspeed, duration, gcm):
                 + "ERA/"
                 + gcm
                 + ", "
-                + luts.windspeeds[windspeed]
-                + ", "
                 + luts.durations[duration],
                 x=0.5,
             ),
             legend={"font": {"family": "Open Sans", "size": 10}},
             yaxis={"title": "Events"},
             height=550,
+            barmode="group",
             margin={"l": 50, "r": 50, "b": 50, "t": 50, "pad": 4},
         ),
-        data=[go.Bar(name="Average wind speed", x=t.index, y=t["gcm"]["count"])],
+        data=traces,
     )
 
 
@@ -501,13 +525,10 @@ def update_threshold_graph(community, windspeed, duration, gcm):
     Output("threshold_3dgraph", "figure"),
     [
         Input("communities-dropdown", "value"),
-        Input("windspeed-dropdown", "value"),
-        Input("year", "value"),
-        Input("gcm-dropdown", "value"),
     ],
 )
 # Exploratory, need to review for naming and other stuff
-def update_threshold_3dgraph(community, windspeed, year, gcm):
+def update_threshold_3dgraph(community):
     """
     Build chart / visualiztion of threshold/durations
     from model data -- 3D Chart Attempt TODO FIXME better
@@ -517,70 +538,71 @@ def update_threshold_3dgraph(community, windspeed, year, gcm):
     c_name = luts.communities.loc[community]["place"]
 
     # Filter by community, windspeed and duration/
-    t = thresholds.loc[
-        (thresholds["stid"] == community)
-        & (thresholds["ts"] == int(year))
-        & ((thresholds["gcm"] == gcm) | (thresholds["gcm"] == "ERA"))
-    ]
-    p = t.loc[:, ["ws_thr", "dur_thr"]]
+    dt = thresholds.loc[(thresholds["stid"] == community)]
 
-    return go.Figure(
-        layout=dict(
-            title=dict(
-                text="Modeled wind event frequency, "
-                + str(year)
-                + ", "
-                + c_name
-                + "<br>"
-                + "ERA/"
-                + gcm
-                + ", "
-                + luts.windspeeds[windspeed],
-                x=0.5,
-            ),
-            legend={"font": {"family": "Open Sans", "size": 10}},
-            height=550,
-            margin={"l": 50, "r": 50, "b": 50, "t": 50, "pad": 4},
-            autosize=False,
-            xaxis=dict(
-                title="Wind speed", zeroline=False, domain=[0, 0.85], showgrid=False
-            ),
-            yaxis=dict(
-                title="Duration", zeroline=False, domain=[0, 0.85], showgrid=False
-            ),
-            xaxis2=dict(zeroline=False, domain=[0.85, 1], showgrid=False),
-            yaxis2=dict(zeroline=False, domain=[0.85, 1], showgrid=False),
-            bargap=0,
-            hovermode="closest",
-        ),
-        data=[
-            go.Histogram2dContour(
-                x=p["ws_thr"],
-                y=p["dur_thr"],
-                colorscale="Jet",
-                contours=dict(
-                    showlabels=True, labelfont=dict(family="Raleway", color="white")
-                ),
-                hoverlabel=dict(
-                    bgcolor="white",
-                    bordercolor="black",
-                    font=dict(family="Raleway", color="black"),
-                ),
-            ),
+    # want:
+    # x = duration bucket
+    # y = windspeed bucket
+    # size = event count in bucket
+    # color = model
+
+    dg = dt.groupby(["gcm", "ws_thr", "dur_thr"]).count()
+    dg = dg.reset_index()
+    sizeref = 2.0 * max(dg["stid"]) / (100 ** 2)
+
+    models = {"ERA": "ERA", "CCSM4": "CCSM4", "CM3": "CM3"}
+
+    fig = go.Figure()
+
+    mco = {
+        "ERA": {
+            "opacity": 1,
+            "color":"#000000"
+        },
+        "CCSM4": {
+            "opacity":0.5,
+            "color":"#ff0000"
+        },
+        "CM3": {
+            "opacity":0.5,
+            "color":"#0000FF"
+        },
+    }
+
+    for model in models:
+        dm = dg.loc[dg.gcm == model]
+        fig.add_trace(
             go.Scatter(
-                x=p["ws_thr"],
-                y=p["dur_thr"],
-                xaxis="x",
-                yaxis="y",
-                mode="markers",
-                marker=dict(color="rgba(255,255,255,1.0)", size=3),
-            ),
-            go.Histogram(
-                y=p["dur_thr"], xaxis="x2", marker=dict(color="rgba(0,0,0,1)")
-            ),
-            go.Histogram(x=p["ws_thr"], yaxis="y2", marker=dict(color="rgba(0,0,0,1)")),
-        ],
+                x=dm.dur_thr,
+                y=dm.ws_thr,
+                name=model,
+                marker=dict(
+                    size=dm.stid,  # shows count, could rename column
+                    opacity=mco[model]["opacity"],
+                    color=mco[model]["color"],
+                )
+            )
+        )
+    fig.update_traces(
+        mode="markers", marker=dict(sizeref=sizeref, sizemode="area", line_width=2)
     )
+
+    fig.update_layout(
+        title=dict(text="Modeled high wind events, 1980-2100, " + c_name, x=0.5),
+        legend_orientation="h",
+        legend={"font": {"family": "Open Sans", "size": 10}},
+        height=550,
+        margin={"l": 50, "r": 50, "b": 50, "t": 50, "pad": 4},
+        xaxis={
+            "type": "category",
+            "title": "Duration"
+        },
+        yaxis={
+            "type": "category",
+            "title": "Wind speed"
+        }
+    )
+    return fig
 
 
 if __name__ == "__main__":
