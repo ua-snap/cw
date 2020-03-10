@@ -252,6 +252,7 @@ Below is a collection of “wind roses” showing distributions of wind by speed
                 dcc.Graph(
                     id="threshold_3dgraph", figure=go.Figure(), config=luts.fig_configs
                 ),
+                dcc.Graph(id="future_rose", figure=go.Figure(), config=luts.fig_configs),
             ],
         ),
     ],

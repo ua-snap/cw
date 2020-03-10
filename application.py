@@ -493,11 +493,7 @@ def update_threshold_graph(community, duration, gcm):
     traces = []
     for ws, name in luts.windspeeds.items():
         k = dk.loc[dk.ws_thr == ws]
-        traces.append(go.Bar(
-            name=name,
-            x=k.ts,
-            y=k.dur_thr
-        ))
+        traces.append(go.Bar(name=name, x=k.ts, y=k.dur_thr))
 
     return go.Figure(
         layout=dict(
@@ -522,10 +518,7 @@ def update_threshold_graph(community, duration, gcm):
 
 
 @app.callback(
-    Output("threshold_3dgraph", "figure"),
-    [
-        Input("communities-dropdown", "value"),
-    ],
+    Output("threshold_3dgraph", "figure"), [Input("communities-dropdown", "value")]
 )
 # Exploratory, need to review for naming and other stuff
 def update_threshold_3dgraph(community):
@@ -555,18 +548,9 @@ def update_threshold_3dgraph(community):
     fig = go.Figure()
 
     mco = {
-        "ERA": {
-            "opacity": 1,
-            "color":"#000000"
-        },
-        "CCSM4": {
-            "opacity":0.5,
-            "color":"#ff0000"
-        },
-        "CM3": {
-            "opacity":0.5,
-            "color":"#0000FF"
-        },
+        "ERA": {"opacity": 1, "color": "#000000"},
+        "CCSM4": {"opacity": 0.5, "color": "#ff0000"},
+        "CM3": {"opacity": 0.5, "color": "#0000FF"},
     }
 
     for model in models:
@@ -580,7 +564,7 @@ def update_threshold_3dgraph(community):
                     size=dm.stid,  # shows count, could rename column
                     opacity=mco[model]["opacity"],
                     color=mco[model]["color"],
-                )
+                ),
             )
         )
     fig.update_traces(
@@ -593,14 +577,44 @@ def update_threshold_3dgraph(community):
         legend={"font": {"family": "Open Sans", "size": 10}},
         height=550,
         margin={"l": 50, "r": 50, "b": 50, "t": 50, "pad": 4},
-        xaxis={
-            "type": "category",
-            "title": "Duration"
-        },
-        yaxis={
-            "type": "category",
-            "title": "Wind speed"
-        }
+        xaxis={"type": "category", "title": "Duration"},
+        yaxis={"type": "category", "title": "Wind speed"},
+    )
+    return fig
+
+
+@app.callback(Output("future_rose", "figure"), [Input("communities-dropdown", "value")])
+def update_future_rose(community):
+    """ Generate cumulative future wind rose for selected community
+    this is very rough right now.
+    """
+    c_name = luts.communities.loc[community]["place"]
+
+    future = pd.read_csv("./data/wrf_adj/CCSM4_" + community + ".csv")
+
+    fig = go.Figure(
+        data=[
+            go.Scatterpolargl(
+                name="ERA",
+                r=future.loc[future.gcm == "ERA"].ws,
+                theta=future.loc[future.gcm == "ERA"].wd,
+                mode="markers",
+                marker=dict(size=4, opacity=0.2),
+            ),
+            go.Scatterpolargl(
+                name="CCSM4",
+                r=future.loc[future.gcm == "CCSM4"].ws,
+                theta=future.loc[future.gcm == "CCSM4"].wd,
+                mode="markers",
+                marker=dict(size=4, opacity=0.2),
+            ),
+        ]
+    )
+
+    fig.update_layout(
+        title="Modeled wind distribution, 1980-2100, ERA/CCSM4, " + c_name,
+        legend_orientation="h",
+        height=800,
     )
     return fig
 
