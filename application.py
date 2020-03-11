@@ -599,19 +599,38 @@ def update_future_rose(community):
                 r=future.loc[future.gcm == "ERA"].ws,
                 theta=future.loc[future.gcm == "ERA"].wd,
                 mode="markers",
-                marker=dict(size=4, opacity=0.2),
-            ),
-            go.Scatterpolargl(
-                name="CCSM4",
-                r=future.loc[future.gcm == "CCSM4"].ws,
-                theta=future.loc[future.gcm == "CCSM4"].wd,
-                mode="markers",
-                marker=dict(size=4, opacity=0.2),
-            ),
+                marker=dict(size=4, opacity=1),
+            )
         ]
     )
 
     fig.update_layout(
+        polar=dict(
+            angularaxis=dict(
+                rotation=90,
+                direction="clockwise",
+                tickmode="array",
+                tickvals=[0, 45, 90, 135, 180, 225, 270, 315],
+                ticks="",  # hide tick marks
+                ticktext=["N", "NE", "E", "SE", "S", "SW", "W", "NW"],
+                tickfont=dict(color="#444"),
+                showline=False,  # no boundary circles
+                color="#888",  # set most colors to #888
+                gridcolor="#efefef",
+            ),
+            radialaxis=dict(
+                color="#888",
+                gridcolor="#efefef",
+                ticksuffix="%",
+                showticksuffix="last",
+                tickcolor="rgba(0, 0, 0, 0)",
+                tick0=0,
+                dtick=3,
+                ticklen=10,
+                showline=False,  # hide the dark axis line
+                tickfont=dict(color="#444"),
+            ),
+        ),
         title="Modeled wind distribution, 1980-2100, ERA/CCSM4, " + c_name,
         legend_orientation="h",
         height=800,
