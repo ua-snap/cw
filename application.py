@@ -228,18 +228,6 @@ def update_box_plots(community):
     d = monthly_means.loc[(monthly_means["sid"] == community)]
     c_name = luts.communities.loc[community]["place"]
 
-    # Exploratory code which charts future data.
-    # This could be pre-processed into a performant version.
-    future = pd.read_csv("./data/wrf_adj/CCSM4_" + community + ".csv")
-    df = future
-    df["ts"] = pd.to_datetime(df["ts"])
-    df.index = pd.DatetimeIndex(df.ts)
-    # Do we omit ERA?
-    # dk = df[df.gcm == "CCSM4"]
-    dk = df.groupby([df.index.year, df.index.month]).mean().round(1)
-    dk.index.names = ["year", "month"]
-    dk = dk.reset_index()
-
     return go.Figure(
         layout=dict(
             title=dict(text="Average monthly wind speed, 1980-2015, " + c_name, x=0.5),
@@ -263,14 +251,7 @@ def update_box_plots(community):
                 hovertemplate="%{x} %{meta}: %{y} mph",
                 marker=dict(color=luts.speed_ranges["22+"]["color"]),
                 line=dict(color=luts.speed_ranges["22+"]["color"]),
-            ),
-            go.Box(
-                name="Modeled wind speed, 1980-2100",
-                x=dk.month,
-                y=dk.ws,
-                meta=dk.year,
-                hovertemplate="%{x} %{meta}: %{y} mph",
-            ),
+            )
         ],
     )
 
