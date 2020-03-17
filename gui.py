@@ -249,8 +249,18 @@ Below is a collection of “wind roses” showing distributions of wind by speed
                 dcc.Graph(
                     id="threshold_graph", figure=go.Figure(), config=luts.fig_configs
                 ),
+                html.H4(
+                    "Changes between model baseline and future model projections",
+                    className="title is-5",
+                ),
+                dcc.Markdown(
+                    """
+*Fixme Wording Help Needed* The next chart shows the difference between the ERA-Interim reanalysis, which can be thought of as a model-based simulation of historical data (1980-2015), and future model selections (either CCSM4 or CM3, as selected in the section above), 2015-2100.  This can show relative patterns of changing wind events for a location.  Gray shows a reduction in events, blue shows an increase, and red shows new events.
+ """,
+                    className="content help-text is-size-6",
+                ),
                 dcc.Graph(
-                    id="threshold_3dgraph", figure=go.Figure(), config=luts.fig_configs
+                    id="future_delta", figure=go.Figure(), config=luts.fig_configs
                 ),
                 dcc.Graph(id="future_rose", figure=go.Figure(), config=luts.fig_configs),
             ],

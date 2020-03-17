@@ -500,10 +500,12 @@ def update_threshold_graph(community, duration, gcm):
 
 
 @app.callback(
-    Output("threshold_3dgraph", "figure"), [Input("communities-dropdown", "value")]
+    Output("future_delta", "figure"), [
+        Input("communities-dropdown", "value"),
+        Input("gcm-dropdown", "value")
+    ]
 )
-# Exploratory, need to review for naming and other stuff
-def update_threshold_3dgraph(community):
+def update_future_delta(community, gcm):
     """
     Build chart / visualiztion of threshold/durations
     from model data -- 3D Chart Attempt TODO FIXME better
@@ -512,43 +514,97 @@ def update_threshold_3dgraph(community):
 
     c_name = luts.communities.loc[community]["place"]
 
-    # Filter by community, windspeed and duration/
-    dt = thresholds.loc[(thresholds["stid"] == community)]
-
-    dg = dt.groupby(["gcm", "ws_thr", "dur_thr"]).count()
-    dg = dg.reset_index()
-    sizeref = 2.0 * max(dg["stid"]) / (100 ** 2)
-
-    models = {"ERA": "ERA", "CCSM4": "CCSM4", "CM3": "CM3"}
-
     fig = go.Figure()
 
-    mco = {
-        "ERA": {"opacity": 1, "color": "#000000"},
-        "CCSM4": {"opacity": 0.5, "color": "#ff0000"},
-        "CM3": {"opacity": 0.5, "color": "#0000FF"},
-    }
+    # Filter by community & relevant models
+    dt = thresholds.loc[(thresholds["stid"] == community)]
+    de = dt.loc[dt.gcm == "ERA"]
+    dc = dt.loc[dt.gcm == gcm]
 
-    for model in models:
-        dm = dg.loc[dg.gcm == model]
-        fig.add_trace(
-            go.Scatter(
-                x=dm.dur_thr,
-                y=dm.ws_thr,
-                name=model,
-                marker=dict(
-                    size=dm.stid,  # shows count, could rename column
-                    opacity=mco[model]["opacity"],
-                    color=mco[model]["color"],
-                ),
-            )
+    # Count events, reset indices, drop unused columns, rename.
+    dec = de.groupby(["ws_thr", "dur_thr"]).count()
+    dcc = dc.groupby(["ws_thr", "dur_thr"]).count()
+    dec = dec.reset_index()
+    dcc = dcc.reset_index()
+    dec = dec.drop(["stid", "wd", "ts"], axis=1)
+    dcc = dcc.drop(["stid", "wd", "ts"], axis=1)
+    dec.columns = ["ws_thr", "dur_thr", "count"]
+    dcc.columns = ["ws_thr", "dur_thr", "count"]
+    dec = dec.set_index(["ws_thr", "dur_thr"])
+    dcc = dcc.set_index(["ws_thr", "dur_thr"])
+
+    # Scale future values (ERA = 35 years, others = 85 years)
+    # 85/35 = 0.3684210526 = scale factor for future data
+    dcc["count"] = (dcc["count"] * 0.4117647059).round()
+
+    # Merge the two dataframes (outer join)
+    # Outer join ensures wind events present in either
+    # dataframe are included (union)
+    dj = dcc.join(dec, how="outer", lsuffix="_ERA", rsuffix="_model")
+    dj = dj.fillna(0)  # so we can subtract
+    dj["delta"] = dj["count_model"] - dj["count_ERA"]
+
+    # Assign dot colors
+    def determine_colors(row):
+        color = "rgba(0, 0, 0, 0)" # transparent
+        if row["delta"] > 0:
+            if int(row["count_ERA"]) != 0:
+                # Positive % increase
+                return luts.speed_ranges["14-18"]["color"]
+            # These are new events, mark specially
+            return "#FE3508"
+        # Negative % change
+        return "#cccccc"
+    dj["color"] = dj.apply(determine_colors, axis=1)
+
+    # Take absolute value to show magnitude, since
+    # now color shows +/-
+    dj["marker_size"] = dj["delta"].abs()
+
+    # Finally, flatten resulting table.
+    dj = dj.reset_index()
+
+    def build_hover_text(row):
+        if int(row["delta"]) == 0:
+            return "No change"
+
+        if int(row["count_ERA"]) != 0:
+            d = round(((row["delta"] / row["count_ERA"]) * 100), 0)
+            t = "<b>" + str(d) + "% "
+            if int(row["delta"]) > 0:
+                t += "more</b> events,<br>"
+            else:
+                t += "fewer</b> events,<br>"
+        else:
+            t = "<b>" + str(int(row["delta"])) + " new events</b>,<br>"
+
+        t += luts.windspeeds[row["ws_thr"]] + "<br>"
+        t += luts.durations[row["dur_thr"]]
+        return t
+
+    dj["hover_text"] = dj.apply(build_hover_text, axis=1)
+
+    # Size ref for bubble size -- scale bubbles sanely
+    sizeref = 2.0 * max(dj["marker_size"]) / (100 ** 2)
+
+    fig.add_trace(
+        go.Scatter(
+            x=dj.dur_thr,
+            y=dj.ws_thr,
+            hovertext=dj.hover_text,
+            hoverinfo="text",
+            marker=dict(size=dj.marker_size, color=dj.color)
         )
+    )
+
     fig.update_traces(
         mode="markers", marker=dict(sizeref=sizeref, sizemode="area", line_width=2)
     )
 
+    figure_text = "<b>Wind event changes between ERA (1980-2015) and " + gcm + " (2015-2100)</b><br>" + c_name
+
     fig.update_layout(
-        title=dict(text="Modeled high wind events, 1980-2100, " + c_name, x=0.5),
+        title=dict(text=figure_text, x=0.5),
         legend_orientation="h",
         legend={"font": {"family": "Open Sans", "size": 10}},
         height=550,
@@ -557,7 +613,6 @@ def update_threshold_3dgraph(community):
         yaxis={"type": "category", "title": "Wind speed"},
     )
     return fig
-
 
 @app.callback(
     Output("future_rose", "figure"),
@@ -571,9 +626,7 @@ def update_future_rose(community, gcm):
     traces = []
 
     # Subset for community & 0=year
-    d = future_rose.loc[
-        (future_rose["sid"] == community) & (future_rose["gcm"] == gcm)
-    ]
+    d = future_rose.loc[(future_rose["sid"] == community) & (future_rose["gcm"] == gcm)]
     get_rose_traces(d, traces, "", True)
 
     # Compute % calm, use this to modify the hole size
