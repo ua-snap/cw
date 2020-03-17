@@ -20,6 +20,7 @@ data = pd.read_csv("roses.csv")
 calms = pd.read_csv("calms.csv")
 monthly_means = pd.read_csv("monthly_averages.csv")
 thresholds = pd.read_csv("WRF_hwe.csv")
+future_rose = pd.read_csv("future_roses.csv")
 
 app = dash.Dash(__name__)
 
@@ -514,12 +515,6 @@ def update_threshold_3dgraph(community):
     # Filter by community, windspeed and duration/
     dt = thresholds.loc[(thresholds["stid"] == community)]
 
-    # want:
-    # x = duration bucket
-    # y = windspeed bucket
-    # size = event count in bucket
-    # color = model
-
     dg = dt.groupby(["gcm", "ws_thr", "dur_thr"]).count()
     dg = dg.reset_index()
     sizeref = 2.0 * max(dg["stid"]) / (100 ** 2)
@@ -564,59 +559,83 @@ def update_threshold_3dgraph(community):
     return fig
 
 
-@app.callback(Output("future_rose", "figure"), [Input("communities-dropdown", "value")])
-def update_future_rose(community):
+@app.callback(
+    Output("future_rose", "figure"),
+    [Input("communities-dropdown", "value"), Input("gcm-dropdown", "value")],
+)
+def update_future_rose(community, gcm):
     """ Generate cumulative future wind rose for selected community
     this is very rough right now.
     """
     c_name = luts.communities.loc[community]["place"]
+    traces = []
 
-    future = pd.read_csv("./data/wrf_adj/CCSM4_" + community + ".csv")
+    # Subset for community & 0=year
+    d = future_rose.loc[
+        (future_rose["sid"] == community) & (future_rose["gcm"] == gcm)
+    ]
+    get_rose_traces(d, traces, "", True)
 
-    fig = go.Figure(
-        data=[
-            go.Scatterpolargl(
-                name="ERA",
-                r=future.loc[future.gcm == "ERA"].ws,
-                theta=future.loc[future.gcm == "ERA"].wd,
-                mode="markers",
-                marker=dict(size=4, opacity=1),
-            )
-        ]
-    )
+    # Compute % calm, use this to modify the hole size
+    c = calms[calms["sid"] == community]
+    c_mean = c.mean()
+    c_mean = int(round(c_mean["percent"]))
 
-    fig.update_layout(
-        polar=dict(
-            angularaxis=dict(
-                rotation=90,
-                direction="clockwise",
-                tickmode="array",
-                tickvals=[0, 45, 90, 135, 180, 225, 270, 315],
-                ticks="",  # hide tick marks
-                ticktext=["N", "NE", "E", "SE", "S", "SW", "W", "NW"],
-                tickfont=dict(color="#444"),
-                showline=False,  # no boundary circles
-                color="#888",  # set most colors to #888
-                gridcolor="#efefef",
-            ),
-            radialaxis=dict(
-                color="#888",
-                gridcolor="#efefef",
-                ticksuffix="%",
-                showticksuffix="last",
-                tickcolor="rgba(0, 0, 0, 0)",
-                tick0=0,
-                dtick=3,
-                ticklen=10,
-                showline=False,  # hide the dark axis line
-                tickfont=dict(color="#444"),
-            ),
-        ),
-        title="Modeled wind distribution, 1980-2100, ERA/CCSM4, " + c_name,
-        legend_orientation="h",
-        height=800,
-    )
-    return fig
+    c_name = luts.communities.loc[community]["place"]
+
+    title = "Modeled Wind Speed Distribution, "
+    if gcm is "ERA":
+        title += "ERA, 1980-2015, "
+    else:
+        title += gcm + ", 2015-2100"
+    title += ", " + c_name
+
+    rose_layout = {
+        "title": title,
+        "height": 700,
+        "margin": {"l": 0, "r": 0, "b": 100, "t": 50},
+        "legend": {"orientation": "h", "x": 0, "y": 1},
+        "annotations": [
+            {
+                "x": 0.5,
+                "y": 0.5,
+                "showarrow": False,
+                "text": str(c_mean) + r"% calm",
+                "xref": "paper",
+                "yref": "paper",
+            }
+        ],
+        "polar": {
+            "legend": {"orientation": "h"},
+            "angularaxis": {
+                "rotation": 90,
+                "direction": "clockwise",
+                "tickmode": "array",
+                "tickvals": [0, 45, 90, 135, 180, 225, 270, 315],
+                "ticks": "",  # hide tick marks
+                "ticktext": ["N", "NE", "E", "SE", "S", "SW", "W", "NW"],
+                "tickfont": {"color": "#444"},
+                "showline": False,  # no boundary circles
+                "color": "#888",  # set most colors to #888
+                "gridcolor": "#efefef",
+            },
+            "radialaxis": {
+                "color": "#888",
+                "gridcolor": "#efefef",
+                "ticksuffix": "%",
+                "showticksuffix": "last",
+                "tickcolor": "rgba(0, 0, 0, 0)",
+                "tick0": 0,
+                "dtick": 3,
+                "ticklen": 10,
+                "showline": False,  # hide the dark axis line
+                "tickfont": {"color": "#444"},
+            },
+            "hole": c_mean / 100,
+        },
+    }
+
+    return {"layout": rose_layout, "data": traces}
 
 
 if __name__ == "__main__":

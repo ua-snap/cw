@@ -1,3 +1,12 @@
+"""
+
+Note, this contains both the older V1 processing code
+as well as the V2 code.  The V1 code isn't tested to
+work for a full processing cycle, and may need
+some adjustments.
+
+"""
+
 # pylint: disable=all
 import pandas as pd
 import dask.dataframe as dd
@@ -10,7 +19,7 @@ cols = ["sid", "direction", "speed", "month"]
 
 def preprocess_stations():
     """
-    This produces two (large) files which combine
+    This producess two (large) files which combine
     all the individual station files into one tidy table.
 
     stations.csv is ready to be processed into the wind roses.
@@ -104,7 +113,7 @@ def process_calm(mean_data):
     calms = calms.assign(percent=round(calms["calm"] / calms["total"], 3) * 100)
     calms.to_csv("calms.csv")
 
-def chunk_to_rose(sgroup, accumulator):
+def chunk_to_rose(sgroup, station_name = None):
     """
     Builds data suitable for Plotly's wind roses from
     a subset of data.
@@ -113,6 +122,14 @@ def chunk_to_rose(sgroup, accumulator):
     Return accumulator of whatever the results of the
     incoming chunk are.
     """
+
+    # Bin into 36 categories.
+    bins = list(range(5, 356, 10))
+    bin_names = list(range(1, 36))
+
+    # Accumulator dataframe.
+    proc_cols = ["sid", "direction_class", "speed_range", "count"]
+    accumulator = pd.DataFrame(columns=proc_cols)
 
     # Assign directions to bins.
     # We'll use the exceptional 'NaN' class to represent
@@ -177,15 +194,10 @@ def process_roses(data):
     proc_cols = ["sid", "direction_class", "speed_range", "count", "month"]
     rose_data = pd.DataFrame(columns=proc_cols)
 
-    # Bin into 36 categories.
-    bins = list(range(5, 356, 10))
-    bin_names = list(range(1, 36))
-
     groups = data.groupby(["sid"])
     for station_name, station in groups:
         # Yearly data.
-        acc = pd.DataFrame(columns=proc_cols)
-        t = chunk_to_rose(station, acc)
+        t = chunk_to_rose(station)
         t = t.assign(month=0)  # year
         rose_data = rose_data.append(t)
 
@@ -201,15 +213,55 @@ def process_roses(data):
 
     rose_data.to_csv("roses.csv")
 
-# Make this skippable during dev
-preprocess = False
+def process_future_roses():
+    """
+    Process wind roses for future data.
+    """
 
-if preprocess:
+    places = pd.read_csv("./places.csv")
+    cols = ["sid", "gcm", "direction_class", "speed_range", "count", "frequency"]
+
+    future_roses = pd.DataFrame(columns=cols)
+
+    for index, place in places.iterrows():
+        print("starting " + place["sid"])
+        # want: ,sid,direction,speed,month
+        # have: ['gcm' 'stid' 'ts' 'ws' 'wd']
+        df = pd.read_csv("./data/wrf_adj/CCSM4_" + place["sid"] + ".csv")
+        df.columns = ['gcm', 'sid', 'ts', 'speed', 'direction']
+        dk = df.loc[df.gcm == "ERA"]
+        t = chunk_to_rose(df, place["sid"])
+        t["gcm"] = "ERA"
+        future_roses = future_roses.append(t)
+
+        dk = df.loc[df.gcm == "CCSM4"]
+        t = chunk_to_rose(df, place["sid"])
+        t["gcm"] = "CCSM4"
+        future_roses = future_roses.append(t)
+
+        df = pd.read_csv("./data/wrf_adj/CCSM4_" + place["sid"] + ".csv")
+        df.columns = ['gcm', 'sid', 'ts', 'speed', 'direction']
+        dk = df.loc[df.gcm == "CM3"]
+        t = chunk_to_rose(df, place["sid"])
+        t["gcm"] = "CM3"
+        future_roses = future_roses.append(t)
+
+        print(future_roses)
+
+    future_roses.to_csv("future_roses.csv")
+
+
+process_future_roses()
+
+# Make all V1 work skippable.
+v1_preprocess = False
+
+if v1_preprocess:
     preprocess_stations()
 
-data = pd.read_csv("stations.csv", index_col=[0])
-mean_data = dd.read_csv("mean_stations.csv")
+    data = pd.read_csv("stations.csv", index_col=[0])
+    mean_data = dd.read_csv("mean_stations.csv")
 
-process_calm(mean_data)
-# averages_by_month(mean_data)
-# process_roses(data)
+    process_calm(mean_data)
+    # averages_by_month(mean_data)
+    # process_roses(data)

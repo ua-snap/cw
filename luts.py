@@ -28,6 +28,7 @@ durations = {
 }
 
 gcms = {
+    "ERA": "ERA",
     "CCSM4": "CCSM4",
     "CM3": "CM3",
 }
