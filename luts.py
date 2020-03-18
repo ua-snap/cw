@@ -95,16 +95,27 @@ fig_configs = dict(
     displaylogo=False,
 )
 
+# Gradient-colors, from gentlest to darker/more saturated.
+# Some charts need to access these directly.
+colors = [
+    "#d0d1e6",
+    "#a6bddb",
+    "#74a9cf",
+    "#3690c0",
+    "#0570b0",
+    "#034e7b"
+]
+
 # The lowest bound excludes actual 0 (calm) readings,
 # this is deliberate.
 speed_ranges = {
-    "0-6": {"range": [0.001, 6], "color": "#d0d1e6"},
-    "6-10": {"range": [6, 10], "color": "#a6bddb"},
-    "10-14": {"range": [10, 14], "color": "#74a9cf"},
-    "14-18": {"range": [14, 18], "color": "#3690c0"},
-    "18-22": {"range": [18, 22], "color": "#0570b0"},
+    "0-6": {"range": [0.001, 6], "color": colors[0]},
+    "6-10": {"range": [6, 10], "color": colors[1]},
+    "10-14": {"range": [10, 14], "color": colors[2]},
+    "14-18": {"range": [14, 18], "color": colors[3]},
+    "18-22": {"range": [18, 22], "color": colors[4]},
     "22+": {
         "range": [22, 1000],  # let's hope the upper bound is sufficient :-)
-        "color": "#034e7b",
+        "color": colors[5],
     },
 }

@@ -473,9 +473,21 @@ def update_threshold_graph(community, duration, gcm):
     dk = dt.groupby(["ts", "ws_thr"]).count().reset_index()
 
     traces = []
+    color_index = 0
     for ws, name in luts.windspeeds.items():
         k = dk.loc[dk.ws_thr == ws]
-        traces.append(go.Bar(name=name, x=k.ts, y=k.dur_thr))
+        traces.append(
+            go.Bar(
+                name=name,
+                x=k.ts,
+                y=k.dur_thr,
+                marker=dict(
+                    color=luts.colors[color_index],
+                    line=dict(width=0),
+                ),
+            )
+        )
+        color_index += 1
 
     return go.Figure(
         layout=dict(
@@ -492,7 +504,7 @@ def update_threshold_graph(community, duration, gcm):
             legend={"font": {"family": "Open Sans", "size": 10}},
             yaxis={"title": "Events"},
             height=550,
-            barmode="group",
+            barmode="stack",
             margin={"l": 50, "r": 50, "b": 50, "t": 50, "pad": 4},
         ),
         data=traces,
@@ -500,10 +512,8 @@ def update_threshold_graph(community, duration, gcm):
 
 
 @app.callback(
-    Output("future_delta", "figure"), [
-        Input("communities-dropdown", "value"),
-        Input("gcm-dropdown", "value")
-    ]
+    Output("future_delta", "figure"),
+    [Input("communities-dropdown", "value"), Input("gcm-dropdown", "value")],
 )
 def update_future_delta(community, gcm):
     """
@@ -554,6 +564,7 @@ def update_future_delta(community, gcm):
             return "#FE3508"
         # Negative % change
         return "#cccccc"
+
     dj["color"] = dj.apply(determine_colors, axis=1)
 
     # Take absolute value to show magnitude, since
@@ -593,7 +604,7 @@ def update_future_delta(community, gcm):
             y=dj.ws_thr,
             hovertext=dj.hover_text,
             hoverinfo="text",
-            marker=dict(size=dj.marker_size, color=dj.color)
+            marker=dict(size=dj.marker_size, color=dj.color),
         )
     )
 
@@ -601,7 +612,12 @@ def update_future_delta(community, gcm):
         mode="markers", marker=dict(sizeref=sizeref, sizemode="area", line_width=2)
     )
 
-    figure_text = "<b>Wind event changes between ERA (1980-2015) and " + gcm + " (2015-2100)</b><br>" + c_name
+    figure_text = (
+        "<b>Wind event changes between ERA (1980-2015) and "
+        + gcm
+        + " (2015-2100)</b><br>"
+        + c_name
+    )
 
     fig.update_layout(
         title=dict(text=figure_text, x=0.5),
@@ -613,6 +629,7 @@ def update_future_delta(community, gcm):
         yaxis={"type": "category", "title": "Wind speed"},
     )
     return fig
+
 
 @app.callback(
     Output("future_rose", "figure"),
