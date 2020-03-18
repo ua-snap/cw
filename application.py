@@ -546,7 +546,6 @@ def update_future_delta(community, gcm):
 
     # Assign dot colors
     def determine_colors(row):
-        color = "rgba(0, 0, 0, 0)" # transparent
         if row["delta"] > 0:
             if int(row["count_ERA"]) != 0:
                 # Positive % increase
@@ -585,6 +584,7 @@ def update_future_delta(community, gcm):
     dj["hover_text"] = dj.apply(build_hover_text, axis=1)
 
     # Size ref for bubble size -- scale bubbles sanely
+    # https://plot.ly/python/bubble-charts/#scaling-the-size-of-bubble-charts
     sizeref = 2.0 * max(dj["marker_size"]) / (100 ** 2)
 
     fig.add_trace(
