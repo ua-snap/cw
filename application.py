@@ -550,7 +550,7 @@ def update_future_delta(community, gcm):
     # Merge the two dataframes (outer join)
     # Outer join ensures wind events present in either
     # dataframe are included (union)
-    dj = dcc.join(dec, how="outer", lsuffix="_ERA", rsuffix="_model")
+    dj = dcc.join(dec, how="outer", lsuffix="_model", rsuffix="_ERA")
     dj = dj.fillna(0)  # so we can subtract
     dj["delta"] = dj["count_model"] - dj["count_ERA"]
 
