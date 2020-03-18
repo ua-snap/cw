@@ -534,7 +534,7 @@ def update_future_delta(community, gcm):
     dcc = dcc.set_index(["ws_thr", "dur_thr"])
 
     # Scale future values (ERA = 35 years, others = 85 years)
-    # 85/35 = 0.3684210526 = scale factor for future data
+    # 35/85 = 0.4117647059 = scale factor for future data
     dcc["count"] = (dcc["count"] * 0.4117647059).round()
 
     # Merge the two dataframes (outer join)
