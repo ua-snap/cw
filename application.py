@@ -680,8 +680,10 @@ def update_future_delta_percentiles(community, gcm):
     dj["percent_change"] = ((dj["delta"] / dj["events_ERA"]) * 100).round()
 
     # Take absolute value to show magnitude, since
-    # now color shows +/-
+    # now color shows +/-.  "inf" values are possible due
+    # to new events; replace them with the mean.
     dj["marker_size"] = dj["percent_change"].abs()
+    dj = dj.replace([np.inf], dj["marker_size"].loc[dj["marker_size"] != np.inf].mean())
 
     # Finally, flatten resulting table.
     dj = dj.reset_index()
@@ -707,7 +709,7 @@ def update_future_delta_percentiles(community, gcm):
 
     # Size ref for bubble size -- scale bubbles sanely
     # https://plot.ly/python/bubble-charts/#scaling-the-size-of-bubble-charts
-    sizeref = 2.0 * max(dj["marker_size"]) / (100 ** 2)
+    sizeref = 2.0 * max(dj["marker_size"]) / (75 ** 2)
 
     fig.add_trace(
         go.Scatter(
@@ -720,7 +722,8 @@ def update_future_delta_percentiles(community, gcm):
     )
 
     fig.update_traces(
-        mode="markers", marker=dict(sizeref=sizeref, sizemode="area", line_width=2)
+        mode="markers",
+        marker=dict(sizeref=sizeref, sizemin=5, sizemode="area", line_width=2),
     )
 
     figure_text = (
