@@ -21,6 +21,7 @@ calms = pd.read_csv("calms.csv")
 monthly_means = pd.read_csv("monthly_averages.csv")
 thresholds = pd.read_csv("WRF_hwe.csv")
 future_rose = pd.read_csv("future_roses.csv")
+percentiles = pd.read_csv("percentiles.csv")
 
 app = dash.Dash(__name__)
 
@@ -481,10 +482,7 @@ def update_threshold_graph(community, duration, gcm):
                 name=name,
                 x=k.ts,
                 y=k.dur_thr,
-                marker=dict(
-                    color=luts.colors[color_index],
-                    line=dict(width=0),
-                ),
+                marker=dict(color=luts.colors[color_index], line=dict(width=0)),
             )
         )
         color_index += 1
@@ -627,6 +625,127 @@ def update_future_delta(community, gcm):
         margin={"l": 50, "r": 50, "b": 50, "t": 50, "pad": 4},
         xaxis={"type": "category", "title": "Duration"},
         yaxis={"type": "category", "title": "Wind speed"},
+    )
+    return fig
+
+
+@app.callback(
+    Output("future_delta_percentiles", "figure"),
+    [Input("communities-dropdown", "value"), Input("gcm-dropdown", "value")],
+)
+def update_future_delta_percentiles(community, gcm):
+    """
+    Build chart / visualiztion of threshold/durations
+    from model data -- 3D Chart Attempt TODO FIXME better
+    description here please.
+    """
+
+    c_name = luts.communities.loc[community]["place"]
+
+    fig = go.Figure()
+
+    # Filter by community & relevant models
+    dt = percentiles.loc[(percentiles["stid"] == community)]
+    de = dt.loc[dt.gcm == "ERA"]
+    dc = dt.loc[dt.gcm == gcm]
+
+    dec = de.set_index(["ws_thr", "dur_thr"])
+    dcc = dc.set_index(["ws_thr", "dur_thr"])
+
+    # Scale future values (ERA = 35 years, others = 85 years)
+    # 35/85 = 0.4117647059 = scale factor for future data
+    dcc["events"] = (dcc["events"] * 0.4117647059).round()
+
+    # Merge the two dataframes (outer join)
+    # Outer join ensures wind events present in either
+    # dataframe are included (union)
+    dj = dcc.join(dec, how="outer", lsuffix="_model", rsuffix="_ERA")
+    dj = dj.fillna(0)  # so we can subtract
+    dj["delta"] = dj["events_model"] - dj["events_ERA"]
+
+    # Assign dot colors
+    def determine_colors(row):
+        if row["delta"] > 0:
+            if int(row["events_ERA"]) != 0:
+                # Positive % increase
+                return luts.speed_ranges["14-18"]["color"]
+            # These are new events, mark specially
+            return "#FE3508"
+        # Negative % change
+        return "#cccccc"
+
+    dj["color"] = dj.apply(determine_colors, axis=1)
+
+    # Compute % change between baseline and model
+    dj["percent_change"] = ((dj["delta"] / dj["events_ERA"]) * 100).round()
+
+    # Take absolute value to show magnitude, since
+    # now color shows +/-
+    dj["marker_size"] = dj["percent_change"].abs()
+
+    # Finally, flatten resulting table.
+    dj = dj.reset_index()
+
+    def build_hover_text(row):
+        if int(row["delta"]) == 0:
+            return "No change"
+
+        if int(row["events_ERA"]) != 0:
+            t = "<b>" + str(row["percent_change"]) + "% "
+            if int(row["delta"]) > 0:
+                t += "more</b> events,<br>"
+            else:
+                t += "fewer</b> events,<br>"
+        else:
+            t = "<b>" + str(int(row["delta"])) + " new events</b>,<br>"
+
+        t += str(row["ws_thr"]) + "mph<br>"
+        t += luts.durations[row["dur_thr"]]
+        return t
+
+    dj["hover_text"] = dj.apply(build_hover_text, axis=1)
+
+    # Size ref for bubble size -- scale bubbles sanely
+    # https://plot.ly/python/bubble-charts/#scaling-the-size-of-bubble-charts
+    sizeref = 2.0 * max(dj["marker_size"]) / (100 ** 2)
+
+    fig.add_trace(
+        go.Scatter(
+            x=dj.dur_thr,
+            y=dj.ws_thr,
+            hovertext=dj.hover_text,
+            hoverinfo="text",
+            marker=dict(size=dj.marker_size, color=dj.color),
+        )
+    )
+
+    fig.update_traces(
+        mode="markers", marker=dict(sizeref=sizeref, sizemode="area", line_width=2)
+    )
+
+    figure_text = (
+        "<b>Wind event changes between ERA (1980-2015) and "
+        + gcm
+        + " (2015-2100)</b><br>"
+        + c_name
+    )
+
+    ytickvals = dj["ws_thr"].unique().astype("U")
+    yticktext = np.char.add(ytickvals, luts.percentiles)
+
+    fig.update_layout(
+        title=dict(text=figure_text, x=0.5),
+        legend_orientation="h",
+        legend={"font": {"family": "Open Sans", "size": 10}},
+        height=550,
+        margin={"l": 50, "r": 50, "b": 50, "t": 50, "pad": 4},
+        xaxis={"type": "category", "title": "Duration (hours)"},
+        yaxis={
+            "type": "category",
+            "title": "Wind speed",
+            "tickvals": ytickvals,
+            "ticktext": yticktext,
+        },
     )
     return fig
 

@@ -250,8 +250,19 @@ def process_future_roses():
 
     future_roses.to_csv("future_roses.csv")
 
+def process_threshold_percentiles():
+    dt = pd.read_csv("WRF_hwe_perc.csv")
+    dt = dt.drop(["wd", "ts"], axis=1)
+    dt["events"] = 0 # add column for count
+    dk = dt.groupby(["stid", "gcm", "ws_thr", "dur_thr"]).count().reset_index()
+    dk.to_csv("percentiles.csv")
 
-process_future_roses()
+process_threshold_percentiles()
+
+# Make already-done V2 work skippable.
+v2_preprocess = False
+if v2_preprocess:
+    process_future_roses()
 
 # Make all V1 work skippable.
 v1_preprocess = False

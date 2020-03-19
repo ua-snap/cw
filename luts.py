@@ -6,9 +6,21 @@ Contains common lookup tables between GUI/application code
 """
 import os
 import pandas as pd
+import numpy as np
 import plotly.graph_objs as go
 
 communities = pd.read_csv("places.csv", index_col="sid")
+
+# Needs to be a numpy array for ease of building relevant
+# strings
+# 50, 75, 85, 95, 99
+percentiles = np.array([
+    "mph (50th %ile)",
+    "mph (75th %ile)",
+    "mph (85th %ile)",
+    "mph (95th %ile)",
+    "mph (99th %ile)",
+])
 
 windspeeds = {
     25: "25mph or greater",
