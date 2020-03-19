@@ -265,6 +265,9 @@ Below is a collection of “wind roses” showing distributions of wind by speed
                 dcc.Graph(
                     id="future_delta_percentiles", figure=go.Figure(), config=luts.fig_configs
                 ),
+                dcc.Graph(
+                    id="future_distance", figure=go.Figure(), config=luts.fig_configs
+                ),
                 dcc.Graph(id="future_rose", figure=go.Figure(), config=luts.fig_configs),
             ],
         ),

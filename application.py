@@ -22,6 +22,7 @@ monthly_means = pd.read_csv("monthly_averages.csv")
 thresholds = pd.read_csv("WRF_hwe.csv")
 future_rose = pd.read_csv("future_roses.csv")
 percentiles = pd.read_csv("percentiles.csv")
+distances = pd.read_csv("WRF_hwe_dist.csv")
 
 app = dash.Dash(__name__)
 
@@ -751,6 +752,47 @@ def update_future_delta_percentiles(community, gcm):
         },
     )
     return fig
+
+
+@app.callback(Output("future_distance", "figure"),
+        [Input("communities-dropdown", "value"), Input("gcm-dropdown", "value")],
+)
+def update_distance_box_plot(community, gcm):
+    """ Generate box plot for future speed distances """
+
+    c_name = luts.communities.loc[community]["place"]
+    de = distances.loc[(distances.gcm == "ERA") & (distances.stid == community)]
+    dm = distances.loc[(distances.gcm == gcm) & (distances.stid == community)]
+
+    return go.Figure(
+        layout=dict(
+            title=dict(text="Wind Distance, 2015-2100, ERA/" + str(gcm) + ", " + c_name, x=0.5),
+            boxmode="group",
+            legend_orientation="h",
+            legend={"font": {"family": "Open Sans", "size": 10}},
+            yaxis={"title": "Wind distance (speed x duration)"},
+            height=550,
+            margin={"l": 50, "r": 50, "b": 50, "t": 50, "pad": 4},
+        ),
+        data=[
+            go.Box(
+                name="Modeled wind distance, 1980-2015",
+                fillcolor="#ccc",
+                x=de.ts,
+                y=de.dist,
+                marker=dict(color="#888"),
+                line=dict(color="#888"),
+            ),
+            go.Box(
+                name="Modeled wind distance, 2015-2100, " + str(gcm),
+                fillcolor=luts.speed_ranges["10-14"]["color"],
+                x=dm.ts,
+                y=dm.dist,
+                marker=dict(color=luts.speed_ranges["22+"]["color"]),
+                line=dict(color=luts.speed_ranges["22+"]["color"]),
+            ),
+        ],
+    )
 
 
 @app.callback(
