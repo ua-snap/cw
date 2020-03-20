@@ -485,6 +485,7 @@ def update_threshold_graph(community, duration, gcm):
                 name=labels[index],
                 x=k.ts,
                 y=k.events,
+                width=10,
                 marker=dict(color=luts.colors[index], line=dict(width=0)),
             )
         )
@@ -504,7 +505,7 @@ def update_threshold_graph(community, duration, gcm):
             ),
             legend={"font": {"family": "Open Sans", "size": 10}},
             yaxis={"title": "Events"},
-            height=550,
+            height=400,
             barmode="stack",
             margin={"l": 50, "r": 50, "b": 50, "t": 50, "pad": 4},
         ),

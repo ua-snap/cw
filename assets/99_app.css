@@ -111,3 +111,15 @@ h3.title--rose {
 ._dash-undo-redo {
 	display: none;
 }
+
+#threshold_graph {
+	margin: 3em auto 1em;
+	width: 800px;
+	height: 450px;
+}
+
+#future_delta_percentiles {
+	margin: 3em auto 1em;
+	width: 700px;
+	height: 550px;
+}
