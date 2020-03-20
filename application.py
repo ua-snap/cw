@@ -629,8 +629,7 @@ def update_future_delta_percentiles(community, gcm):
         margin={"l": 50, "r": 50, "b": 50, "t": 50, "pad": 4},
         xaxis={"type": "category", "title": "Duration (hours)"},
         yaxis={
-            "type": "category",
-            "title": "Wind speed",
+            "title": "Wind Speed",
             "tickvals": ytickvals,
             "ticktext": yticktext,
         },
