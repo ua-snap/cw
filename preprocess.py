@@ -235,20 +235,73 @@ def process_future_roses():
         future_roses = future_roses.append(t)
 
         dk = df.loc[df.gcm == "CCSM4"]
-        t = chunk_to_rose(df, place["sid"])
+        t = chunk_to_rose(dk, place["sid"])
         t["gcm"] = "CCSM4"
         future_roses = future_roses.append(t)
 
-        df = pd.read_csv("./data/wrf_adj/CCSM4_" + place["sid"] + ".csv")
+        df = pd.read_csv("./data/wrf_adj/CM3_" + place["sid"] + ".csv")
         df.columns = ['gcm', 'sid', 'ts', 'speed', 'direction']
         dk = df.loc[df.gcm == "CM3"]
-        t = chunk_to_rose(df, place["sid"])
+        t = chunk_to_rose(dk, place["sid"])
         t["gcm"] = "CM3"
         future_roses = future_roses.append(t)
 
         print(future_roses)
 
     future_roses.to_csv("future_roses.csv")
+
+def process_future_calms():
+    """
+    For each station, generate a count
+    of # of calm measurements by model.
+    """
+    places = pd.read_csv("./places.csv")
+    cols = ["sid", "gcm", "total", "calm", "percent"]
+
+    future_calms = pd.DataFrame(columns=cols)
+
+    for index, place in places.iterrows():
+        print("*** Generating ^^^FUTURE>>> calm counts for " + place["sid"])
+
+        # CCSM4
+        df = pd.read_csv("./data/wrf_adj/CCSM4_" + place["sid"] + ".csv")
+        dt = df.loc[df.gcm == "ERA"]
+        dz = dt.loc[dt.ws == 0]
+
+        future_calms = future_calms.append({
+            "sid": place["sid"],
+            "gcm": "ERA",
+            "total": dt.size,
+            "calm": dz.size,
+            "percent": round(dz.size / dt.size, 3) * 100
+        }, ignore_index=True)
+
+        dt = df.loc[df.gcm == "CCSM4"]
+        dz = dt.loc[dt.ws == 0]
+
+        future_calms = future_calms.append({
+            "sid": place["sid"],
+            "gcm": "CCSM4",
+            "total": dt.size,
+            "calm": dz.size,
+            "percent": round(dz.size / dt.size, 3) * 100
+        }, ignore_index=True)
+
+        # CM3
+        df = pd.read_csv("./data/wrf_adj/CM3_" + place["sid"] + ".csv")
+        dt = df.loc[df.gcm == "CM3"]
+        dz = dt.loc[dt.ws == 0]
+
+        future_calms = future_calms.append({
+            "sid": place["sid"],
+            "gcm": "CM3",
+            "total": dt.size,
+            "calm": dz.size,
+            "percent": round(dz.size / dt.size, 3) * 100
+        }, ignore_index=True)
+        print(future_calms)
+
+    future_calms.to_csv("future_calms.csv")
 
 def process_threshold_percentiles():
     dt = pd.read_csv("WRF_hwe_perc.csv")
@@ -257,12 +310,13 @@ def process_threshold_percentiles():
     dk = dt.groupby(["stid", "gcm", "ts", "ws_thr", "dur_thr"]).count().reset_index()
     dk.to_csv("percentiles.csv")
 
-process_threshold_percentiles()
 
 # Make already-done V2 work skippable.
-v2_preprocess = False
+v2_preprocess = True
 if v2_preprocess:
-    process_future_roses()
+    process_future_calms()
+    # process_threshold_percentiles()
+    # process_future_roses()
 
 # Make all V1 work skippable.
 v1_preprocess = False

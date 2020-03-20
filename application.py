@@ -18,6 +18,7 @@ import luts
 # Read data blobs and other items used from env
 data = pd.read_csv("roses.csv")
 calms = pd.read_csv("calms.csv")
+future_calms = pd.read_csv("future_calms.csv")
 monthly_means = pd.read_csv("monthly_averages.csv")
 thresholds = pd.read_csv("WRF_hwe.csv")
 future_rose = pd.read_csv("future_roses.csv")
@@ -652,7 +653,7 @@ def update_future_rose(community, gcm):
     get_rose_traces(d, traces, "", True)
 
     # Compute % calm, use this to modify the hole size
-    c = calms[calms["sid"] == community]
+    c = future_calms[(future_calms["sid"] == community) & (future_calms["gcm"] == gcm)]
     c_mean = c.mean()
     c_mean = int(round(c_mean["percent"]))
 
