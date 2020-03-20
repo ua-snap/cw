@@ -12,7 +12,7 @@ import plotly.graph_objs as go
 communities = pd.read_csv("places.csv", index_col="sid")
 
 # Needs to be a numpy array for ease of building relevant
-# strings
+# strings for some code
 # 50, 75, 85, 95, 99
 percentiles = np.array([
     "mph (50th %ile)",

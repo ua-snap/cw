@@ -252,9 +252,9 @@ def process_future_roses():
 
 def process_threshold_percentiles():
     dt = pd.read_csv("WRF_hwe_perc.csv")
-    dt = dt.drop(["wd", "ts"], axis=1)
+    dt = dt.drop(["wd"], axis=1)
     dt["events"] = 0 # add column for count
-    dk = dt.groupby(["stid", "gcm", "ws_thr", "dur_thr"]).count().reset_index()
+    dk = dt.groupby(["stid", "gcm", "ts", "ws_thr", "dur_thr"]).count().reset_index()
     dk.to_csv("percentiles.csv")
 
 process_threshold_percentiles()

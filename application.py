@@ -21,8 +21,7 @@ calms = pd.read_csv("calms.csv")
 monthly_means = pd.read_csv("monthly_averages.csv")
 thresholds = pd.read_csv("WRF_hwe.csv")
 future_rose = pd.read_csv("future_roses.csv")
-percentiles = pd.read_csv("percentiles.csv")
-distances = pd.read_csv("WRF_hwe_dist.csv")
+percentiles = pd.read_csv("percentiles.csv", index_col=0)
 
 app = dash.Dash(__name__)
 
@@ -467,26 +466,28 @@ def update_threshold_graph(community, duration, gcm):
     c_name = luts.communities.loc[community]["place"]
 
     # Filter by community, windspeed and duration/
-    dt = thresholds.loc[
-        (thresholds["stid"] == community)
-        & (thresholds["dur_thr"] == duration)
-        & ((thresholds["gcm"] == gcm) | (thresholds["gcm"] == "ERA"))
+    dk = percentiles.loc[
+        (percentiles["stid"] == community)
+        & (percentiles["dur_thr"] == duration)
+        & ((percentiles["gcm"] == gcm) | (percentiles["gcm"] == "ERA"))
     ]
-    dk = dt.groupby(["ts", "ws_thr"]).count().reset_index()
 
     traces = []
-    color_index = 0
-    for ws, name in luts.windspeeds.items():
+    index = 0
+    wind_speeds = dk.ws_thr.unique()
+    labels = np.char.add(wind_speeds.astype("U"), luts.percentiles)
+
+    for ws in dk.ws_thr.unique():
         k = dk.loc[dk.ws_thr == ws]
         traces.append(
             go.Bar(
-                name=name,
+                name=labels[index],
                 x=k.ts,
-                y=k.dur_thr,
-                marker=dict(color=luts.colors[color_index], line=dict(width=0)),
+                y=k.events,
+                marker=dict(color=luts.colors[index], line=dict(width=0)),
             )
         )
-        color_index += 1
+        index += 1
 
     return go.Figure(
         layout=dict(
@@ -509,127 +510,6 @@ def update_threshold_graph(community, duration, gcm):
         data=traces,
     )
 
-
-@app.callback(
-    Output("future_delta", "figure"),
-    [Input("communities-dropdown", "value"), Input("gcm-dropdown", "value")],
-)
-def update_future_delta(community, gcm):
-    """
-    Build chart / visualiztion of threshold/durations
-    from model data -- 3D Chart Attempt TODO FIXME better
-    description here please.
-    """
-
-    c_name = luts.communities.loc[community]["place"]
-
-    fig = go.Figure()
-
-    # Filter by community & relevant models
-    dt = thresholds.loc[(thresholds["stid"] == community)]
-    de = dt.loc[dt.gcm == "ERA"]
-    dc = dt.loc[dt.gcm == gcm]
-
-    # Count events, reset indices, drop unused columns, rename.
-    dec = de.groupby(["ws_thr", "dur_thr"]).count()
-    dcc = dc.groupby(["ws_thr", "dur_thr"]).count()
-    dec = dec.reset_index()
-    dcc = dcc.reset_index()
-    dec = dec.drop(["stid", "wd", "ts"], axis=1)
-    dcc = dcc.drop(["stid", "wd", "ts"], axis=1)
-    dec.columns = ["ws_thr", "dur_thr", "count"]
-    dcc.columns = ["ws_thr", "dur_thr", "count"]
-    dec = dec.set_index(["ws_thr", "dur_thr"])
-    dcc = dcc.set_index(["ws_thr", "dur_thr"])
-
-    # Scale future values (ERA = 35 years, others = 85 years)
-    # 35/85 = 0.4117647059 = scale factor for future data
-    dcc["count"] = (dcc["count"] * 0.4117647059).round()
-
-    # Merge the two dataframes (outer join)
-    # Outer join ensures wind events present in either
-    # dataframe are included (union)
-    dj = dcc.join(dec, how="outer", lsuffix="_model", rsuffix="_ERA")
-    dj = dj.fillna(0)  # so we can subtract
-    dj["delta"] = dj["count_model"] - dj["count_ERA"]
-
-    # Assign dot colors
-    def determine_colors(row):
-        if row["delta"] > 0:
-            if int(row["count_ERA"]) != 0:
-                # Positive % increase
-                return luts.speed_ranges["14-18"]["color"]
-            # These are new events, mark specially
-            return "#FE3508"
-        # Negative % change
-        return "#cccccc"
-
-    dj["color"] = dj.apply(determine_colors, axis=1)
-
-    # Take absolute value to show magnitude, since
-    # now color shows +/-
-    dj["marker_size"] = dj["delta"].abs()
-
-    # Finally, flatten resulting table.
-    dj = dj.reset_index()
-
-    def build_hover_text(row):
-        if int(row["delta"]) == 0:
-            return "No change"
-
-        if int(row["count_ERA"]) != 0:
-            d = round(((row["delta"] / row["count_ERA"]) * 100), 0)
-            t = "<b>" + str(d) + "% "
-            if int(row["delta"]) > 0:
-                t += "more</b> events,<br>"
-            else:
-                t += "fewer</b> events,<br>"
-        else:
-            t = "<b>" + str(int(row["delta"])) + " new events</b>,<br>"
-
-        t += luts.windspeeds[row["ws_thr"]] + "<br>"
-        t += luts.durations[row["dur_thr"]]
-        return t
-
-    dj["hover_text"] = dj.apply(build_hover_text, axis=1)
-
-    # Size ref for bubble size -- scale bubbles sanely
-    # https://plot.ly/python/bubble-charts/#scaling-the-size-of-bubble-charts
-    sizeref = 2.0 * max(dj["marker_size"]) / (100 ** 2)
-
-    fig.add_trace(
-        go.Scatter(
-            x=dj.dur_thr,
-            y=dj.ws_thr,
-            hovertext=dj.hover_text,
-            hoverinfo="text",
-            marker=dict(size=dj.marker_size, color=dj.color),
-        )
-    )
-
-    fig.update_traces(
-        mode="markers", marker=dict(sizeref=sizeref, sizemode="area", line_width=2)
-    )
-
-    figure_text = (
-        "<b>Wind event changes between ERA (1980-2015) and "
-        + gcm
-        + " (2015-2100)</b><br>"
-        + c_name
-    )
-
-    fig.update_layout(
-        title=dict(text=figure_text, x=0.5),
-        legend_orientation="h",
-        legend={"font": {"family": "Open Sans", "size": 10}},
-        height=550,
-        margin={"l": 50, "r": 50, "b": 50, "t": 50, "pad": 4},
-        xaxis={"type": "category", "title": "Duration"},
-        yaxis={"type": "category", "title": "Wind speed"},
-    )
-    return fig
-
-
 @app.callback(
     Output("future_delta_percentiles", "figure"),
     [Input("communities-dropdown", "value"), Input("gcm-dropdown", "value")],
@@ -647,6 +527,8 @@ def update_future_delta_percentiles(community, gcm):
 
     # Filter by community & relevant models
     dt = percentiles.loc[(percentiles["stid"] == community)]
+    dt = dt.drop(["ts"], axis=1).groupby(["gcm", "ws_thr", "dur_thr"]).sum().reset_index()
+
     de = dt.loc[dt.gcm == "ERA"]
     dc = dt.loc[dt.gcm == gcm]
 
@@ -752,47 +634,6 @@ def update_future_delta_percentiles(community, gcm):
         },
     )
     return fig
-
-
-@app.callback(Output("future_distance", "figure"),
-        [Input("communities-dropdown", "value"), Input("gcm-dropdown", "value")],
-)
-def update_distance_box_plot(community, gcm):
-    """ Generate box plot for future speed distances """
-
-    c_name = luts.communities.loc[community]["place"]
-    de = distances.loc[(distances.gcm == "ERA") & (distances.stid == community)]
-    dm = distances.loc[(distances.gcm == gcm) & (distances.stid == community)]
-
-    return go.Figure(
-        layout=dict(
-            title=dict(text="Wind Distance, 2015-2100, ERA/" + str(gcm) + ", " + c_name, x=0.5),
-            boxmode="group",
-            legend_orientation="h",
-            legend={"font": {"family": "Open Sans", "size": 10}},
-            yaxis={"title": "Wind distance (speed x duration)"},
-            height=550,
-            margin={"l": 50, "r": 50, "b": 50, "t": 50, "pad": 4},
-        ),
-        data=[
-            go.Box(
-                name="Modeled wind distance, 1980-2015",
-                fillcolor="#ccc",
-                x=de.ts,
-                y=de.dist,
-                marker=dict(color="#888"),
-                line=dict(color="#888"),
-            ),
-            go.Box(
-                name="Modeled wind distance, 2015-2100, " + str(gcm),
-                fillcolor=luts.speed_ranges["10-14"]["color"],
-                x=dm.ts,
-                y=dm.dist,
-                marker=dict(color=luts.speed_ranges["22+"]["color"]),
-                line=dict(color=luts.speed_ranges["22+"]["color"]),
-            ),
-        ],
-    )
 
 
 @app.callback(
