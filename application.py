@@ -512,6 +512,7 @@ def update_threshold_graph(community, duration, gcm):
         data=traces,
     )
 
+
 @app.callback(
     Output("future_delta_percentiles", "figure"),
     [Input("communities-dropdown", "value"), Input("gcm-dropdown", "value")],
@@ -529,7 +530,12 @@ def update_future_delta_percentiles(community, gcm):
 
     # Filter by community & relevant models
     dt = percentiles.loc[(percentiles["stid"] == community)]
-    dt = dt.drop(["ts"], axis=1).groupby(["gcm", "ws_thr", "dur_thr"]).sum().reset_index()
+    dt = (
+        dt.drop(["ts"], axis=1)
+        .groupby(["gcm", "ws_thr", "dur_thr"])
+        .sum()
+        .reset_index()
+    )
 
     de = dt.loc[dt.gcm == "ERA"]
     dc = dt.loc[dt.gcm == gcm]
@@ -567,8 +573,10 @@ def update_future_delta_percentiles(community, gcm):
     # Take absolute value to show magnitude, since
     # now color shows +/-.  "inf" values are possible due
     # to new events; replace them with the mean.
+    # nan are also possible (0/0)
     dj["marker_size"] = dj["percent_change"].abs()
     dj = dj.replace([np.inf], dj["marker_size"].loc[dj["marker_size"] != np.inf].mean())
+    dj = dj.fillna(0)
 
     # Finally, flatten resulting table.
     dj = dj.reset_index()
@@ -628,11 +636,7 @@ def update_future_delta_percentiles(community, gcm):
         height=550,
         margin={"l": 50, "r": 50, "b": 50, "t": 50, "pad": 4},
         xaxis={"type": "category", "title": "Duration (hours)"},
-        yaxis={
-            "title": "Wind Speed",
-            "tickvals": ytickvals,
-            "ticktext": yticktext,
-        },
+        yaxis={"title": "Wind Speed", "tickvals": ytickvals, "ticktext": yticktext},
     )
     return fig
 
@@ -645,73 +649,96 @@ def update_future_rose(community, gcm):
     """ Generate cumulative future wind rose for selected community
     this is very rough right now.
     """
+
+    # t = top margin in % of figure.
+    subplot_spec = dict(type="polar", t=0.01)
+    fig = make_subplots(
+        rows=1,
+        cols=2,
+        horizontal_spacing=0.03,
+        vertical_spacing=0.04,
+        specs=[[subplot_spec, subplot_spec]],
+        subplot_titles=["ERA-Interim (1980-2015)", luts.gcms[gcm] + " (2015-2100)"],
+    )
+
+    max_axes = pd.DataFrame()
+
+    if_show_legend = True
+    for index, m in enumerate(["ERA", gcm]):
+        traces = []
+        d = future_rose.loc[
+            (future_rose["sid"] == community) & (future_rose["gcm"] == m)
+        ]
+        max_axes = max_axes.append(get_rose_traces(d, traces, "", if_show_legend), ignore_index=True)
+        for trace in traces:
+            fig.add_trace(trace, row=1, col=index + 1)
+
+        if_show_legend = False
+
+    # Determine maximum r-axis and r-step.
+    # Adding one and using floor(/2.5) was the
+    # result of experimenting with values that yielded
+    # about 3 steps in most cases, with a little headroom
+    # for the r-axis outer ring.
+    rmax = max_axes.max()["frequency"] + 1
+    rstep = math.floor(rmax / 2.5)
+
+    # Apply formatting to subplot titles,
+    # which are actually annotations.
+    for i in fig["layout"]["annotations"]:
+        i["y"] = i["y"] + 0.04
+        i["font"] = dict(size=12, color="#444")
+        i["text"] = "<b>" + i["text"] + "</b>"
+
     c_name = luts.communities.loc[community]["place"]
-    traces = []
 
-    # Subset for community & 0=year
-    d = future_rose.loc[(future_rose["sid"] == community) & (future_rose["gcm"] == gcm)]
-    get_rose_traces(d, traces, "", True)
-
-    # Compute % calm, use this to modify the hole size
-    c = future_calms[(future_calms["sid"] == community) & (future_calms["gcm"] == gcm)]
-    c_mean = c.mean()
-    c_mean = int(round(c_mean["percent"]))
-
-    c_name = luts.communities.loc[community]["place"]
-
-    title = "Modeled Wind Speed Distribution, "
-    if gcm is "ERA":
-        title += "ERA, 1980-2015, "
-    else:
-        title += gcm + ", 2015-2100"
-    title += ", " + c_name
-
-    rose_layout = {
-        "title": title,
-        "height": 700,
-        "margin": {"l": 0, "r": 0, "b": 100, "t": 50},
-        "legend": {"orientation": "h", "x": 0, "y": 1},
-        "annotations": [
-            {
-                "x": 0.5,
-                "y": 0.5,
-                "showarrow": False,
-                "text": str(c_mean) + r"% calm",
-                "xref": "paper",
-                "yref": "paper",
-            }
-        ],
-        "polar": {
-            "legend": {"orientation": "h"},
-            "angularaxis": {
-                "rotation": 90,
-                "direction": "clockwise",
-                "tickmode": "array",
-                "tickvals": [0, 45, 90, 135, 180, 225, 270, 315],
-                "ticks": "",  # hide tick marks
-                "ticktext": ["N", "NE", "E", "SE", "S", "SW", "W", "NW"],
-                "tickfont": {"color": "#444"},
-                "showline": False,  # no boundary circles
-                "color": "#888",  # set most colors to #888
-                "gridcolor": "#efefef",
-            },
-            "radialaxis": {
-                "color": "#888",
-                "gridcolor": "#efefef",
-                "ticksuffix": "%",
-                "showticksuffix": "last",
-                "tickcolor": "rgba(0, 0, 0, 0)",
-                "tick0": 0,
-                "dtick": 3,
-                "ticklen": 10,
-                "showline": False,  # hide the dark axis line
-                "tickfont": {"color": "#444"},
-            },
-            "hole": c_mean / 100,
-        },
-    }
-
-    return {"layout": rose_layout, "data": traces}
+    polar_props = dict(
+        bgcolor="#fff",
+        angularaxis=dict(
+            tickmode="array",
+            tickvals=[0, 45, 90, 135, 180, 225, 270, 315],
+            ticktext=["N", "NE", "E", "SE", "S", "SW", "W", "NW"],
+            tickfont=dict(color="#444", size=10),
+            showticksuffix="last",
+            showline=False,  # no boundary circles
+            color="#888",  # set most colors to #888
+            gridcolor="#efefef",
+            rotation=90,  # align compass to north
+            direction="clockwise",  # degrees go clockwise
+        ),
+        radialaxis=dict(
+            color="#888",
+            gridcolor="#efefef",
+            tickangle=0,
+            range=[0, rmax],
+            tick0=1,
+            dtick=rstep,
+            ticksuffix="%",
+            showticksuffix="last",
+            showline=False,  # hide the dark axis line
+            tickfont=dict(color="#444"),
+        ),
+    )
+    fig.update_layout(
+        title=dict(
+            text="Modeled Wind Speed/Direction Distribution, 1980-2100, " + c_name,
+            font=dict(family="Open Sans", size=18),
+            x=0.5,
+        ),
+        margin=dict(l=50, t=100, r=50, b=0),
+        font_size=10,
+        legend=dict(x=0, y=0, orientation="h"),
+        height=600,
+        paper_bgcolor="#fff",
+        plot_bgcolor="#fff",
+        # We need to explicitly define the rotations
+        # we need for each named subplot.
+        polar1={**polar_props},
+        polar2={**polar_props},
+        # polar1={**polar_props, **{"hole": c.iloc[0]["percent"]}},
+        # polar2={**polar_props, **{"hole": c.iloc[1]["percent"]}},
+    )
+    return fig
 
 
 if __name__ == "__main__":

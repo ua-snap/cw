@@ -264,6 +264,16 @@ Below is a collection of “wind roses” showing distributions of wind by speed
                     figure=go.Figure(),
                     config=luts.fig_configs,
                 ),
+                html.H4(
+                    "Wind speed and direction for model baseline and future projections",
+                    className="title is-5",
+                ),
+                dcc.Markdown(
+                    """
+*Fixme Wording Help Needed* This chart shows the ERA-Interim model reanalysis on the left, and the selected future model on the right.  This allows comparisons between the historical modeled data and future projections.
+ """,
+                    className="content help-text is-size-6",
+                ),
                 dcc.Graph(
                     id="future_rose", figure=go.Figure(), config=luts.fig_configs
                 ),
