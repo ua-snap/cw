@@ -735,8 +735,6 @@ def update_future_rose(community, gcm):
         # we need for each named subplot.
         polar1={**polar_props},
         polar2={**polar_props},
-        # polar1={**polar_props, **{"hole": c.iloc[0]["percent"]}},
-        # polar2={**polar_props, **{"hole": c.iloc[1]["percent"]}},
     )
     return fig
 

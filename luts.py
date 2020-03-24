@@ -22,15 +22,6 @@ percentiles = np.array([
     "mph (99th %ile)<br><b>Extremely rare</b>",
 ])
 
-windspeeds = {
-    25: "25mph or greater",
-    30: "30mph+",
-    35: "35mph+",
-    40: "40mph+",
-    45: "45mph+",
-    50: "50mph+",
-}
-
 durations = {
     1: "1 continuous hour or more",
     6: "6+ hours",
