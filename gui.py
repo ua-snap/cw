@@ -10,9 +10,6 @@ import luts
 
 path_prefix = os.environ["REQUESTS_PATHNAME_PREFIX"]
 
-# Google analytics tag
-gtag_id = os.environ["GTAG_ID"]
-
 map_figure = go.Figure(
     {"data": [luts.map_communities_trace], "layout": luts.map_layout}
 )
