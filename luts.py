@@ -16,10 +16,10 @@ communities = pd.read_csv("places.csv", index_col="sid")
 # 50, 75, 85, 95, 99
 percentiles = np.array([
     "mph (50th %ile)<br><b>Common<b>",
-    "mph (75th %ile)<br><b>Occasional</b>",
-    "mph (85th %ile)<br><b>Rare</b>",
-    "mph (95th %ile)<br><b>Very rare</b>",
-    "mph (99th %ile)<br><b>Extremely rare</b>",
+    "mph (75th %ile)<br>",
+    "mph (85th %ile)<br><b>Occasional</b>",
+    "mph (95th %ile)<br>",
+    "mph (99th %ile)<br><b>Rare</b>",
 ])
 
 durations = {
@@ -31,9 +31,8 @@ durations = {
 }
 
 gcms = {
-    "ERA": "ERA",
-    "CCSM4": "CCSM4",
-    "CM3": "CM3",
+    "CCSM4": "NCAR-CCSM4",
+    "CM3": "GFDL-CM3",
 }
 
 months = {
