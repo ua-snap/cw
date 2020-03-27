@@ -9,6 +9,11 @@ h1, h2, h3, h4, h5, h6 {
 	font-family: 'Open Sans';
 }
 
+/* Slightly boost font size for body text. */
+.is-size-6 {
+	font-size: 1.2rem!important;
+}
+
 /*
 Not sure why, but need to hide this SVG to prevent
 unwanted background from being shown behind the
@@ -138,10 +143,14 @@ h3.title--rose {
 }
 #toc li h3 {
 	display: inline-block;
-	margin-bottom: 0;
+	margin-bottom: 0.5rem;
 }
 #toc ol li {
+	font-size: 1.1rem;
 	list-style-type: none;
+	line-height: 1.2;
+	margin-top: .2rem;
+	margin-bottom: .3rem;
 }
 #toc ol ol {
 	margin-left: 1rem;

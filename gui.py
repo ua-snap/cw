@@ -249,7 +249,7 @@ help_text = html.Div(
  * We also removed obviously wrong reports (e.g., wind speeds exceeding 100 mph) and short-duration (< 6 hour) spikes in which an hourly wind speed was at least 30 mph greater than in the immediately preceding and subsequent hours.
 
                 """,
-                    className="is-size-5 content",
+                    className="is-size-6 content",
                 )
             ],
         ),
