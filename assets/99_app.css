@@ -113,13 +113,36 @@ h3.title--rose {
 }
 
 #threshold_graph {
-	margin: 3em auto 1em;
-	width: 800px;
+	width: 75%;
 	height: 450px;
 }
 
 #future_delta_percentiles {
-	margin: 3em auto 1em;
-	width: 700px;
+	width: 75%;
 	height: 550px;
+}
+
+#toc {
+	position: sticky;
+	top: 0;
+	margin: 0 0 3rem 3rem;
+	padding-top: 3rem;
+}
+
+#toc ol {
+    counter-reset: item
+}
+#toc li {
+    display: block;
+    padding-bottom: 0.25rem;
+}
+#toc li h3 {
+	display: inline-block;
+	margin-bottom: 0;
+}
+#toc ol li {
+	list-style-type: none;
+}
+#toc ol ol {
+	margin-left: 1rem;
 }
