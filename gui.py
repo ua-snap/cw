@@ -3,7 +3,6 @@ NWT Mine site future climate tool
 """
 # pylint: disable=invalid-name, import-error, line-too-long
 import os
-import json
 import plotly.graph_objs as go
 import dash_core_components as dcc
 import dash_html_components as html
