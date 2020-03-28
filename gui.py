@@ -226,7 +226,7 @@ intro = html.Div(
 )
 
 help_text = html.Div(
-    className="container",
+    className="section",
     children=[
         html.A(id="toc_about"),
         html.Div(
@@ -278,114 +278,159 @@ columns = html.Div(
         html.Div(
             className="column",
             children=[
-                html.A(id="toc_location"),
-                html.Div(className="section section--form", children=[form_fields]),
                 html.Div(
-                    className="section graph",
                     children=[
-                        html.A(id="toc_g1"),
-                        html.Hr(),
-                        html.H3("Average wind speeds by month", className="title is-4"),
-                        dcc.Graph(
-                            id="means_box", figure=go.Figure(), config=luts.fig_configs
+                        html.Div(
+                            className="section",
+                            children=[
+                                html.A(id="toc_location"),
+                                form_fields
+                            ]
                         ),
-                        dcc.Markdown(
-                            """
+                        html.Div(
+                            className="section",
+                            children=[
+                                html.A(id="toc_g1"),
+                                html.H3(
+                                    "Average wind speeds by month",
+                                    className="title is-4",
+                                ),
+                                dcc.Graph(
+                                    id="means_box",
+                                    figure=go.Figure(),
+                                    config=luts.fig_configs,
+                                ),
+                                dcc.Markdown(
+                                    """
  * Boxes show the 25&percnt; and 75&percnt; ranges of monthly averages over 35 years.
  * Averages (horizontal lines within boxes) are based on all hourly reports for a month.
  * &ldquo;Whiskers&rdquo; (vertical lines above and below boxes) represent full ranges of typical variation of monthly averages for the different years, extended to the minimum and maximum points contained within 1.5 of the interquartile range (IQR, which is the height of the box shown).
  * Dots indicate outliers, or individual values outside the normal variation (1.5 IQR).
  """,
-                            className="content help-text is-size-6",
+                                    className="content help-text is-size-6",
+                                ),
+                            ],
                         ),
-                        html.A(id="toc_g2"),
-                        html.H3(
-                            "Wind frequency by direction and speed",
-                            className="title is-4 title--rose",
+                        html.Div(
+                            className="section",
+                            children=[
+                                html.A(id="toc_g2"),
+                                html.H3(
+                                    "Wind frequency by direction and speed",
+                                    className="title is-4 title--rose",
+                                ),
+                                dcc.Graph(
+                                    id="rose",
+                                    figure=go.Figure(),
+                                    config=luts.fig_configs,
+                                ),
+                                dcc.Markdown(
+                                    """
+     * The &ldquo;spokes&rdquo; in the rose point in the compass direction from which the wind was blowing (i.e., a spoke pointing to the right denotes a wind from the east).
+     * For each spoke, we show frequencies of wind speed occurrence (1&percnt;, 4&percnt;, 10&percnt;, &hellip;). These are denoted by concentric circles within each wind rose. Hover cursor over plot to display.
+     * The &percnt; of calm winds is shown by the size of the hole in the center of the wind rose.
+     """,
+                                    className="content help-text is-size-6",
+                                ),
+                            ],
                         ),
-                        dcc.Graph(
-                            id="rose", figure=go.Figure(), config=luts.fig_configs
+                        html.Div(
+                            className="section",
+                            children=[
+                                html.A(id="toc_g3"),
+                                html.H3(
+                                    "Monthly wind frequency by direction and speed",
+                                    className="title is-4 title--rose",
+                                ),
+                                dcc.Graph(
+                                    id="rose_monthly",
+                                    figure=go.Figure(),
+                                    config=luts.fig_configs,
+                                ),
+                            ],
                         ),
-                        dcc.Markdown(
-                            """
- * The &ldquo;spokes&rdquo; in the rose point in the compass direction from which the wind was blowing (i.e., a spoke pointing to the right denotes a wind from the east).
- * For each spoke, we show frequencies of wind speed occurrence (1&percnt;, 4&percnt;, 10&percnt;, &hellip;). These are denoted by concentric circles within each wind rose. Hover cursor over plot to display.
- * The &percnt; of calm winds is shown by the size of the hole in the center of the wind rose.
- """,
-                            className="content help-text is-size-6",
-                        ),
-                        html.A(id="toc_g3"),
-                        html.H3(
-                            "Monthly wind frequency by direction and speed",
-                            className="title is-4 title--rose",
-                        ),
-                        dcc.Graph(
-                            id="rose_monthly",
-                            figure=go.Figure(),
-                            config=luts.fig_configs,
-                        ),
-                        html.A(id="toc_gcm"),
                         html.Hr(),
-                        html.H3("Modeled data", className="title is-4"),
-                        dcc.Markdown(
-                            """
-The charts below show modeled output from the Weather Research and Forecasting Model (WRF), which we used to improve the accuracy of wind projections from two Global Climate Models (GCMs).
+                        html.Div(
+                            className="section",
+                            children=[
+                                html.A(id="toc_gcm"),
+                                html.H3("Modeled data", className="title is-4"),
+                                dcc.Markdown(
+                                    """
+        The charts below show modeled output from the Weather Research and Forecasting Model (WRF), which we used to improve the accuracy of wind projections from two Global Climate Models (GCMs).
 
-Select the GCM below to switch which model/GCM output is shown for model data.
-""",
-                            className="content help-text is-size-6",
+        Select the GCM below to switch which model/GCM output is shown for model data.
+        """,
+                                    className="content help-text is-size-6",
+                                ),
+                                gcm_dropdown_field,
+                            ],
                         ),
-                        gcm_dropdown_field,
-                        html.A(id="toc_g4"),
-                        html.H3(
-                            "Future modeled frequency of wind speed by duration",
-                            className="title is-4",
+                        html.Div(
+                            className="section",
+                            children=[
+                                html.A(id="toc_g4"),
+                                html.H3(
+                                    "Future modeled frequency of wind speed by duration",
+                                    className="title is-4",
+                                ),
+                                dcc.Markdown(
+                                    """
+        Choose the duration threshold to see changing trends over time.
+         """,
+                                    className="content help-text is-size-6",
+                                ),
+                                duration_threshold_dropdown_field,
+                                dcc.Graph(
+                                    id="threshold_graph",
+                                    figure=go.Figure(),
+                                    config=luts.fig_configs,
+                                ),
+                            ],
                         ),
-                        dcc.Markdown(
-                            """
-Choose the duration threshold to see changing trends over time.
- """,
-                            className="content help-text is-size-6",
+                        html.Div(
+                            className="section",
+                            children=[
+                                html.A(id="toc_g5"),
+                                html.H3(
+                                    "Changes between historical and future projections of wind",
+                                    className="title is-4",
+                                ),
+                                dcc.Markdown(
+                                    """
+        This chart shows the difference between modeled historical data (ERA-Interim reanalysis, 1980-2015), and future projections (NCAR-CCSM4 or GFDL-CM3, 2015-2100). Here, you can see relative patterns of changing wind events for a location. Gray shows a reduction in events, blue shows an increase, and red shows new events.
+         """,
+                                    className="content help-text is-size-6",
+                                ),
+                                dcc.Graph(
+                                    id="future_delta_percentiles",
+                                    figure=go.Figure(),
+                                    config=luts.fig_configs,
+                                ),
+                            ],
                         ),
-                        duration_threshold_dropdown_field,
-                        dcc.Graph(
-                            id="threshold_graph",
-                            figure=go.Figure(),
-                            config=luts.fig_configs,
+                        html.Div(
+                            className="section",
+                            children=[
+                                html.A(id="toc_g6"),
+                                html.H3(
+                                    "Wind speed and direction for historical and future projections",
+                                    className="title is-4",
+                                ),
+                                dcc.Markdown(
+                                    """
+        This chart shows the modeled historical data (ERA-Interim) on the left, and the selected GCM projection on the right. This allows comparisons between the historical patterns  and future projections.
+         """,
+                                    className="content help-text is-size-6",
+                                ),
+                                dcc.Graph(
+                                    id="future_rose",
+                                    figure=go.Figure(),
+                                    config=luts.fig_configs,
+                                ),
+                            ],
                         ),
-                        html.A(id="toc_g5"),
-                        html.H3(
-                            "Changes between historical and future projections of wind",
-                            className="title is-4",
-                        ),
-                        dcc.Markdown(
-                            """
-This chart shows the difference between modeled historical data (ERA-Interim reanalysis, 1980-2015), and future projections (NCAR-CCSM4 or GFDL-CM3, 2015-2100). Here, you can see relative patterns of changing wind events for a location. Gray shows a reduction in events, blue shows an increase, and red shows new events.
- """,
-                            className="content help-text is-size-6",
-                        ),
-                        dcc.Graph(
-                            id="future_delta_percentiles",
-                            figure=go.Figure(),
-                            config=luts.fig_configs,
-                        ),
-                        html.A(id="toc_g6"),
-                        html.H3(
-                            "Wind speed and direction for historical and future projections",
-                            className="title is-4",
-                        ),
-                        dcc.Markdown(
-                            """
-This chart shows the modeled historical data (ERA-Interim) on the left, and the selected GCM projection on the right. This allows comparisons between the historical patterns  and future projections.
- """,
-                            className="content help-text is-size-6",
-                        ),
-                        dcc.Graph(
-                            id="future_rose",
-                            figure=go.Figure(),
-                            config=luts.fig_configs,
-                        ),
-                    ],
+                    ]
                 ),
                 help_text,
             ],

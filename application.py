@@ -278,7 +278,7 @@ def update_rose(community):
     rose_layout = {
         "title": "Annual Wind Speed/Direction Distribution, 1980-2015, " + c_name,
         "height": 700,
-        "margin": {"l": 0, "r": 0, "b": 100, "t": 50},
+        "margin": {"l": 0, "r": 0, "b": 20, "t": 75},
         "legend": {"orientation": "h", "x": 0, "y": 1},
         "annotations": [
             {
@@ -424,7 +424,7 @@ def update_rose_monthly(community):
             font=dict(family="Open Sans", size=18),
             x=0.5,
         ),
-        margin=dict(l=50, t=100, r=50, b=0),
+        margin=dict(l=0, t=100, r=0, b=0),
         font_size=10,
         legend=dict(x=0, y=0, orientation="h"),
         height=1500,

@@ -9,13 +9,86 @@ h1, h2, h3, h4, h5, h6 {
 	font-family: 'Open Sans';
 }
 
+/* Tweaks to Bulma / Plotly control/form elements */
 /* Slightly boost font size for body text. */
 .is-size-6 {
 	font-size: 1.2rem!important;
 }
+/* Styling the dropdown selectors */
+.dropdown-selector {
+	width: 20em;
+}
+div.Select-control {
+	border: 1px solid #888;
+	box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
+.section + .section {
+	padding-top: 0;
+}
+
+
+/* Header & intro styles */
+.header {
+	background-color: #DDE4F2;
+	padding: 0;
+}
+.header--section {
+	margin-top: -1rem;
+}
+.header--section h1 {
+	padding-top: .8rem;
+}
+.header--logo {
+	float: left;
+	padding-right: 2rem;
+}
+.header--snap-link a {
+	height: 5.4em;
+	display: block;
+	z-index: 1000;
+}
+.header--snap-link img {
+	height: 5.4em;
+}
+.section.survey-link a.button {
+	font-family: 'Open Sans';
+	font-weight: 500;
+}
+
+
+/* Chart layout/padding styles.
+
+Block out height/width for all charts to reduce "bounce"
+when the page is loading.
+
+*/
+#map {
+	max-width: 640px;
+	height: 450px;
+}
+#rose {
+	max-width: 970px;
+	height: 700px;
+}
+#rose_monthly {
+	max-width: 970px;
+	height: 1500px;
+}
+#threshold_graph {
+	max-width: 970px;
+	height: 450px;
+}
+#future_delta_percentiles {
+	max-width: 970px;
+	height: 550px;
+}
+#future_rose {
+	max-width: 970px;
+	height: 600px;
+}
 
 /*
-Not sure why, but need to hide this SVG to prevent
+Not entirely sure why, but need to hide this SVG to prevent
 unwanted background from being shown behind the
 wind roses in Plotly.
 */
@@ -23,117 +96,28 @@ g.bglayer {
 	display: none !important;
 }
 
-/* We want vertical Checklists always. */
-.control label.checkbox {
-	display: block;
-}
 
-.header {
-	background-color: #DDE4F2;
-	padding: 0;
-}
-
-.header--section {
-	margin-top: -1rem;
-}
-
-.header--section h1 {
-	padding-top: .8rem;
-}
-
-.header--logo {
-	float: left;
-	padding-right: 2rem;
-}
-
-.header--snap-link a {
-	height: 5.4em;
-	display: block;
-	z-index: 1000;
-}
-
-.header--snap-link img {
-	height: 5.4em;
-}
-
-
-.section.survey-link {
-	margin: -3ex 0;
-	padding-bottom: 0;
-}
-
-.section.survey-link a.button {
-	font-family: 'Open Sans';
-	font-weight: 500;
-}
-
-.dropdown-selector {
-	width: 20em;
-}
-
-div.Select-control {
-	border: 1px solid #888;
-	box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
-}
-
-#map {
-	width: 40em;
-}
-
-div.section.section--form {
-	padding-bottom: 0;
-}
-
-h3.title--rose {
-	margin-top: 1em;
-}
-
-#rose_monthly {
-	margin-top: -3em;
-}
-
-.help-text {
-	max-width: 50em;
-	color: rgba(25, 25, 25, 1);
-}
-
-
+/* Footer! */
 .footer p {
 	width: 50%;
 	margin: 1em auto;
 }
-
 .footer a {
 	display: inline-block;
 }
-
 .footer a img {
 	height: 5em;
 	margin: 1em 1.5em;
 }
 
 
-._dash-undo-redo {
-	display: none;
-}
-
-#threshold_graph {
-	width: 75%;
-	height: 450px;
-}
-
-#future_delta_percentiles {
-	width: 75%;
-	height: 550px;
-}
-
+/* Table of contents! */
 #toc {
 	position: sticky;
 	top: 0;
 	margin: 0 0 3rem 3rem;
 	padding-top: 3rem;
 }
-
 #toc ol {
     counter-reset: item
 }
