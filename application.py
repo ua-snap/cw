@@ -504,10 +504,14 @@ def update_threshold_graph(community, duration, gcm):
                 x=0.5,
             ),
             legend={"font": {"family": "Open Sans", "size": 10}},
-            yaxis={"title": "Events"},
+            yaxis={"title": "Number of Events"},
+            xaxis=dict(
+                title="Years",
+                tickvals=list(luts.decades.keys()), ticktext=list(luts.decades.values())
+            ),
             height=400,
             barmode="stack",
-            margin={"l": 50, "r": 50, "b": 50, "t": 50, "pad": 4},
+
         ),
         data=traces,
     )

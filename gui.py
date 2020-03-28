@@ -371,7 +371,7 @@ columns = html.Div(
                             children=[
                                 html.A(id="toc_g4"),
                                 html.H3(
-                                    "Future modeled frequency of wind speed by duration",
+                                    "Historical & future modeled frequency of wind speed by duration",
                                     className="title is-4",
                                 ),
                                 dcc.Markdown(
@@ -386,6 +386,12 @@ columns = html.Div(
                                     figure=go.Figure(),
                                     config=luts.fig_configs,
                                 ),
+                                dcc.Markdown(
+"""
+ * Percentiles (&percnt;ile) are based on the frequency of 1-hour wind events.
+""",
+className="content help-text is-size-6",
+                                )
                             ],
                         ),
                         html.Div(
