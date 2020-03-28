@@ -132,7 +132,7 @@ UA is an AA/EO employer and educational institution and prohibits illegal discri
 )
 
 communities_dropdown_field = html.Div(
-    className="field",
+    className="field dropdown-selector",
     children=[
         html.Label("Choose a location", className="label"),
         html.Div(
@@ -152,7 +152,7 @@ communities_dropdown_field = html.Div(
 )
 
 gcm_dropdown_field = html.Div(
-    className="field",
+    className="field dropdown-selector",
     children=[
         html.Label("Select GCM", className="label"),
         html.Div(
@@ -172,7 +172,7 @@ gcm_dropdown_field = html.Div(
 )
 
 duration_threshold_dropdown_field = html.Div(
-    className="field",
+    className="field dropdown-selector",
     children=[
         html.Label("Select duration threshold", className="label"),
         html.Div(

@@ -67,7 +67,7 @@ g.bglayer {
 	font-weight: 500;
 }
 
-#communities-dropdown {
+.dropdown-selector {
 	width: 20em;
 }
 
