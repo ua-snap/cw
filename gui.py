@@ -210,7 +210,7 @@ intro = html.Div(
             className="section survey-link",
             children=[
                 html.P(
-                    "This tool visualizes hourly wind data recorded between 1980-2015 for 67 Alaskan communities.",
+                    "This tool displays recorded hourly wind data 1980-2015 and projected data 1980-2100 for 67 Alaskan communities.",
                     className="content is-size-4",
                 ),
                 html.A(
@@ -235,18 +235,33 @@ help_text = html.Div(
                 dcc.Markdown(
                     """
 
-#### About these wind data
+### About wind observation data
 
- * **Source**: [Iowa Environmental Mesonet](https://mesonet.agron.iastate.edu/request/download.phtml?network=AK_ASOS) run by Iowa State University. Houses data collected by the [Automated Surface Observing System](https://www.ncdc.noaa.gov/data-access/land-based-station-data/land-based-datasets/automated-surface-observing-system-asos) network and the [Automated Weather Observing System](https://www.ncdc.noaa.gov/data-access/land-based-station-data/land-based-datasets/automated-weather-observing-system-awos).
- * **Measurement frequency**: Varies between locations, from every 5 minutes to every 3 hours. Winds were measured hourly in most cases; speeds were averaged to the nearest hour in cases where measurements were more frequent.
- * **Observing site criteria**: We use data from 67 observing sites located across Alaska, mostly at airports (see map). For inclusion here, a station must have made 4 or more hourly wind measurements on at least 75% of the days during the period 1980-2015.
+ * Wind speed observations source: [Iowa Environmental Mesonet](https://mesonet.agron.iastate.edu/request/download.phtml?network=AK_ASOS), run by Iowa State University. Houses data collected by the [Automated Surface Observing System](https://www.ncdc.noaa.gov/data-access/land-based-station-data/land-based-datasets/automated-surface-observing-system-asos) network and the [Automated Weather Observing System](https://www.ncdc.noaa.gov/data-access/land-based-station-data/land-based-datasets/automated-weather-observing-system-awos).
+ * Measurement frequency: Varies between locations, from every 5 minutes to every 3 hours. Winds were measured hourly in most cases; speeds were averaged to the nearest hour in cases where measurements were more frequent.
+ * Observing site criteria: We use data from 67 observing sites located across Alaska, mostly at airports (see map). For inclusion here, a station must have made 4 or more hourly wind measurements on at least 75&percnt; of the days during the period 1980&ndash;2015.
 
-#### Data processing and quality control
+##### Data processing and quality control
 
  * Data were adjusted for homogeneity because some instrument heights (now 10 m) and/or precise locations have changed since 1980.
  * Wind speeds at 28 stations showed a statistically significant change from one part of the record to the next. Therefore we adjusted the data prior to the change using quantile mapping, a typical method for correcting biased meteorological data.
  * Four stations displayed two discontinuities. For these, we applied the quantile mapping adjustments to the later period.
  * We also removed obviously wrong reports (e.g., wind speeds exceeding 100 mph) and short-duration (< 6 hour) spikes in which an hourly wind speed was at least 30 mph greater than in the immediately preceding and subsequent hours.
+
+#### About the modeled historical and future projections of wind
+
+ * [WRF model data source](http://ckan.snap.uaf.edu/dataset/historical-and-projected-dynamically-downscaled-climate-data-for-the-state-of-alaska-and-surrou): Scenarios Network for Alaska + Arctic Planning, International Arctic Research Center, University of Alaska Fairbanks
+
+##### Data processing and quality control
+
+ * The WRF model data used here are available as a gridded product covering Alaska. To display these data for individual communities, we extracted the model output from the grid cell overlapping the community location.
+ * Modeled data, both historical and future, are inherently biased. We adjusted these data by quantile mapping the historical output to match the observed data, and applied those same adjustments to the future output. This assumes that the historical and future model output are biased in the same ways.
+
+#### Suggested citation
+
+If you want to cite this web site in a paper, we suggest this format:
+
+ > J. Walsh, K. Redilla, B. Crevensten, T. Kurkowski. Alaska Community Wind Tool. [http://windtool.accap.uaf.edu](http://windtool.accap.uaf.edu)
 
                 """,
                     className="is-size-6 content",
@@ -271,41 +286,33 @@ columns = html.Div(
                         html.A(id="toc_g1"),
                         html.Hr(),
                         html.H3("Average wind speeds by month", className="title is-4"),
+                        dcc.Graph(
+                            id="means_box", figure=go.Figure(), config=luts.fig_configs
+                        ),
                         dcc.Markdown(
                             """
-
-Below is a series of box plots of average monthly wind speeds for the entire 35-year time span.
-
- * Boxes represent the 25% and 75% ranges of monthly averages over 35 years.
+ * Boxes show the 25&percnt; and 75&percnt; ranges of monthly averages over 35 years.
  * Averages (horizontal lines within boxes) are based on all hourly reports for a month.
- * “Whiskers” (vertical lines above and below boxes) represent full ranges of typical variation of monthly averages for the different years, extended to the minimum and maximum points contained within 1.5 of the interquartile range (IQR, which is the height of the box shown).
+ * &ldquo;Whiskers&rdquo; (vertical lines above and below boxes) represent full ranges of typical variation of monthly averages for the different years, extended to the minimum and maximum points contained within 1.5 of the interquartile range (IQR, which is the height of the box shown).
  * Dots indicate outliers, or individual values outside the normal variation (1.5 IQR).
  """,
                             className="content help-text is-size-6",
-                        ),
-                        dcc.Graph(
-                            id="means_box", figure=go.Figure(), config=luts.fig_configs
                         ),
                         html.A(id="toc_g2"),
                         html.H3(
                             "Wind frequency by direction and speed",
                             className="title is-4 title--rose",
                         ),
-                        dcc.Markdown(
-                            """
-
-Below is a collection of “wind roses” showing distributions of wind by speed and direction at the location of interest.
-
- * The “spokes” in the rose point in the compass direction from which the wind was blowing (i.e., a spoke pointing to the right denotes a wind from the east).
- * There are 36 spokes corresponding to the wind direction code in the hourly wind reports (01, 02, … 3).
- * For each spoke, we display frequencies of wind speed occurrence (1%, 4%, 10%, &hellip;). These are denoted by concentric circles within each wind rose.
- * The % of calm winds is shown by the size of the hole in the center of the wind rose.
-
- """,
-                            className="content help-text is-size-6",
-                        ),
                         dcc.Graph(
                             id="rose", figure=go.Figure(), config=luts.fig_configs
+                        ),
+                        dcc.Markdown(
+                            """
+ * The &ldquo;spokes&rdquo; in the rose point in the compass direction from which the wind was blowing (i.e., a spoke pointing to the right denotes a wind from the east).
+ * For each spoke, we show frequencies of wind speed occurrence (1&percnt;, 4&percnt;, 10&percnt;, &hellip;). These are denoted by concentric circles within each wind rose. Hover cursor over plot to display.
+ * The &percnt; of calm winds is shown by the size of the hole in the center of the wind rose.
+ """,
+                            className="content help-text is-size-6",
                         ),
                         html.A(id="toc_g3"),
                         html.H3(
@@ -322,19 +329,21 @@ Below is a collection of “wind roses” showing distributions of wind by speed
                         html.H3("Modeled data", className="title is-4"),
                         dcc.Markdown(
                             """
-This application shows data output from two models (ERA-Interim and WRF) and two GCMs (...).  Select the GCM below to switch which model/gcm output is shown for model data.
+The charts below show modeled output from the Weather Research and Forecasting Model (WRF), which we used to improve the accuracy of wind projections from two Global Climate Models (GCMs).
+
+Select the GCM below to switch which model/GCM output is shown for model data.
 """,
                             className="content help-text is-size-6",
                         ),
                         gcm_dropdown_field,
                         html.A(id="toc_g4"),
                         html.H3(
-                            "Future modeled frequency of wind speed and duration",
+                            "Future modeled frequency of wind speed by duration",
                             className="title is-4",
                         ),
                         dcc.Markdown(
                             """
-*Fixme Wording Help Needed* The chart below shows modeled output from the [Weather Research and Forecasting Model](https://www.mmm.ucar.edu/weather-research-and-forecasting-model) (WRF).  Choose the model, wind speed threshold and duration threshold to see changing trends over time.
+Choose the duration threshold to see changing trends over time.
  """,
                             className="content help-text is-size-6",
                         ),
@@ -346,12 +355,12 @@ This application shows data output from two models (ERA-Interim and WRF) and two
                         ),
                         html.A(id="toc_g5"),
                         html.H3(
-                            "Changes between model baseline and future model projections",
+                            "Changes between historical and future projections of wind",
                             className="title is-4",
                         ),
                         dcc.Markdown(
                             """
-*Fixme Wording Help Needed* The next chart shows the difference between the ERA-Interim reanalysis, which can be thought of as a model-based simulation of historical data (1980-2015), and future model selections (either CCSM4 or CM3, as selected in the section above), 2015-2100.  This can show relative patterns of changing wind events for a location.  Gray shows a reduction in events, blue shows an increase, and red shows new events.
+This chart shows the difference between modeled historical data (ERA-Interim reanalysis, 1980-2015), and future projections (NCAR-CCSM4 or GFDL-CM3, 2015-2100). Here, you can see relative patterns of changing wind events for a location. Gray shows a reduction in events, blue shows an increase, and red shows new events.
  """,
                             className="content help-text is-size-6",
                         ),
@@ -362,12 +371,12 @@ This application shows data output from two models (ERA-Interim and WRF) and two
                         ),
                         html.A(id="toc_g6"),
                         html.H3(
-                            "Wind speed and direction for model baseline and future projections",
+                            "Wind speed and direction for historical and future projections",
                             className="title is-4",
                         ),
                         dcc.Markdown(
                             """
-*Fixme Wording Help Needed* This chart shows the ERA-Interim model reanalysis on the left, and the selected future model on the right.  This allows comparisons between the historical modeled data and future projections.
+This chart shows the modeled historical data (ERA-Interim) on the left, and the selected GCM projection on the right. This allows comparisons between the historical patterns  and future projections.
  """,
                             className="content help-text is-size-6",
                         ),

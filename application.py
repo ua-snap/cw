@@ -276,7 +276,7 @@ def update_rose(community):
     c_name = luts.communities.loc[community]["place"]
 
     rose_layout = {
-        "title": "Wind Speed Distribution, 1980-2015, " + c_name,
+        "title": "Annual Wind Speed/Direction Distribution, 1980-2015, " + c_name,
         "height": 700,
         "margin": {"l": 0, "r": 0, "b": 100, "t": 50},
         "legend": {"orientation": "h", "x": 0, "y": 1},
@@ -494,10 +494,10 @@ def update_threshold_graph(community, duration, gcm):
     return go.Figure(
         layout=dict(
             title=dict(
-                text="Projected wind event frequency, 1980-2100, "
+                text="Projected Wind Event Frequency, 1980-2100, "
                 + c_name
                 + "<br>"
-                + "ERA/"
+                + "ERA-Interim/"
                 + gcm
                 + ", "
                 + luts.durations[duration],
@@ -620,7 +620,7 @@ def update_future_delta_percentiles(community, gcm):
     )
 
     figure_text = (
-        "<b>Wind event changes between ERA (1980-2015) and "
+        "<br><b>Wind Event Changes Between ERA-Interim (1980-2015) and "
         + gcm
         + " (2015-2100)</b><br>"
         + c_name
