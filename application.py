@@ -660,7 +660,6 @@ def update_future_rose(community, gcm):
         rows=1,
         cols=3,
         horizontal_spacing=0.03,
-        vertical_spacing=0.04,
         specs=[[subplot_spec, subplot_spec, subplot_spec]],
         subplot_titles=[
             "ERA-Interim (1980-2015)",
@@ -753,10 +752,10 @@ def update_future_rose(community, gcm):
             font=dict(family="Open Sans", size=18),
             x=0.5,
         ),
-        margin=dict(l=50, t=100, r=50, b=0),
+        margin=dict(l=0, t=75, r=0, b=0),
         font_size=10,
         legend=dict(x=0, y=0, orientation="h"),
-        height=600,
+        height=550,
         paper_bgcolor="#fff",
         plot_bgcolor="#fff",
         # We need to explicitly define the rotations
