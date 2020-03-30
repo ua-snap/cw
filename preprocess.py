@@ -216,37 +216,71 @@ def process_roses(data):
 def process_future_roses():
     """
     Process wind roses for future data.
+
+    We create the data with decadal groups this way for display:
+    0 = ERA
+    1 = CCSM4/CM3, 2031-2050
+    2 = CCSM4/CM3, 2080-2099
     """
 
     places = pd.read_csv("./places.csv")
-    cols = ["sid", "gcm", "direction_class", "speed_range", "count", "frequency"]
+    cols = ["sid", "gcm", "decadal_group", "direction_class", "speed_range", "count", "frequency"]
 
     future_roses = pd.DataFrame(columns=cols)
 
     for index, place in places.iterrows():
-        print("starting " + place["sid"])
-        # want: ,sid,direction,speed,month
-        # have: ['gcm' 'stid' 'ts' 'ws' 'wd']
+        print("[future roses] starting " + place["sid"])
+
+        # Read and prep for ERA/CCSM4.
         df = pd.read_csv("./data/wrf_adj/CCSM4_" + place["sid"] + ".csv")
         df.columns = ['gcm', 'sid', 'ts', 'speed', 'direction']
+        df["ts"] = pd.to_datetime(df["ts"])
+        df["year"] = pd.DatetimeIndex(df["ts"]).year
+        df = df.set_index(["gcm", "year"])
+        df = df.reset_index()
+
         dk = df.loc[df.gcm == "ERA"]
-        t = chunk_to_rose(df, place["sid"])
+        t = chunk_to_rose(dk, place["sid"])
         t["gcm"] = "ERA"
+        t["decadal_group"] = 0
         future_roses = future_roses.append(t)
 
-        dk = df.loc[df.gcm == "CCSM4"]
+        # For both CCSM4 and CM3, we need two buckets --
+        # 2031 - 2050, and 2080-2099.
+        dk = df.loc[(df.gcm == "CCSM4") & (df.year >= 2031) & (df.year <= 2050)]
         t = chunk_to_rose(dk, place["sid"])
         t["gcm"] = "CCSM4"
+        t["decadal_group"] = 1
         future_roses = future_roses.append(t)
 
+        dk = df.loc[(df.gcm == "CCSM4") & (df.year >= 2080) & (df.year <= 2099)]
+        dk = dk.reset_index() # for performance.
+        t = chunk_to_rose(dk, place["sid"])
+        t["gcm"] = "CCSM4"
+        t["decadal_group"] = 2
+        future_roses = future_roses.append(t)
+
+        # Read & prep CM3
         df = pd.read_csv("./data/wrf_adj/CM3_" + place["sid"] + ".csv")
         df.columns = ['gcm', 'sid', 'ts', 'speed', 'direction']
-        dk = df.loc[df.gcm == "CM3"]
+        df["ts"] = pd.to_datetime(df["ts"])
+        df["year"] = pd.DatetimeIndex(df["ts"]).year
+        df = df.set_index(["gcm", "year"])
+        df = df.reset_index()
+
+        dk = df.loc[(df.gcm == "CM3") & (df.year >= 2031) & (df.year <= 2050)]
+        dk = dk.reset_index() # for performance.
         t = chunk_to_rose(dk, place["sid"])
         t["gcm"] = "CM3"
+        t["decadal_group"] = 1
         future_roses = future_roses.append(t)
 
-        print(future_roses)
+        dk = df.loc[(df.gcm == "CM3") & (df.year >= 2080) & (df.year <= 2099)]
+        dk = dk.reset_index() # for performance.
+        t = chunk_to_rose(dk, place["sid"])
+        t["gcm"] = "CM3"
+        t["decadal_group"] = 2
+        future_roses = future_roses.append(t)
 
     future_roses.to_csv("future_roses.csv")
 
@@ -314,9 +348,9 @@ def process_threshold_percentiles():
 # Make already-done V2 work skippable.
 v2_preprocess = True
 if v2_preprocess:
-    process_future_calms()
+    # process_future_calms()
     # process_threshold_percentiles()
-    # process_future_roses()
+    process_future_roses()
 
 # Make all V1 work skippable.
 v1_preprocess = False

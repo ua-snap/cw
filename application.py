@@ -507,11 +507,11 @@ def update_threshold_graph(community, duration, gcm):
             yaxis={"title": "Number of Events"},
             xaxis=dict(
                 title="Years",
-                tickvals=list(luts.decades.keys()), ticktext=list(luts.decades.values())
+                tickvals=list(luts.decades.keys()),
+                ticktext=list(luts.decades.values()),
             ),
             height=400,
             barmode="stack",
-
         ),
         data=traces,
     )
@@ -658,26 +658,50 @@ def update_future_rose(community, gcm):
     subplot_spec = dict(type="polar", t=0.01)
     fig = make_subplots(
         rows=1,
-        cols=2,
+        cols=3,
         horizontal_spacing=0.03,
         vertical_spacing=0.04,
-        specs=[[subplot_spec, subplot_spec]],
-        subplot_titles=["ERA-Interim (1980-2015)", luts.gcms[gcm] + " (2015-2100)"],
+        specs=[[subplot_spec, subplot_spec, subplot_spec]],
+        subplot_titles=[
+            "ERA-Interim (1980-2015)",
+            luts.gcms[gcm] + " (2031-2050)",
+            luts.gcms[gcm] + " (2080-2099)",
+
+        ],
     )
 
     max_axes = pd.DataFrame()
 
-    if_show_legend = True
-    for index, m in enumerate(["ERA", gcm]):
-        traces = []
-        d = future_rose.loc[
-            (future_rose["sid"] == community) & (future_rose["gcm"] == m)
-        ]
-        max_axes = max_axes.append(get_rose_traces(d, traces, "", if_show_legend), ignore_index=True)
-        for trace in traces:
-            fig.add_trace(trace, row=1, col=index + 1)
+    # ERA
+    traces = []
+    d = future_rose.loc[
+        (future_rose["sid"] == community) & (future_rose["gcm"] == "ERA")
+    ]
+    max_axes = max_axes.append(get_rose_traces(d, traces, "", True), ignore_index=True)
+    for trace in traces:
+        fig.add_trace(trace, row=1, col=1)
 
-        if_show_legend = False
+    # GCM -- 1st decadal group
+    traces = []
+    d = future_rose.loc[
+        (future_rose["sid"] == community)
+        & (future_rose["gcm"] == gcm)
+        & (future_rose["decadal_group"] == 1)
+    ]
+    max_axes = max_axes.append(get_rose_traces(d, traces, "", False), ignore_index=True)
+    for trace in traces:
+        fig.add_trace(trace, row=1, col=2)
+
+    # GCM -- 2nd decadal group
+    traces = []
+    d = future_rose.loc[
+        (future_rose["sid"] == community)
+        & (future_rose["gcm"] == gcm)
+        & (future_rose["decadal_group"] == 2)
+    ]
+    max_axes = max_axes.append(get_rose_traces(d, traces, "", False), ignore_index=True)
+    for trace in traces:
+        fig.add_trace(trace, row=1, col=3)
 
     # Determine maximum r-axis and r-step.
     # Adding one and using floor(/2.5) was the
@@ -739,6 +763,7 @@ def update_future_rose(community, gcm):
         # we need for each named subplot.
         polar1={**polar_props},
         polar2={**polar_props},
+        polar3={**polar_props},
     )
     return fig
 
