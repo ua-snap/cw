@@ -239,7 +239,7 @@ def process_future_roses():
         df = df.set_index(["gcm", "year"])
         df = df.reset_index()
 
-        dk = df.loc[df.gcm == "ERA"]
+        dk = df.loc[(df.gcm == "ERA") & (df.year <= 2009)]
         t = chunk_to_rose(dk, place["sid"])
         t["gcm"] = "ERA"
         t["decadal_group"] = 0
@@ -247,13 +247,13 @@ def process_future_roses():
 
         # For both CCSM4 and CM3, we need two buckets --
         # 2031 - 2050, and 2080-2099.
-        dk = df.loc[(df.gcm == "CCSM4") & (df.year >= 2031) & (df.year <= 2050)]
+        dk = df.loc[(df.gcm == "CCSM4") & (df.year >= 2025) & (df.year <= 2054)]
         t = chunk_to_rose(dk, place["sid"])
         t["gcm"] = "CCSM4"
         t["decadal_group"] = 1
         future_roses = future_roses.append(t)
 
-        dk = df.loc[(df.gcm == "CCSM4") & (df.year >= 2080) & (df.year <= 2099)]
+        dk = df.loc[(df.gcm == "CCSM4") & (df.year >= 2070) & (df.year <= 2099)]
         dk = dk.reset_index() # for performance.
         t = chunk_to_rose(dk, place["sid"])
         t["gcm"] = "CCSM4"

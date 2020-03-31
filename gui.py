@@ -425,7 +425,7 @@ className="content help-text is-size-6",
                                 ),
                                 dcc.Markdown(
                                     """
-        This chart shows the modeled historical data (ERA-Interim) on the left, and the selected GCM projection on the right. This allows comparisons between the historical patterns  and future projections.
+        This chart shows the modeled historical data (ERA-Interim, 1980-2009) and GCM model output for mid-century (2025-2054) and late-century (2070-2099). This allows comparisons between the historical patterns and future projections.
          """,
                                     className="content help-text is-size-6",
                                 ),

@@ -662,9 +662,9 @@ def update_future_rose(community, gcm):
         horizontal_spacing=0.03,
         specs=[[subplot_spec, subplot_spec, subplot_spec]],
         subplot_titles=[
-            "ERA-Interim (1980-2015)",
-            luts.gcms[gcm] + " (2031-2050)",
-            luts.gcms[gcm] + " (2080-2099)",
+            "ERA-Interim (1980-2009)",
+            luts.gcms[gcm] + " (2025-2054)",
+            luts.gcms[gcm] + " (2070-2099)",
 
         ],
     )
