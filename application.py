@@ -581,8 +581,6 @@ def update_future_delta_percentiles(community, gcm):
     dj["marker_size"] = dj["percent_change"].abs()
     dj = dj.replace([np.inf], dj["marker_size"].loc[dj["marker_size"] != np.inf].mean())
     dj = dj.fillna(0)
-
-    # Finally, flatten resulting table.
     dj = dj.reset_index()
 
     def build_hover_text(row):
@@ -604,6 +602,14 @@ def update_future_delta_percentiles(community, gcm):
 
     dj["hover_text"] = dj.apply(build_hover_text, axis=1)
 
+    def build_annotation_text(row):
+        # Add a + sign if the row is positive, and format
+        # the numbers nicely.
+        sign = "+" if row["delta"] > 0 else ""
+        return "<b>" + sign + f'{int(row["delta"]):,}' + "</b>"
+
+    dj["annotations"] = dj.apply(build_annotation_text, axis=1)
+
     # Size ref for bubble size -- scale bubbles sanely
     # https://plot.ly/python/bubble-charts/#scaling-the-size-of-bubble-charts
     sizeref = 2.0 * max(dj["marker_size"]) / (75 ** 2)
@@ -612,15 +618,20 @@ def update_future_delta_percentiles(community, gcm):
         go.Scatter(
             x=dj.dur_thr,
             y=dj.ws_thr,
+            mode="markers+text",
+            text=dj.annotations,
+            textposition="middle center",
             hovertext=dj.hover_text,
             hoverinfo="text",
-            marker=dict(size=dj.marker_size, color=dj.color),
+            marker=dict(
+                size=dj.marker_size,
+                color=dj.color,
+            ),
         )
     )
 
     fig.update_traces(
-        mode="markers",
-        marker=dict(sizeref=sizeref, sizemin=5, sizemode="area", line_width=2),
+        marker=dict(sizeref=sizeref, sizemin=5, sizemode="area")
     )
 
     figure_text = (
@@ -665,7 +676,6 @@ def update_future_rose(community, gcm):
             "ERA-Interim (1980-2009)",
             luts.gcms[gcm] + " (2025-2054)",
             luts.gcms[gcm] + " (2070-2099)",
-
         ],
     )
 
