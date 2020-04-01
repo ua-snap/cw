@@ -563,7 +563,7 @@ def update_future_delta_percentiles(community, gcm):
         if row["delta"] > 0:
             if int(row["events_ERA"]) != 0:
                 # Positive % increase
-                return luts.speed_ranges["14-18"]["color"]
+                return luts.speed_ranges["10-14"]["color"]
             # These are new events, mark specially
             return "#FE3508"
         # Negative % change
@@ -582,7 +582,12 @@ def update_future_delta_percentiles(community, gcm):
     dj = dj.replace([np.inf], dj["marker_size"].loc[dj["marker_size"] != np.inf].mean())
     dj = dj.fillna(0)
     dj = dj.reset_index()
+    max_marker_size = dj["marker_size"].max() if dj["marker_size"].max() > 100 else 100
+    dj["marker_size"] = np.interp(
+        dj["marker_size"], (dj["marker_size"].min(), max_marker_size), (10, 100)
+    )
 
+    # Format hover text nicely.
     def build_hover_text(row):
         if int(row["delta"]) == 0:
             return "No change"
@@ -602,6 +607,7 @@ def update_future_delta_percentiles(community, gcm):
 
     dj["hover_text"] = dj.apply(build_hover_text, axis=1)
 
+    # Annotations show changed number of events.
     def build_annotation_text(row):
         # Add a + sign if the row is positive, and format
         # the numbers nicely.
@@ -610,30 +616,61 @@ def update_future_delta_percentiles(community, gcm):
 
     dj["annotations"] = dj.apply(build_annotation_text, axis=1)
 
-    # Size ref for bubble size -- scale bubbles sanely
-    # https://plot.ly/python/bubble-charts/#scaling-the-size-of-bubble-charts
-    sizeref = 2.0 * max(dj["marker_size"]) / (75 ** 2)
+    def build_annotation_positions(row):
+        # Magic number 20 = trial and error for the
+        # threshold at which the bubbles _generally_ look
+        # better with the text annotation to the right.
+        return "middle center" if row["marker_size"] > 20 else "middle right"
 
+    dj["annotations_positions"] = dj.apply(build_annotation_positions, axis=1)
+
+    # Build the trace for increased frequency events.
+    inc_freq_df = dj.loc[dj.delta > 0]
     fig.add_trace(
         go.Scatter(
-            x=dj.dur_thr,
-            y=dj.ws_thr,
+            x=inc_freq_df.dur_thr,
+            y=inc_freq_df.ws_thr,
             mode="markers+text",
-            text=dj.annotations,
-            textposition="middle center",
-            hovertext=dj.hover_text,
+            name="Increasing frequency",
+            text=inc_freq_df.annotations,
+            textposition=inc_freq_df.annotations_positions,
+            hovertext=inc_freq_df.hover_text,
             hoverinfo="text",
-            marker=dict(
-                size=dj.marker_size,
-                color=dj.color,
-            ),
+            marker=dict(size=inc_freq_df.marker_size, color=inc_freq_df.color),
         )
     )
 
-    fig.update_traces(
-        marker=dict(sizeref=sizeref, sizemin=5, sizemode="area")
+    # Decreasing frequency events.
+    dec_freq_df = dj.loc[dj.delta < 0]
+    fig.add_trace(
+        go.Scatter(
+            x=dec_freq_df.dur_thr,
+            y=dec_freq_df.ws_thr,
+            mode="markers+text",
+            name="Decreasing frequency",
+            text=dec_freq_df.annotations,
+            textposition=dec_freq_df.annotations_positions,
+            hovertext=dec_freq_df.hover_text,
+            hoverinfo="text",
+            marker=dict(size=dec_freq_df.marker_size, color=dec_freq_df.color),
+        )
     )
 
+    # Trace for new events.
+    new_df = dj.loc[(dj.delta > 0) & (dj.events_ERA == 0)]
+    fig.add_trace(
+        go.Scatter(
+            x=new_df.dur_thr,
+            y=new_df.ws_thr,
+            mode="markers+text",
+            name="New events",
+            text=new_df.annotations,
+            textposition=new_df.annotations_positions,
+            hovertext=new_df.hover_text,
+            hoverinfo="text",
+            marker=dict(size=new_df.marker_size, color=new_df.color),
+        )
+    )
     figure_text = (
         "<br><b>Wind Event Changes Between ERA-Interim (1980-2015) and "
         + gcm
@@ -647,10 +684,10 @@ def update_future_delta_percentiles(community, gcm):
     fig.update_layout(
         title=dict(text=figure_text, x=0.5),
         legend_orientation="h",
-        legend={"font": {"family": "Open Sans", "size": 10}},
+        legend={"font": {"family": "Open Sans", "size": 14}, "y": -0.2},
         height=550,
         margin={"l": 50, "r": 50, "b": 50, "t": 50, "pad": 4},
-        xaxis={"type": "category", "title": "Duration (hours)"},
+        xaxis={"tickvals": [1, 6, 12, 24, 48], "title": "Duration (hours)"},
         yaxis={"title": "Wind Speed", "tickvals": ytickvals, "ticktext": yticktext},
     )
     return fig

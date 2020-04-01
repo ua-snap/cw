@@ -88,6 +88,8 @@ when the page is loading.
 }
 
 /*
+Style some SVG elements within Plotly to hide things we don't want.
+
 Not entirely sure why, but need to hide this SVG to prevent
 unwanted background from being shown behind the
 wind roses in Plotly.
@@ -95,7 +97,13 @@ wind roses in Plotly.
 g.bglayer {
 	display: none !important;
 }
-
+/*
+Hide 'Aa' from legends in bubble plot.
+https://github.com/plotly/plotly.js/issues/2967#
+*/
+g.pointtext {
+	display: none;
+}
 
 /* Footer! */
 .footer p {

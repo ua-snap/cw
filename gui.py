@@ -404,7 +404,7 @@ className="content help-text is-size-6",
                                 ),
                                 dcc.Markdown(
                                     """
-        This chart shows the difference between modeled historical data (ERA-Interim reanalysis, 1980-2015), and future projections (NCAR-CCSM4 or GFDL-CM3, 2015-2100). Here, you can see relative patterns of changing wind events for a location. Gray shows a reduction in events, blue shows an increase, and red shows new events.
+This chart shows the _difference_ in number of events between modeled historical data (ERA-Interim reanalysis, 1980-2015) and future projections (NCAR-CCSM4 or GFDL-CM3, 2015-2100).
          """,
                                     className="content help-text is-size-6",
                                 ),
@@ -412,6 +412,15 @@ className="content help-text is-size-6",
                                     id="future_delta_percentiles",
                                     figure=go.Figure(),
                                     config=luts.fig_configs,
+                                ),
+                                dcc.Markdown(
+                                    """
+ * Bubble sizes correspond to &percnt;change in the number of events.
+ * Numbers show the actual change in events.
+ * The number of events are rounded and scaled to allow comparison between ERA-Intrim and NCAR-CCSM4 or GFDL-CM3.
+ * Percentiles (&percnt;ile) are based on the frequency of 1-hour wind events.
+         """,
+                                    className="content help-text is-size-6",
                                 ),
                             ],
                         ),
