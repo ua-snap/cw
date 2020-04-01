@@ -14,13 +14,15 @@ communities = pd.read_csv("places.csv", index_col="sid")
 # Needs to be a numpy array for ease of building relevant
 # strings for some code
 # 50, 75, 85, 95, 99
-percentiles = np.array([
-    "mph (50th %ile) <b>Common<b>",
-    "mph (75th %ile)",
-    "mph (85th %ile) <b>Occasional</b>",
-    "mph (95th %ile)",
-    "mph (99th %ile) <b>Rare</b>",
-])
+percentiles = np.array(
+    [
+        "mph (50th %ile) <b>Common<b>",
+        "mph (75th %ile)",
+        "mph (85th %ile) <b>Occasional</b>",
+        "mph (95th %ile)",
+        "mph (99th %ile) <b>Rare</b>",
+    ]
+)
 
 durations = {
     1: "1 continuous hour or more",
@@ -30,10 +32,7 @@ durations = {
     48: "48+ hours",
 }
 
-gcms = {
-    "CCSM4": "NCAR-CCSM4",
-    "CM3": "GFDL-CM3",
-}
+gcms = {"CCSM4": "NCAR-CCSM4", "CM3": "GFDL-CM3"}
 
 months = {
     1: "January",
@@ -54,6 +53,14 @@ decades = {
     1980: "1980-1999",
     2000: "2000-2019",
     2020: "2020-2029",
+    2040: "2040-2059",
+    2060: "2060-2079",
+    2080: "2080-2099",
+}
+
+# For decadal selector, we need a subset of the above!
+decade_selections = {
+    2020: "2020-2039",
     2040: "2040-2059",
     2060: "2060-2079",
     2080: "2080-2099",
@@ -108,14 +115,7 @@ fig_configs = dict(
 
 # Gradient-colors, from gentlest to darker/more saturated.
 # Some charts need to access these directly.
-colors = [
-    "#d0d1e6",
-    "#a6bddb",
-    "#74a9cf",
-    "#3690c0",
-    "#0570b0",
-    "#034e7b"
-]
+colors = ["#d0d1e6", "#a6bddb", "#74a9cf", "#3690c0", "#0570b0", "#034e7b"]
 
 # The lowest bound excludes actual 0 (calm) readings,
 # this is deliberate.

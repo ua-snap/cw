@@ -519,9 +519,13 @@ def update_threshold_graph(community, duration, gcm):
 
 @app.callback(
     Output("future_delta_percentiles", "figure"),
-    [Input("communities-dropdown", "value"), Input("gcm-dropdown", "value")],
+    [
+        Input("communities-dropdown", "value"),
+        Input("gcm-dropdown", "value"),
+        Input("decadal_selector", "value"),
+    ],
 )
-def update_future_delta_percentiles(community, gcm):
+def update_future_delta_percentiles(community, gcm, decade):
     """
     Build chart / visualiztion of threshold/durations
     from model data -- 3D Chart Attempt TODO FIXME better
@@ -537,7 +541,7 @@ def update_future_delta_percentiles(community, gcm):
     dt = dt.groupby(["gcm", "ts", "ws_thr", "dur_thr"]).sum().reset_index()
 
     de = dt.loc[(dt.gcm == "ERA") & (dt.ts == 1980)]
-    dc = dt.loc[(dt.gcm == gcm) & (dt.ts == 2080)]
+    dc = dt.loc[(dt.gcm == gcm) & (dt.ts == decade)]
 
     dec = de.set_index(["ws_thr", "dur_thr"])
     dcc = dc.set_index(["ws_thr", "dur_thr"])
@@ -548,19 +552,6 @@ def update_future_delta_percentiles(community, gcm):
     dj = dcc.join(dec, how="outer", lsuffix="_model", rsuffix="_ERA")
     dj = dj.fillna(0)  # so we can subtract
     dj["delta"] = dj["events_model"] - dj["events_ERA"]
-
-    # Assign dot colors
-    def determine_colors(row):
-        if row["delta"] > 0:
-            if int(row["events_ERA"]) != 0:
-                # Positive % increase
-                return luts.speed_ranges["10-14"]["color"]
-            # These are new events, mark specially
-            return "#FE3508"
-        # Negative % change
-        return "#cccccc"
-
-    dj["color"] = dj.apply(determine_colors, axis=1)
 
     # Compute % change between baseline and model
     dj["percent_change"] = ((dj["delta"] / dj["events_ERA"]) * 100).round()
@@ -627,7 +618,7 @@ def update_future_delta_percentiles(community, gcm):
             textposition=inc_freq_df.annotations_positions,
             hovertext=inc_freq_df.hover_text,
             hoverinfo="text",
-            marker=dict(size=inc_freq_df.marker_size, color=inc_freq_df.color),
+            marker=dict(size=inc_freq_df.marker_size, color=luts.speed_ranges["10-14"]["color"]),
         )
     )
 
@@ -643,7 +634,7 @@ def update_future_delta_percentiles(community, gcm):
             textposition=dec_freq_df.annotations_positions,
             hovertext=dec_freq_df.hover_text,
             hoverinfo="text",
-            marker=dict(size=dec_freq_df.marker_size, color=dec_freq_df.color),
+            marker=dict(size=dec_freq_df.marker_size, color="#bbb"),
         )
     )
 
@@ -659,13 +650,13 @@ def update_future_delta_percentiles(community, gcm):
             textposition=new_df.annotations_positions,
             hovertext=new_df.hover_text,
             hoverinfo="text",
-            marker=dict(size=new_df.marker_size, color=new_df.color),
+            marker=dict(size=new_df.marker_size, color="#FE3508"),
         )
     )
     figure_text = (
         "<br><b>Wind Event Changes Between ERA-Interim (1980-2000) and "
         + gcm
-        + " (2080-2100)</b><br>"
+        + " (" + luts.decade_selections[decade] + ")</b><br>"
         + c_name
     )
 

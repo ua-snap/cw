@@ -191,6 +191,22 @@ duration_threshold_dropdown_field = html.Div(
     ],
 )
 
+decadal_radios_field = html.Div(
+    className="field",
+    children=[
+        dcc.RadioItems(
+            id="decadal_selector",
+            labelClassName="radio",
+            className="control",
+            options=[
+                {"label": decade, "value": group}
+                for group, decade in luts.decade_selections.items()
+            ],
+            value=2080,
+        )
+    ]
+)
+
 form_fields = html.Div(
     className="selectors form",
     children=[
@@ -404,10 +420,13 @@ className="content help-text is-size-6",
                                 ),
                                 dcc.Markdown(
                                     """
-This chart shows the _difference_ in number of events between modeled historical data (ERA-Interim reanalysis, 1980-2000) and end&ndash;of&ndash;century future projections (NCAR-CCSM4 or GFDL-CM3, 2080-2100).
+This chart shows the _difference_ in number of events between modeled historical data (ERA-Interim reanalysis, 1980-2000)  future projections (NCAR-CCSM4 or GFDL-CM3, 2020-2100).
+
+Choose the future model output decadal group to compare against the historical modeled data.
          """,
                                     className="content help-text is-size-6",
                                 ),
+                                decadal_radios_field,
                                 dcc.Graph(
                                     id="future_delta_percentiles",
                                     figure=go.Figure(),

@@ -25,6 +25,15 @@ div.Select-control {
 .section + .section {
 	padding-top: 0;
 }
+/* Fix up horizontal radio buttons, they're janky */
+.field .control label {
+	margin-right: 1rem;
+}
+.field .control input[type="radio"] {
+	position: relative;
+	bottom: 2px;
+	right: 5px;
+}
 
 
 /* Header & intro styles */
