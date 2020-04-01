@@ -399,12 +399,12 @@ className="content help-text is-size-6",
                             children=[
                                 html.A(id="toc_g5"),
                                 html.H3(
-                                    "Changes between historical and future projections of wind",
+                                    "Changes between modeled historical and future projections of wind events",
                                     className="title is-4",
                                 ),
                                 dcc.Markdown(
                                     """
-This chart shows the _difference_ in number of events between modeled historical data (ERA-Interim reanalysis, 1980-2015) and future projections (NCAR-CCSM4 or GFDL-CM3, 2015-2100).
+This chart shows the _difference_ in number of events between modeled historical data (ERA-Interim reanalysis, 1980-2000) and end&ndash;of&ndash;century future projections (NCAR-CCSM4 or GFDL-CM3, 2080-2100).
          """,
                                     className="content help-text is-size-6",
                                 ),
@@ -415,9 +415,8 @@ This chart shows the _difference_ in number of events between modeled historical
                                 ),
                                 dcc.Markdown(
                                     """
- * Bubble sizes correspond to &percnt;change in the number of events.
- * Numbers show the actual change in events.
- * The number of events are rounded and scaled to allow comparison between ERA-Intrim and NCAR-CCSM4 or GFDL-CM3.
+ * Bubble sizes correspond to &percnt; change in the number of events.  Larger bubbles show relatively more change in this category, smaller bubbles relatively less change.
+ * Numbers show the actual change in modeled events between 1980-2000 and 2080-2100.
  * Percentiles (&percnt;ile) are based on the frequency of 1-hour wind events.
          """,
                                     className="content help-text is-size-6",

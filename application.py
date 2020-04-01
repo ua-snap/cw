@@ -534,22 +534,13 @@ def update_future_delta_percentiles(community, gcm):
 
     # Filter by community & relevant models
     dt = percentiles.loc[(percentiles["stid"] == community)]
-    dt = (
-        dt.drop(["ts"], axis=1)
-        .groupby(["gcm", "ws_thr", "dur_thr"])
-        .sum()
-        .reset_index()
-    )
+    dt = dt.groupby(["gcm", "ts", "ws_thr", "dur_thr"]).sum().reset_index()
 
-    de = dt.loc[dt.gcm == "ERA"]
-    dc = dt.loc[dt.gcm == gcm]
+    de = dt.loc[(dt.gcm == "ERA") & (dt.ts == 1980)]
+    dc = dt.loc[(dt.gcm == gcm) & (dt.ts == 2080)]
 
     dec = de.set_index(["ws_thr", "dur_thr"])
     dcc = dc.set_index(["ws_thr", "dur_thr"])
-
-    # Scale future values (ERA = 35 years, others = 85 years)
-    # 35/85 = 0.4117647059 = scale factor for future data
-    dcc["events"] = (dcc["events"] * 0.4117647059).round()
 
     # Merge the two dataframes (outer join)
     # Outer join ensures wind events present in either
@@ -672,9 +663,9 @@ def update_future_delta_percentiles(community, gcm):
         )
     )
     figure_text = (
-        "<br><b>Wind Event Changes Between ERA-Interim (1980-2015) and "
+        "<br><b>Wind Event Changes Between ERA-Interim (1980-2000) and "
         + gcm
-        + " (2015-2100)</b><br>"
+        + " (2080-2100)</b><br>"
         + c_name
     )
 
