@@ -552,22 +552,22 @@ def update_future_delta_percentiles(community, gcm, decade):
     dj = dcc.join(dec, how="outer", lsuffix="_model", rsuffix="_ERA")
     dj = dj.fillna(0)  # so we can subtract
     dj["delta"] = dj["events_model"] - dj["events_ERA"]
+    dj = dj.reset_index()
 
     # Compute % change between baseline and model
     dj["percent_change"] = ((dj["delta"] / dj["events_ERA"]) * 100).round()
+
+    # Group magnitude of changes into 5 quantiles
+    dj["bins"] = pd.qcut(dj["delta"].abs(), 5)
+    dj["bin_labels"] = pd.qcut(
+        dj["delta"].abs(), 5, labels=["least", "some", "middle", "more", "most"]
+    )
 
     # Take absolute value to show magnitude, since
     # now color shows +/-.  "inf" values are possible due
     # to new events; replace them with the mean.
     # nan are also possible (0/0)
-    dj["marker_size"] = dj["percent_change"].abs()
-    dj = dj.replace([np.inf], dj["marker_size"].loc[dj["marker_size"] != np.inf].mean())
-    dj = dj.fillna(0)
-    dj = dj.reset_index()
-    max_marker_size = dj["marker_size"].max() if dj["marker_size"].max() > 100 else 100
-    dj["marker_size"] = np.interp(
-        dj["marker_size"], (dj["marker_size"].min(), max_marker_size), (10, 100)
-    )
+    dj["marker_size"] = dj["bin_labels"].apply(lambda label: luts.bubble_bins[label])
 
     # Format hover text nicely.
     def build_hover_text(row):
@@ -618,7 +618,9 @@ def update_future_delta_percentiles(community, gcm, decade):
             textposition=inc_freq_df.annotations_positions,
             hovertext=inc_freq_df.hover_text,
             hoverinfo="text",
-            marker=dict(size=inc_freq_df.marker_size, color=luts.speed_ranges["10-14"]["color"]),
+            marker=dict(
+                size=inc_freq_df.marker_size, color=luts.speed_ranges["10-14"]["color"]
+            ),
         )
     )
 
@@ -656,7 +658,9 @@ def update_future_delta_percentiles(community, gcm, decade):
     figure_text = (
         "<br><b>Wind Event Changes Between ERA-Interim (1980-2000) and "
         + gcm
-        + " (" + luts.decade_selections[decade] + ")</b><br>"
+        + " ("
+        + luts.decade_selections[decade]
+        + ")</b><br>"
         + c_name
     )
 
@@ -667,8 +671,8 @@ def update_future_delta_percentiles(community, gcm, decade):
         title=dict(text=figure_text, x=0.5),
         legend_orientation="h",
         legend={"font": {"family": "Open Sans", "size": 14}, "y": -0.2},
-        height=550,
-        margin={"l": 50, "r": 50, "b": 50, "t": 50, "pad": 4},
+        height=600,
+        margin={"l": 50, "r": 50, "b": 35, "t": 85},
         xaxis={"tickvals": [1, 6, 12, 24, 48], "title": "Duration (hours)"},
         yaxis={"title": "Wind Speed", "tickvals": ytickvals, "ticktext": yticktext},
     )

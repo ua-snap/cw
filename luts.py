@@ -66,6 +66,15 @@ decade_selections = {
     2080: "2080-2099",
 }
 
+# Map of quantiles to bubble pixel size
+bubble_bins = {
+    "least": 10,
+    "some": 20,
+    "middle": 35,
+    "more": 55,
+    "most": 80,
+}
+
 # This trace is shared so we can highlight specific communities.
 map_communities_trace = go.Scattermapbox(
     lat=communities.loc[:, "latitude"],

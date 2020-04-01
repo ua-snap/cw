@@ -404,7 +404,7 @@ columns = html.Div(
                                 ),
                                 dcc.Markdown(
 """
- * Percentiles (&percnt;ile) are based on the frequency of 1-hour wind events.
+ * Percentile wind speeds categories (&percnt;ile) are based on the frequency of 1-hour wind events.
 """,
 className="content help-text is-size-6",
                                 )
@@ -420,7 +420,7 @@ className="content help-text is-size-6",
                                 ),
                                 dcc.Markdown(
                                     """
-This chart shows the _difference_ in number of events between modeled historical data (ERA-Interim reanalysis, 1980-2000)  future projections (NCAR-CCSM4 or GFDL-CM3, 2020-2100).
+This chart shows the change in number of events between modeled historical data (ERA-Interim reanalysis, 1980-2000) and future projections (NCAR-CCSM4 or GFDL-CM3, 2020-2100).
 
 Choose the future model output decadal group to compare against the historical modeled data.
          """,
@@ -434,9 +434,9 @@ Choose the future model output decadal group to compare against the historical m
                                 ),
                                 dcc.Markdown(
                                     """
- * Bubble sizes correspond to &percnt; change in the number of events.  Larger bubbles show relatively more change in this category, smaller bubbles relatively less change.
- * Numbers show the actual change in modeled events between 1980-2000 and 2080-2100.
- * Percentiles (&percnt;ile) are based on the frequency of 1-hour wind events.
+ * Bubble sizes correspond to change in the number of events.
+ * Numbers show the actual change in modeled events between 1980-2000 and 2080-2100.  Hover over points to see &percnt; change.
+ * Percentile wind speeds (&percnt;ile, y&ndash;axis) are based on the frequency of 1-hour wind events.
          """,
                                     className="content help-text is-size-6",
                                 ),
