@@ -494,7 +494,7 @@ def update_threshold_graph(community, duration, gcm):
     return go.Figure(
         layout=dict(
             title=dict(
-                text="Projected Wind Event Frequency, 1980-2100, "
+                text="Historical and Future Modeled Wind Event Frequency, 1980-2100, "
                 + c_name
                 + "<br>"
                 + "ERA-Interim/"
