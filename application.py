@@ -555,7 +555,11 @@ def update_future_delta_percentiles(community, gcm, decade):
     dj = dj.reset_index()
 
     # Compute % change between baseline and model
-    dj["percent_change"] = ((dj["delta"] / dj["events_ERA"]) * 100).round()
+    # Handle NaN and NA values, then round to integer.
+    dj["percent_change"] = (dj["delta"] / dj["events_ERA"]) * 100
+    dj["percent_change"] = (
+        dj["percent_change"].replace([np.inf], 0).fillna(0).round(0).astype("int8")
+    )
 
     # Group magnitude of changes into 5 quantiles
     dj["bins"] = pd.qcut(dj["delta"].abs(), 5)
