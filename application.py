@@ -674,7 +674,12 @@ def update_future_delta_percentiles(community, gcm, decade):
         height=600,
         margin={"l": 50, "r": 50, "b": 35, "t": 85},
         xaxis={"tickvals": [1, 6, 12, 24, 48], "title": "Duration (hours)"},
-        yaxis={"title": "Wind Speed", "tickvals": ytickvals, "ticktext": yticktext},
+        yaxis={
+            "title": "Wind Speed",
+            "tickvals": ytickvals,
+            "ticktext": yticktext,
+            "automargin": True,
+        },
     )
     return fig
 
