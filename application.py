@@ -237,11 +237,17 @@ def update_box_plots(community):
             boxmode="group",
             legend_orientation="h",
             legend={"font": {"family": "Open Sans", "size": 10}},
-            yaxis={"title": "Wind speed (mph)", "rangemode": "tozero"},
+            yaxis={
+                "title": "Wind speed (mph)",
+                "rangemode": "tozero",
+                "fixedrange": True,
+            },
             height=550,
             margin={"l": 50, "r": 50, "b": 50, "t": 50, "pad": 4},
             xaxis=dict(
-                tickvals=list(luts.months.keys()), ticktext=list(luts.months.values())
+                tickvals=list(luts.months.keys()),
+                ticktext=list(luts.months.values()),
+                fixedrange=True,
             ),
         ),
         data=[
@@ -511,11 +517,12 @@ def update_threshold_graph(community, duration, gcm):
                 x=0.5,
             ),
             legend={"font": {"family": "Open Sans", "size": 10}},
-            yaxis={"title": "Number of Events"},
+            yaxis={"title": "Number of Events", "fixedrange": True},
             xaxis=dict(
                 title="Years",
                 tickvals=list(luts.decades.keys()),
                 ticktext=list(luts.decades.values()),
+                fixedrange=True,
             ),
             height=400,
             barmode="stack",
@@ -684,12 +691,17 @@ def update_future_delta_percentiles(community, gcm, decade):
         legend={"font": {"family": "Open Sans", "size": 14}, "y": -0.2},
         height=600,
         margin={"l": 50, "r": 50, "b": 35, "t": 85},
-        xaxis={"tickvals": [1, 6, 12, 24, 48], "title": "Duration (hours)"},
+        xaxis={
+            "tickvals": [1, 6, 12, 24, 48],
+            "title": "Duration (hours)",
+            "fixedrange": True,
+        },
         yaxis={
             "title": "Wind Speed",
             "tickvals": ytickvals,
             "ticktext": yticktext,
             "automargin": True,
+            "fixedrange": True,
         },
     )
     return fig
