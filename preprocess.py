@@ -17,6 +17,7 @@ from luts import speed_ranges
 directory = "./data/station"
 cols = ["sid", "direction", "speed", "month"]
 
+
 def preprocess_stations():
     """
     This producess two (large) files which combine
@@ -85,10 +86,11 @@ def averages_by_month(mean_data):
     d = d.reset_index()
     d = d.drop(["direction"], axis=1)
     # Weird code -- drop the prior index, which is unnamed
-    d = d.loc[:, ~d.columns.str.contains('^Unnamed')]
-    d = d.astype({"year":"int16", "month":"int16"})
+    d = d.loc[:, ~d.columns.str.contains("^Unnamed")]
+    d = d.astype({"year": "int16", "month": "int16"})
     d = d.assign(speed=round(d["speed"], 1))
     d.to_csv("monthly_averages.csv")
+
 
 # Requires Dask DF, not Pandas
 def process_calm(mean_data):
@@ -109,11 +111,12 @@ def process_calm(mean_data):
     d = d.groupby(["sid", "month"]).size().reset_index().compute()
 
     calms = calms.assign(calm=d[[0]])
-    calms.columns=["sid", "month", "total", "calm"]
+    calms.columns = ["sid", "month", "total", "calm"]
     calms = calms.assign(percent=round(calms["calm"] / calms["total"], 3) * 100)
     calms.to_csv("calms.csv")
 
-def chunk_to_rose(sgroup, station_name = None):
+
+def chunk_to_rose(sgroup, station_name=None):
     """
     Builds data suitable for Plotly's wind roses from
     a subset of data.
@@ -172,6 +175,7 @@ def chunk_to_rose(sgroup, station_name = None):
 
     return accumulator
 
+
 def process_roses(data):
     """
     For each station we need one trace for each direction.
@@ -213,6 +217,7 @@ def process_roses(data):
 
     rose_data.to_csv("roses.csv")
 
+
 def process_future_roses():
     """
     Process wind roses for future data.
@@ -224,7 +229,15 @@ def process_future_roses():
     """
 
     places = pd.read_csv("./places.csv")
-    cols = ["sid", "gcm", "decadal_group", "direction_class", "speed_range", "count", "frequency"]
+    cols = [
+        "sid",
+        "gcm",
+        "decadal_group",
+        "direction_class",
+        "speed_range",
+        "count",
+        "frequency",
+    ]
 
     future_roses = pd.DataFrame(columns=cols)
 
@@ -233,7 +246,7 @@ def process_future_roses():
 
         # Read and prep for ERA/CCSM4.
         df = pd.read_csv("./data/wrf_adj/CCSM4_" + place["sid"] + ".csv")
-        df.columns = ['gcm', 'sid', 'ts', 'speed', 'direction']
+        df.columns = ["gcm", "sid", "ts", "speed", "direction"]
         df["ts"] = pd.to_datetime(df["ts"])
         df["year"] = pd.DatetimeIndex(df["ts"]).year
         df = df.set_index(["gcm", "year"])
@@ -254,7 +267,7 @@ def process_future_roses():
         future_roses = future_roses.append(t)
 
         dk = df.loc[(df.gcm == "CCSM4") & (df.year >= 2070) & (df.year <= 2099)]
-        dk = dk.reset_index() # for performance.
+        dk = dk.reset_index()  # for performance.
         t = chunk_to_rose(dk, place["sid"])
         t["gcm"] = "CCSM4"
         t["decadal_group"] = 2
@@ -262,21 +275,21 @@ def process_future_roses():
 
         # Read & prep CM3
         df = pd.read_csv("./data/wrf_adj/CM3_" + place["sid"] + ".csv")
-        df.columns = ['gcm', 'sid', 'ts', 'speed', 'direction']
+        df.columns = ["gcm", "sid", "ts", "speed", "direction"]
         df["ts"] = pd.to_datetime(df["ts"])
         df["year"] = pd.DatetimeIndex(df["ts"]).year
         df = df.set_index(["gcm", "year"])
         df = df.reset_index()
 
         dk = df.loc[(df.gcm == "CM3") & (df.year >= 2031) & (df.year <= 2050)]
-        dk = dk.reset_index() # for performance.
+        dk = dk.reset_index()  # for performance.
         t = chunk_to_rose(dk, place["sid"])
         t["gcm"] = "CM3"
         t["decadal_group"] = 1
         future_roses = future_roses.append(t)
 
         dk = df.loc[(df.gcm == "CM3") & (df.year >= 2080) & (df.year <= 2099)]
-        dk = dk.reset_index() # for performance.
+        dk = dk.reset_index()  # for performance.
         t = chunk_to_rose(dk, place["sid"])
         t["gcm"] = "CM3"
         t["decadal_group"] = 2
@@ -284,63 +297,11 @@ def process_future_roses():
 
     future_roses.to_csv("future_roses.csv")
 
-def process_future_calms():
-    """
-    For each station, generate a count
-    of # of calm measurements by model.
-    """
-    places = pd.read_csv("./places.csv")
-    cols = ["sid", "gcm", "total", "calm", "percent"]
-
-    future_calms = pd.DataFrame(columns=cols)
-
-    for index, place in places.iterrows():
-        print("*** Generating ^^^FUTURE>>> calm counts for " + place["sid"])
-
-        # CCSM4
-        df = pd.read_csv("./data/wrf_adj/CCSM4_" + place["sid"] + ".csv")
-        dt = df.loc[df.gcm == "ERA"]
-        dz = dt.loc[dt.ws == 0]
-
-        future_calms = future_calms.append({
-            "sid": place["sid"],
-            "gcm": "ERA",
-            "total": dt.size,
-            "calm": dz.size,
-            "percent": round(dz.size / dt.size, 3) * 100
-        }, ignore_index=True)
-
-        dt = df.loc[df.gcm == "CCSM4"]
-        dz = dt.loc[dt.ws == 0]
-
-        future_calms = future_calms.append({
-            "sid": place["sid"],
-            "gcm": "CCSM4",
-            "total": dt.size,
-            "calm": dz.size,
-            "percent": round(dz.size / dt.size, 3) * 100
-        }, ignore_index=True)
-
-        # CM3
-        df = pd.read_csv("./data/wrf_adj/CM3_" + place["sid"] + ".csv")
-        dt = df.loc[df.gcm == "CM3"]
-        dz = dt.loc[dt.ws == 0]
-
-        future_calms = future_calms.append({
-            "sid": place["sid"],
-            "gcm": "CM3",
-            "total": dt.size,
-            "calm": dz.size,
-            "percent": round(dz.size / dt.size, 3) * 100
-        }, ignore_index=True)
-        print(future_calms)
-
-    future_calms.to_csv("future_calms.csv")
 
 def process_threshold_percentiles():
     dt = pd.read_csv("WRF_hwe_perc.csv")
     dt = dt.drop(["wd"], axis=1)
-    dt["events"] = 0 # add column for count
+    dt["events"] = 0  # add column for count
     dk = dt.groupby(["stid", "gcm", "ts", "ws_thr", "dur_thr"]).count().reset_index()
     dk.to_csv("percentiles.csv")
 
@@ -348,7 +309,6 @@ def process_threshold_percentiles():
 # Make already-done V2 work skippable.
 v2_preprocess = True
 if v2_preprocess:
-    # process_future_calms()
     # process_threshold_percentiles()
     process_future_roses()
 
