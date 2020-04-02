@@ -466,17 +466,24 @@ def update_threshold_graph(community, duration, gcm):
 
     c_name = luts.communities.loc[community]["place"]
 
-    # Filter by community, windspeed and duration/
+    # Filter by community and selected models.
+    # Don't filter by duration, here, because it
+    # could result in incomplete list of possible
+    # speed buckets.
     dk = percentiles.loc[
         (percentiles["stid"] == community)
-        & (percentiles["dur_thr"] == duration)
         & ((percentiles["gcm"] == gcm) | (percentiles["gcm"] == "ERA"))
     ]
 
     traces = []
     index = 0
+
+    # Determine wind speed buckets (needs all available data)
     wind_speeds = dk.ws_thr.unique()
     labels = np.char.add(wind_speeds.astype("U"), luts.percentiles)
+
+    # Filter by duration class
+    dk = dk.loc[percentiles["dur_thr"] == duration]
 
     for ws in dk.ws_thr.unique():
         k = dk.loc[dk.ws_thr == ws]
