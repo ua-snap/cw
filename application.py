@@ -18,7 +18,6 @@ import luts
 # Read data blobs and other items used from env
 data = pd.read_csv("roses.csv")
 calms = pd.read_csv("calms.csv")
-future_calms = pd.read_csv("future_calms.csv")
 monthly_means = pd.read_csv("monthly_averages.csv")
 thresholds = pd.read_csv("WRF_hwe.csv")
 future_rose = pd.read_csv("future_roses.csv")
