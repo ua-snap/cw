@@ -485,7 +485,14 @@ def update_threshold_graph(community, duration, gcm):
 
     # Determine wind speed buckets (needs all available data)
     wind_speeds = dk.ws_thr.unique()
-    labels = np.char.add(wind_speeds.astype("U"), luts.percentiles)
+
+    # PADT (Slana) has an exception where the 85th/95th percentiles
+    # are idential (!).  Handle that here.
+    percentile_lookups = luts.percentiles
+    if community == "PADT":
+        percentile_lookups = np.delete(percentile_lookups, [3])
+
+    labels = np.char.add(wind_speeds.astype("U"), percentile_lookups)
 
     # Filter by duration class
     dk = dk.loc[percentiles["dur_thr"] == duration]
@@ -682,8 +689,16 @@ def update_future_delta_percentiles(community, gcm, decade):
         + c_name
     )
 
+    # We need to specially handle Slana (PADT).
     ytickvals = dj["ws_thr"].unique().astype("U")
-    yticktext = np.char.add(ytickvals, luts.percentiles)
+
+    # PADT (Slana) has an exception where the 85th/95th percentiles
+    # are idential (!).  Handle that here.
+    percentile_lookups = luts.percentiles
+    if community == "PADT":
+        percentile_lookups = np.delete(percentile_lookups, [3])
+
+    yticktext = np.char.add(ytickvals, percentile_lookups)
 
     fig.update_layout(
         title=dict(text=figure_text, x=0.5),
