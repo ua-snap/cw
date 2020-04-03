@@ -277,7 +277,7 @@ help_text = html.Div(
 
 If you want to cite this web site in a paper, we suggest this format:
 
- > J. Walsh, K. Redilla, B. Crevensten, T. Kurkowski. Alaska Community Wind Tool. [http://windtool.accap.uaf.edu](http://windtool.accap.uaf.edu)
+ > J. Walsh, K. Redilla, B. Crevensten, T. Kurkowski. Alaska Community Wind Tool. \[online tool\] Alaska Center for Climate Assessment and Policy, University of Alaska Fairbanks [http://windtool.accap.uaf.edu](http://windtool.accap.uaf.edu)
 
                 """,
                     className="is-size-6 content",
