@@ -232,10 +232,14 @@ def update_box_plots(community):
 
     return go.Figure(
         layout=dict(
-            title=dict(text="Average monthly wind speed, 1980-2015, " + c_name, x=0.5),
+            font=dict(family="Open Sans", size=10),
+            title=dict(
+                text="Average monthly wind speed, 1980-2015, " + c_name,
+                x=0.5,
+                font=dict(size=18),
+            ),
             boxmode="group",
             legend_orientation="h",
-            legend={"font": {"family": "Open Sans", "size": 10}},
             yaxis={
                 "title": "Wind speed (mph)",
                 "rangemode": "tozero",
@@ -281,8 +285,12 @@ def update_rose(community):
     c_name = luts.communities.loc[community]["place"]
 
     rose_layout = {
-        "title": "Annual Wind Speed/Direction Distribution, 1980-2015, " + c_name,
+        "title": dict(
+            text="Annual Wind Speed/Direction Distribution, 1980-2015, " + c_name,
+            font=dict(size=18),
+        ),
         "height": 700,
+        "font": dict(family="Open Sans", size=10),
         "margin": {"l": 0, "r": 0, "b": 20, "t": 75},
         "legend": {"orientation": "h", "x": 0, "y": 1},
         "annotations": [
@@ -430,7 +438,7 @@ def update_rose_monthly(community):
             x=0.5,
         ),
         margin=dict(l=0, t=100, r=0, b=0),
-        font_size=10,
+        font=dict(family="Open Sans", size=10),
         legend=dict(x=0, y=0, orientation="h"),
         height=1500,
         paper_bgcolor="#fff",
@@ -522,8 +530,9 @@ def update_threshold_graph(community, duration, gcm):
                 + ", "
                 + luts.durations[duration],
                 x=0.5,
+                font=dict(size=18),
             ),
-            legend={"font": {"family": "Open Sans", "size": 10}},
+            font=dict(family="Open Sans", size=10),
             yaxis={"title": "Number of Events", "fixedrange": True},
             xaxis=dict(
                 title="Years",
@@ -681,11 +690,11 @@ def update_future_delta_percentiles(community, gcm, decade):
         )
     )
     figure_text = (
-        "<br><b>Changes in Number of Wind Events Between ERA-Interim (1980-2000) and "
+        "Changes in Number of Wind Events Between ERA-Interim (1980-2000) and "
         + gcm
         + " ("
         + luts.decade_selections[decade]
-        + ")</b><br>"
+        + ")<br>"
         + c_name
     )
 
@@ -701,10 +710,11 @@ def update_future_delta_percentiles(community, gcm, decade):
     yticktext = np.char.add(ytickvals, percentile_lookups)
 
     fig.update_layout(
-        title=dict(text=figure_text, x=0.5),
+        title=dict(text=figure_text, x=0.5, font=dict(size=18)),
         legend_orientation="h",
-        legend={"font": {"family": "Open Sans", "size": 14}, "y": -0.2},
+        legend={"font": {"size": 14}, "y": -0.2},
         height=600,
+        font=dict(family="Open Sans", size=10),
         margin={"l": 50, "r": 50, "b": 35, "t": 85},
         xaxis={
             "tickvals": [1, 6, 12, 24, 48],
@@ -829,7 +839,7 @@ def update_future_rose(community, gcm):
             x=0.5,
         ),
         margin=dict(l=0, t=75, r=0, b=0),
-        font_size=10,
+        font=dict(family="Open Sans", size=10),
         legend=dict(x=0, y=0, orientation="h"),
         height=550,
         paper_bgcolor="#fff",
