@@ -491,7 +491,8 @@ def update_threshold_graph(community, duration, gcm):
     dk = dk.loc[percentiles["dur_thr"] == duration]
 
     for ws in dk.ws_thr.unique():
-        k = dk.loc[dk.ws_thr == ws]
+        # Need to filter, glue together the 2000's (between ERA/GCM)
+        k = dk.loc[dk.ws_thr == ws].groupby(["ts"]).sum().reset_index()
         traces.append(
             go.Bar(
                 name=labels[index],
