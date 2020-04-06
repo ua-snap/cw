@@ -277,7 +277,11 @@ help_text = html.Div(
 
 If you want to cite this web site in a paper, we suggest this format:
 
- > J. Walsh, K. Redilla, B. Crevensten, T. Kurkowski. Alaska Community Wind Tool. \[online tool\] Alaska Center for Climate Assessment and Policy, University of Alaska Fairbanks [http://windtool.accap.uaf.edu](http://windtool.accap.uaf.edu)
+ > J. Walsh, K. Redilla, B. Crevensten, T. Kurkowski. Alaska Community Wind Tool. 2019 (revised 2020) \[online tool\] Alaska Center for Climate Assessment and Policy, University of Alaska Fairbanks [http://windtool.accap.uaf.edu](http://windtool.accap.uaf.edu)
+
+#### Acknowledgements
+
+We acknowledge the World Climate Research Programme’s Working Group on Coupled Modeling, which is responsible for CMIP, and we thank all the climate modeling groups for producing and making available their model output. For CMIP, the US Department of Energy's Program for Climate Model Diagnosis and Intercomparison provides coordinating support and leads development of software infrastructure in partnership with the Global Organization for Earth System Science Portals.
 
                 """,
                     className="is-size-6 content",

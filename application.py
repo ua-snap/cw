@@ -526,7 +526,7 @@ def update_threshold_graph(community, duration, gcm):
                 + c_name
                 + "<br>"
                 + "ERA-Interim/"
-                + gcm
+                + luts.gcms[gcm]
                 + ", "
                 + luts.durations[duration],
                 x=0.5,
@@ -691,7 +691,7 @@ def update_future_delta_percentiles(community, gcm, decade):
     )
     figure_text = (
         "Changes in Number of Wind Events Between ERA-Interim (1980-2000) and "
-        + gcm
+        + luts.gcms[gcm]
         + " ("
         + luts.decade_selections[decade]
         + ")<br>"
