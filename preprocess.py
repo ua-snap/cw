@@ -1,3 +1,12 @@
+"""
+
+Note, this contains both the older V1 processing code
+as well as the V2 code.  The V1 code isn't tested to
+work for a full processing cycle, and may need
+some adjustments.
+
+"""
+
 # pylint: disable=all
 import pandas as pd
 import dask.dataframe as dd
@@ -8,9 +17,10 @@ from luts import speed_ranges
 directory = "./data/station"
 cols = ["sid", "direction", "speed", "month"]
 
+
 def preprocess_stations():
     """
-    This produces two (large) files which combine
+    This producess two (large) files which combine
     all the individual station files into one tidy table.
 
     stations.csv is ready to be processed into the wind roses.
@@ -76,10 +86,11 @@ def averages_by_month(mean_data):
     d = d.reset_index()
     d = d.drop(["direction"], axis=1)
     # Weird code -- drop the prior index, which is unnamed
-    d = d.loc[:, ~d.columns.str.contains('^Unnamed')]
-    d = d.astype({"year":"int16", "month":"int16"})
+    d = d.loc[:, ~d.columns.str.contains("^Unnamed")]
+    d = d.astype({"year": "int16", "month": "int16"})
     d = d.assign(speed=round(d["speed"], 1))
     d.to_csv("monthly_averages.csv")
+
 
 # Requires Dask DF, not Pandas
 def process_calm(mean_data):
@@ -100,11 +111,12 @@ def process_calm(mean_data):
     d = d.groupby(["sid", "month"]).size().reset_index().compute()
 
     calms = calms.assign(calm=d[[0]])
-    calms.columns=["sid", "month", "total", "calm"]
+    calms.columns = ["sid", "month", "total", "calm"]
     calms = calms.assign(percent=round(calms["calm"] / calms["total"], 3) * 100)
     calms.to_csv("calms.csv")
 
-def chunk_to_rose(sgroup, accumulator):
+
+def chunk_to_rose(sgroup, station_name=None):
     """
     Builds data suitable for Plotly's wind roses from
     a subset of data.
@@ -113,6 +125,14 @@ def chunk_to_rose(sgroup, accumulator):
     Return accumulator of whatever the results of the
     incoming chunk are.
     """
+
+    # Bin into 36 categories.
+    bins = list(range(5, 356, 10))
+    bin_names = list(range(1, 36))
+
+    # Accumulator dataframe.
+    proc_cols = ["sid", "direction_class", "speed_range", "count"]
+    accumulator = pd.DataFrame(columns=proc_cols)
 
     # Assign directions to bins.
     # We'll use the exceptional 'NaN' class to represent
@@ -155,6 +175,7 @@ def chunk_to_rose(sgroup, accumulator):
 
     return accumulator
 
+
 def process_roses(data):
     """
     For each station we need one trace for each direction.
@@ -177,15 +198,10 @@ def process_roses(data):
     proc_cols = ["sid", "direction_class", "speed_range", "count", "month"]
     rose_data = pd.DataFrame(columns=proc_cols)
 
-    # Bin into 36 categories.
-    bins = list(range(5, 356, 10))
-    bin_names = list(range(1, 36))
-
     groups = data.groupby(["sid"])
     for station_name, station in groups:
         # Yearly data.
-        acc = pd.DataFrame(columns=proc_cols)
-        t = chunk_to_rose(station, acc)
+        t = chunk_to_rose(station)
         t = t.assign(month=0)  # year
         rose_data = rose_data.append(t)
 
@@ -201,15 +217,110 @@ def process_roses(data):
 
     rose_data.to_csv("roses.csv")
 
-# Make this skippable during dev
-preprocess = False
 
-if preprocess:
+def process_future_roses():
+    """
+    Process wind roses for future data.
+
+    We create the data with decadal groups this way for display:
+    0 = ERA
+    1 = CCSM4/CM3, 2031-2050
+    2 = CCSM4/CM3, 2080-2099
+    """
+
+    places = pd.read_csv("./places.csv")
+    cols = [
+        "sid",
+        "gcm",
+        "decadal_group",
+        "direction_class",
+        "speed_range",
+        "count",
+        "frequency",
+    ]
+
+    future_roses = pd.DataFrame(columns=cols)
+
+    for index, place in places.iterrows():
+        print("[future roses] starting " + place["sid"])
+
+        # Read and prep for ERA/CCSM4.
+        df = pd.read_csv("./data/wrf_adj/CCSM4_" + place["sid"] + ".csv")
+        df.columns = ["gcm", "sid", "ts", "speed", "direction"]
+        df["ts"] = pd.to_datetime(df["ts"])
+        df["year"] = pd.DatetimeIndex(df["ts"]).year
+        df = df.set_index(["gcm", "year"])
+        df = df.reset_index()
+
+        dk = df.loc[(df.gcm == "ERA") & (df.year <= 2009)]
+        t = chunk_to_rose(dk, place["sid"])
+        t["gcm"] = "ERA"
+        t["decadal_group"] = 0
+        future_roses = future_roses.append(t)
+
+        # For both CCSM4 and CM3, we need two buckets --
+        # 2031 - 2050, and 2080-2099.
+        dk = df.loc[(df.gcm == "CCSM4") & (df.year >= 2025) & (df.year <= 2054)]
+        t = chunk_to_rose(dk, place["sid"])
+        t["gcm"] = "CCSM4"
+        t["decadal_group"] = 1
+        future_roses = future_roses.append(t)
+
+        dk = df.loc[(df.gcm == "CCSM4") & (df.year >= 2070) & (df.year <= 2099)]
+        dk = dk.reset_index()  # for performance.
+        t = chunk_to_rose(dk, place["sid"])
+        t["gcm"] = "CCSM4"
+        t["decadal_group"] = 2
+        future_roses = future_roses.append(t)
+
+        # Read & prep CM3
+        df = pd.read_csv("./data/wrf_adj/CM3_" + place["sid"] + ".csv")
+        df.columns = ["gcm", "sid", "ts", "speed", "direction"]
+        df["ts"] = pd.to_datetime(df["ts"])
+        df["year"] = pd.DatetimeIndex(df["ts"]).year
+        df = df.set_index(["gcm", "year"])
+        df = df.reset_index()
+
+        dk = df.loc[(df.gcm == "CM3") & (df.year >= 2031) & (df.year <= 2050)]
+        dk = dk.reset_index()  # for performance.
+        t = chunk_to_rose(dk, place["sid"])
+        t["gcm"] = "CM3"
+        t["decadal_group"] = 1
+        future_roses = future_roses.append(t)
+
+        dk = df.loc[(df.gcm == "CM3") & (df.year >= 2080) & (df.year <= 2099)]
+        dk = dk.reset_index()  # for performance.
+        t = chunk_to_rose(dk, place["sid"])
+        t["gcm"] = "CM3"
+        t["decadal_group"] = 2
+        future_roses = future_roses.append(t)
+
+    future_roses.to_csv("future_roses.csv")
+
+
+def process_threshold_percentiles():
+    dt = pd.read_csv("WRF_hwe_perc.csv")
+    dt = dt.drop(["wd"], axis=1)
+    dt["events"] = 0  # add column for count
+    dk = dt.groupby(["stid", "gcm", "ts", "ws_thr", "dur_thr"]).count().reset_index()
+    dk.to_csv("percentiles.csv")
+
+
+# Make already-done V2 work skippable.
+v2_preprocess = True
+if v2_preprocess:
+    # process_threshold_percentiles()
+    process_future_roses()
+
+# Make all V1 work skippable.
+v1_preprocess = False
+
+if v1_preprocess:
     preprocess_stations()
 
-data = pd.read_csv("stations.csv", index_col=[0])
-mean_data = dd.read_csv("mean_stations.csv")
+    data = pd.read_csv("stations.csv", index_col=[0])
+    mean_data = dd.read_csv("mean_stations.csv")
 
-process_calm(mean_data)
-# averages_by_month(mean_data)
-# process_roses(data)
+    process_calm(mean_data)
+    # averages_by_month(mean_data)
+    # process_roses(data)

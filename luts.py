@@ -6,9 +6,33 @@ Contains common lookup tables between GUI/application code
 """
 import os
 import pandas as pd
+import numpy as np
 import plotly.graph_objs as go
 
 communities = pd.read_csv("places.csv", index_col="sid")
+
+# Needs to be a numpy array for ease of building relevant
+# strings for some code
+# 50, 75, 85, 95, 99
+percentiles = np.array(
+    [
+        "mph (50th %ile) <b>Common<b>",
+        "mph (75th %ile)",
+        "mph (85th %ile) <b>Occasional</b>",
+        "mph (95th %ile)",
+        "mph (99th %ile) <b>Rare</b>",
+    ]
+)
+
+durations = {
+    1: "1 continuous hour or more",
+    6: "6+ hours",
+    12: "12+ hours",
+    24: "24+ hours",
+    48: "48+ hours",
+}
+
+gcms = {"CCSM4": "NCAR-CCSM4", "CM3": "GFDL-CM3"}
 
 months = {
     1: "January",
@@ -23,6 +47,32 @@ months = {
     10: "October",
     11: "November",
     12: "December",
+}
+
+decades = {
+    1980: "1980-1999",
+    2000: "2000-2019",
+    2020: "2020-2029",
+    2040: "2040-2059",
+    2060: "2060-2079",
+    2080: "2080-2099",
+}
+
+# For decadal selector, we need a subset of the above!
+decade_selections = {
+    2020: "2020-2039",
+    2040: "2040-2059",
+    2060: "2060-2079",
+    2080: "2080-2099",
+}
+
+# Map of quantiles to bubble pixel size
+bubble_bins = {
+    "least": 10,
+    "some": 20,
+    "middle": 35,
+    "more": 55,
+    "most": 80,
 }
 
 # This trace is shared so we can highlight specific communities.
@@ -72,16 +122,20 @@ fig_configs = dict(
     displaylogo=False,
 )
 
+# Gradient-colors, from gentlest to darker/more saturated.
+# Some charts need to access these directly.
+colors = ["#d0d1e6", "#a6bddb", "#74a9cf", "#3690c0", "#0570b0", "#034e7b"]
+
 # The lowest bound excludes actual 0 (calm) readings,
 # this is deliberate.
 speed_ranges = {
-    "0-6": {"range": [0.001, 6], "color": "#d0d1e6"},
-    "6-10": {"range": [6, 10], "color": "#a6bddb"},
-    "10-14": {"range": [10, 14], "color": "#74a9cf"},
-    "14-18": {"range": [14, 18], "color": "#3690c0"},
-    "18-22": {"range": [18, 22], "color": "#0570b0"},
+    "0-6": {"range": [0.001, 6], "color": colors[0]},
+    "6-10": {"range": [6, 10], "color": colors[1]},
+    "10-14": {"range": [10, 14], "color": colors[2]},
+    "14-18": {"range": [14, 18], "color": colors[3]},
+    "18-22": {"range": [18, 22], "color": colors[4]},
     "22+": {
         "range": [22, 1000],  # let's hope the upper bound is sufficient :-)
-        "color": "#034e7b",
+        "color": colors[5],
     },
 }
