@@ -19,7 +19,6 @@ import luts
 data = pd.read_csv("roses.csv")
 calms = pd.read_csv("calms.csv")
 monthly_means = pd.read_csv("monthly_averages.csv")
-thresholds = pd.read_csv("WRF_hwe.csv")
 future_rose = pd.read_csv("future_roses.csv")
 percentiles = pd.read_csv("percentiles.csv", index_col=0)
 
