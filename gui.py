@@ -11,9 +11,7 @@ import luts
 
 path_prefix = os.environ["REQUESTS_PATHNAME_PREFIX"]
 
-map_figure = go.Figure(
-    {"data": [luts.map_communities_trace], "layout": luts.map_layout}
-)
+map_figure = go.Figure(data=luts.map_communities_trace, layout=luts.map_layout)
 
 toc = html.Div(
     id="toc",
@@ -36,7 +34,7 @@ toc = html.Div(
             <li>
                 <h3 class="title is-6">Explore modeled winds (1980-2100)</h3>
                 <ol>
-                    <li><a href="#toc_gcm">Select GCM</a></li>
+                    <li><a href="#toc_gcm">Choose a Global Climate Model</a></li>
                     <li><a href="#toc_g4">Modeled wind event duration</a></li>
                     <li><a href="#toc_g5">Modeled past vs. future wind events</a></li>
                     <li><a href="#toc_g6">Modeled wind speed/direction</a></li>
@@ -87,7 +85,7 @@ header_section = html.Div(
                                     "Alaska Community Wind Data", className="title is-3"
                                 ),
                                 html.H2(
-                                    "Explore historical wind data for Alaska communities",
+                                    "Explore past and future wind data for Alaska communities",
                                     className="subtitle is-5",
                                 ),
                             ],
@@ -156,7 +154,7 @@ communities_dropdown_field = html.Div(
 gcm_dropdown_field = html.Div(
     className="field dropdown-selector",
     children=[
-        html.Label("Select a Global Climate Model", className="label"),
+        html.Label("Choose a Global Climate Model", className="label"),
         html.Div(
             className="control",
             children=[
@@ -386,7 +384,10 @@ These wind roses are similar to the one shown above, except data are separated b
                             className="section",
                             children=[
                                 html.A(id="toc_gcm"),
-                                html.H3("Explore modeled winds (1980-2100)", className="title is-4"),
+                                html.H3(
+                                    "Explore modeled winds (1980-2100)",
+                                    className="title is-4",
+                                ),
                                 dcc.Markdown(
                                     """
         Explore these projected data to see how wind may change in the future. Wind data from 1980&ndash;2100 were simulated using two Global Climate Models (GCMs): NCAR&ndash;CCSM4 and GFDL&ndash;CM3. Switch between the two GCMs to explore possible futures.
@@ -418,7 +419,7 @@ Explore how the length and intensity of wind events may change. To start, use th
                                     id="threshold_graph",
                                     figure=go.Figure(),
                                     config=luts.fig_configs,
-                                )
+                                ),
                             ],
                         ),
                         html.Div(
@@ -445,14 +446,6 @@ This chart shows how wind events may change over time.  Some types of wind event
                                     id="future_delta_percentiles",
                                     figure=go.Figure(),
                                     config=luts.fig_configs,
-                                ),
-                                dcc.Markdown(
-                                    """
- * Bubble sizes correspond to change in the number of events.
- * Numbers show the actual change in modeled events between 1980-2000 and 2080-2100.  Hover over points to see &percnt; change.
- * Percentile wind speeds (&percnt;ile, y&ndash;axis) are based on the frequency of 1-hour wind events.
-         """,
-                                    className="content help-text is-size-6",
                                 ),
                             ],
                         ),
