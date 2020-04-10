@@ -1,7 +1,6 @@
-@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,700&subset=latin-ext');
-
-html {
-	font-family: 'Open Sans';
+@import url('https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&family=Open+Sans:wght@400;600&display=swap');
+body {
+	font-family: 'Cardo', serif;
 }
 
 /* Tweaks to Bulma / Plotly control/form elements */
@@ -18,7 +17,7 @@ div.Select-control {
 	box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
 }
 .section + .section {
-	padding-top: 0;
+	border-top: 1px solid #eee;
 }
 /* Fix up horizontal radio buttons, they're janky */
 .field .control label {
@@ -55,8 +54,7 @@ div.Select-control {
 	height: 5.4em;
 }
 .section.survey-link a.button {
-	font-family: 'Open Sans';
-	font-weight: 500;
+	font-weight: 700;
 }
 
 
@@ -66,9 +64,16 @@ Block out height/width for all charts to reduce "bounce"
 when the page is loading.
 
 */
+.section.charts {
+	padding-top: 0;
+}
 #map {
 	max-width: 640px;
 	height: 450px;
+}
+#means_box {
+	max-width: 970px;
+	height: 500px;
 }
 #rose {
 	max-width: 970px;
@@ -127,7 +132,6 @@ g.pointtext {
 #toc {
 	position: sticky;
 	top: 0;
-	margin: 0 0 3rem 3rem;
 	padding-top: 3rem;
 }
 #toc ol {
