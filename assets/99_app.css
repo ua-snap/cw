@@ -18,7 +18,7 @@ div.Select-control {
 	box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
 }
 .section + .section {
-	padding-top: 0;
+	border-top: 1px solid #eee;
 }
 /* Fix up horizontal radio buttons, they're janky */
 .field .control label {
