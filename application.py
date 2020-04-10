@@ -113,7 +113,7 @@ def update_selected_community_on_map(community):
     return {
         "data": [
             luts.map_communities_trace,
-            go.Scattermapbox(
+            go.Scattergeo(
                 lat=[luts.communities.loc[community]["latitude"]],
                 lon=[luts.communities.loc[community]["longitude"]],
                 mode="markers",

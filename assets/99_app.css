@@ -66,9 +66,12 @@ Block out height/width for all charts to reduce "bounce"
 when the page is loading.
 
 */
+.content {
+	max-width: 40em;
+}
 #map {
 	max-width: 640px;
-	height: 450px;
+	height: 800px;
 }
 #rose {
 	max-width: 970px;

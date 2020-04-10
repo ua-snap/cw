@@ -67,16 +67,10 @@ decade_selections = {
 }
 
 # Map of quantiles to bubble pixel size
-bubble_bins = {
-    "least": 10,
-    "some": 20,
-    "middle": 35,
-    "more": 55,
-    "most": 80,
-}
+bubble_bins = {"least": 10, "some": 20, "middle": 35, "more": 55, "most": 80}
 
 # This trace is shared so we can highlight specific communities.
-map_communities_trace = go.Scattermapbox(
+map_communities_trace = go.Scattergeo(
     lat=communities.loc[:, "latitude"],
     lon=communities.loc[:, "longitude"],
     mode="markers",
@@ -87,11 +81,24 @@ map_communities_trace = go.Scattermapbox(
 )
 
 map_layout = go.Layout(
-    autosize=True,
-    hovermode="closest",
-    mapbox=dict(style="stamen-terrain", zoom=2.5, center=dict(lat=63, lon=-160)),
-    showlegend=False,
+    height=800,
     margin=dict(l=0, r=0, t=0, b=0),
+    hovermode="closest",
+    showlegend=False,
+    geo=dict(
+        center=dict(
+            lat=65,
+            lon=-155,
+        ),
+        projection=dict(
+            type="stereographic",
+            scale=8,
+            rotation=dict(
+                lat=65,
+                lon=-155,
+            ),
+        ),
+    )
 )
 
 
