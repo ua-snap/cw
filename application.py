@@ -234,11 +234,10 @@ def update_box_plots(community):
             font=dict(family="Open Sans", size=10),
             title=dict(
                 text="Average monthly wind speed, 1980-2015, " + c_name,
+                font=dict(size=18, family="Open Sans"),
                 x=0.5,
-                font=dict(size=18),
             ),
             boxmode="group",
-            legend_orientation="h",
             yaxis={
                 "title": "Wind speed (mph)",
                 "rangemode": "tozero",
