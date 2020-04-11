@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&family=Open+Sans:wght@400;600&display=swap');
+
 body {
 	font-family: 'Cardo', serif;
 }
@@ -7,6 +8,9 @@ body {
 /* Slightly boost font size for body text. */
 .is-size-6 {
 	font-size: 1.2rem!important;
+}
+a {
+	color: #0570b0;
 }
 /* Styling the dropdown selectors */
 .dropdown-selector {
@@ -143,15 +147,25 @@ g.pointtext {
 }
 #toc li h3 {
 	display: inline-block;
+	font-size: 1.1rem;
 	margin-bottom: 0.5rem;
+	margin-top: 0.5rem;
 }
 #toc ol li {
 	font-size: 1.1rem;
 	list-style-type: none;
 	line-height: 1.2;
-	margin-top: .2rem;
-	margin-bottom: .3rem;
+	margin-top: 0;
+	margin-bottom: 0;
 }
 #toc ol ol {
 	margin-left: 1rem;
+}
+#toc a {
+	display: inline-block;
+	padding: 0.25rem;
+	margin-left: -0.25rem;
+}
+#toc a:hover {
+	background-color: #FDFACC;
 }
