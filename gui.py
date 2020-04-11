@@ -420,7 +420,7 @@ These wind roses are similar to the one shown above, except data are separated b
                                     children=[
                                         html.A(id="toc_g4"),
                                         html.H3(
-                                            "Modeled past vs. future wind events",
+                                            "Modeled wind event duration",
                                             className="title is-4",
                                         ),
                                         dcc.Markdown(
@@ -445,7 +445,7 @@ Explore how the length and intensity of wind events may change. To start, use th
                                     children=[
                                         html.A(id="toc_g5"),
                                         html.H3(
-                                            "Modeled wind event duration",
+                                            "Modeled past vs. future wind events",
                                             className="title is-4",
                                         ),
                                         dcc.Markdown(
