@@ -79,8 +79,8 @@ when the page is loading.
 	padding-top: 0;
 }
 #map {
-	max-width: 640px;
-	height: 450px;
+	max-width: 500px;
+	height: 400px;
 }
 #means_box {
 	max-width: 970px;
