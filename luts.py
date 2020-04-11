@@ -67,13 +67,7 @@ decade_selections = {
 }
 
 # Map of quantiles to bubble pixel size
-bubble_bins = {
-    "least": 10,
-    "some": 20,
-    "middle": 35,
-    "more": 55,
-    "most": 80,
-}
+bubble_bins = {"least": 10, "some": 20, "middle": 35, "more": 55, "most": 80}
 
 # This trace is shared so we can highlight specific communities.
 map_communities_trace = go.Scattermapbox(
@@ -125,6 +119,7 @@ fig_configs = dict(
 # Gradient-colors, from gentlest to darker/more saturated.
 # Some charts need to access these directly.
 colors = ["#d0d1e6", "#a6bddb", "#74a9cf", "#3690c0", "#0570b0", "#034e7b"]
+modeled_colors = ["#efefdb", "#c4c3b4", "#9a9a8f", "#72726b", "#4d4d49", "#2a2a2a"]
 
 # The lowest bound excludes actual 0 (calm) readings,
 # this is deliberate.
@@ -138,4 +133,12 @@ speed_ranges = {
         "range": [22, 1000],  # let's hope the upper bound is sufficient :-)
         "color": colors[5],
     },
+}
+modeled_ranges = {
+    "0-6": {"range": [0.001, 6], "color": modeled_colors[0]},
+    "6-10": {"range": [6, 10], "color": modeled_colors[1]},
+    "10-14": {"range": [10, 14], "color": modeled_colors[2]},
+    "14-18": {"range": [14, 18], "color": modeled_colors[3]},
+    "18-22": {"range": [18, 22], "color": modeled_colors[4]},
+    "22+": {"range": [22, 1000], "color": modeled_colors[5]},
 }

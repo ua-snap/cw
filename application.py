@@ -195,7 +195,7 @@ def get_rose_calm_month_annotations(titles, calm):
     return calm_annotations
 
 
-def get_rose_traces(d, traces, month, showlegend=False):
+def get_rose_traces(d, traces, month, speed_ranges, showlegend=False):
     """
     Get all traces for a wind rose, given the data chunk.
     Month is used to tie the subplot to the formatting
@@ -203,7 +203,7 @@ def get_rose_traces(d, traces, month, showlegend=False):
     """
 
     # Directly mutate the `traces` array.
-    for sr, sr_info in luts.speed_ranges.items():
+    for sr, sr_info in speed_ranges.items():
         dcr = d.loc[(d["speed_range"] == sr)]
         props = dict(
             r=dcr["frequency"].tolist(),
@@ -273,7 +273,7 @@ def update_rose(community):
 
     # Subset for community & 0=year
     d = data.loc[(data["sid"] == community) & (data["month"] == 0)]
-    get_rose_traces(d, traces, "", True)
+    get_rose_traces(d, traces, "", luts.speed_ranges, True)
 
     # Compute % calm, use this to modify the hole size
     c = calms[calms["sid"] == community]
@@ -366,7 +366,8 @@ def update_rose_monthly(community):
             traces = []
             d = data.loc[(data["sid"] == community) & (data["month"] == month)]
             max_axes = max_axes.append(
-                get_rose_traces(d, traces, month, if_show_legend), ignore_index=True
+                get_rose_traces(d, traces, month, luts.speed_ranges, if_show_legend),
+                ignore_index=True,
             )
             for trace in traces:
                 fig.add_trace(trace, row=i, col=j)
@@ -512,7 +513,7 @@ def update_threshold_graph(community, duration, gcm):
                 x=k.ts,
                 y=k.events,
                 width=10,
-                marker=dict(color=luts.colors[index], line=dict(width=0)),
+                marker=dict(color=luts.modeled_colors[index], line=dict(width=0)),
             )
         )
         index += 1
@@ -760,7 +761,9 @@ def update_future_rose(community, gcm):
     d = future_rose.loc[
         (future_rose["sid"] == community) & (future_rose["gcm"] == "ERA")
     ]
-    max_axes = max_axes.append(get_rose_traces(d, traces, "", True), ignore_index=True)
+    max_axes = max_axes.append(
+        get_rose_traces(d, traces, "", luts.modeled_ranges, True), ignore_index=True
+    )
     for trace in traces:
         fig.add_trace(trace, row=1, col=1)
 
@@ -771,7 +774,9 @@ def update_future_rose(community, gcm):
         & (future_rose["gcm"] == gcm)
         & (future_rose["decadal_group"] == 1)
     ]
-    max_axes = max_axes.append(get_rose_traces(d, traces, "", False), ignore_index=True)
+    max_axes = max_axes.append(
+        get_rose_traces(d, traces, "", luts.modeled_ranges, False), ignore_index=True
+    )
     for trace in traces:
         fig.add_trace(trace, row=1, col=2)
 
@@ -782,7 +787,9 @@ def update_future_rose(community, gcm):
         & (future_rose["gcm"] == gcm)
         & (future_rose["decadal_group"] == 2)
     ]
-    max_axes = max_axes.append(get_rose_traces(d, traces, "", False), ignore_index=True)
+    max_axes = max_axes.append(
+        get_rose_traces(d, traces, "", luts.modeled_ranges, False), ignore_index=True
+    )
     for trace in traces:
         fig.add_trace(trace, row=1, col=3)
 
