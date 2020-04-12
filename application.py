@@ -555,9 +555,9 @@ def update_threshold_graph(community, duration, gcm):
 )
 def update_future_delta_percentiles(community, gcm, decade):
     """
-    Build chart / visualiztion of threshold/durations
-    from model data -- 3D Chart Attempt TODO FIXME better
-    description here please.
+    Build visualization that shows the number
+    of events, categorized by wind speed (y-axis)
+    and duration (x-axis).
     """
 
     c_name = luts.communities.loc[community]["place"]
