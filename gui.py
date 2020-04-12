@@ -22,7 +22,7 @@ toc = html.Div(
         <ol>
             <li><a href="#toc_location">Choose a location</a></li>
             <li>
-                <h3 class="title is-6">Explore observed winds (1980-2015)</h3>
+                <h3 class="title is-6">Explore observed winds (1980-2014)</h3>
                 <ol>
                     <li><a href="#toc_g1">Monthly wind speeds</a></li>
                     <li><a href="#toc_g2">Annual wind speed/direction
@@ -212,7 +212,7 @@ form_fields = html.Div(
     children=[
         dcc.Markdown(
             """
-            Explore past and future wind data from 67 communities across Alaska. Start by choosing a specific community. Use the navigation menu on the left to explore observed wind patterns from the last 35 years (1980&ndash;2015) or past and future wind projections (1980&ndash;2099).
+            Explore past and future wind data from 67 communities across Alaska. Start by choosing a specific community. Use the navigation menu on the left to explore observed wind patterns from the last 35 years (1980&ndash;2014) or past and future wind projections (1980&ndash;2099).
 """,
             className="content is-size-5",
         ),
@@ -235,7 +235,7 @@ intro = html.Div(
                     className="survey-link",
                     children=[
                         html.P(
-                            "This tool displays recorded hourly wind data 1980-2015 and projected data 1980-2099 for 67 Alaska communities.",
+                            "This tool displays recorded hourly wind data 1980-2014 and projected data 1980-2099 for 67 Alaska communities.",
                             className="content is-size-4",
                         ),
                         html.A(
@@ -266,7 +266,7 @@ help_text = html.Div(
 
  * Wind speed observations source: [Iowa Environmental Mesonet](https://mesonet.agron.iastate.edu/request/download.phtml?network=AK_ASOS), run by Iowa State University. Houses data collected by the [Automated Surface Observing System](https://www.ncdc.noaa.gov/data-access/land-based-station-data/land-based-datasets/automated-surface-observing-system-asos) network and the [Automated Weather Observing System](https://www.ncdc.noaa.gov/data-access/land-based-station-data/land-based-datasets/automated-weather-observing-system-awos).
  * Measurement frequency: Varies between locations, from every 5 minutes to every 3 hours. Winds were measured hourly in most cases; speeds were averaged to the nearest hour in cases where measurements were more frequent.
- * Observing site criteria: We use data from 67 observing sites located across Alaska, mostly at airports (see map). For inclusion here, a station must have made 4 or more hourly wind measurements on at least 75&percnt; of the days during the period 1980&ndash;2015.
+ * Observing site criteria: We use data from 67 observing sites located across Alaska, mostly at airports (see map). For inclusion here, a station must have made 4 or more hourly wind measurements on at least 75&percnt; of the days during the period 1980&ndash;2014.
 
 ##### Data processing and quality control
 
@@ -278,7 +278,7 @@ help_text = html.Div(
 #### About the modeled historical and future projections of wind
 
  * [WRF model data source](http://ckan.snap.uaf.edu/dataset/historical-and-projected-dynamically-downscaled-climate-data-for-the-state-of-alaska-and-surrou): Scenarios Network for Alaska + Arctic Planning, International Arctic Research Center, University of Alaska Fairbanks.
- * Data spans from January 1, 1980 through December 31, 2099.
+ * Modeled data spans from January 1, 1980 through December 31, 2099.
 
 ##### Data processing and quality control
 
@@ -329,7 +329,7 @@ columns = html.Div(
                                         ),
                                         dcc.Markdown(
                                             """
-Use this box-plot to explore seasonal changes in wind speed. Each month’s data are averaged over 35 years of observations (1980&ndash;2015).
+Use this box-plot to explore seasonal changes in wind speed. Each month’s data are averaged over 35 years of observations (1980&ndash;2014).
 
  * **Boxes** show the middle 50&percnt; of monthly averages.
  * **Horizontal lines within boxes** show averages based on all hourly reports for a month.
@@ -355,7 +355,7 @@ Use this box-plot to explore seasonal changes in wind speed. Each month’s data
                                         ),
                                         dcc.Markdown(
                                             """
-This wind rose shows prevailing wind direction and speed for a given location. Data show annual trends averaged over 35 years of observations (1980&ndash;2015).
+This wind rose shows prevailing wind direction and speed for a given location. Data show annual trends averaged over 35 years of observations (1980&ndash;2014).
 
  * **Spokes** in the rose point in the compass direction from which the wind was blowing (i.e., a spoke pointing to the right denotes a wind from the east).
  * **Colors** within each spoke denote frequencies of wind speed occurrence.  Hover cursor over spoke to show the frequencies.
@@ -380,7 +380,7 @@ This wind rose shows prevailing wind direction and speed for a given location. D
                                         ),
                                         dcc.Markdown(
                                             """
-These wind roses are similar to the one shown above, except data are separated by month. Each rose shows the prevailing wind direction and speed for a given month. Compare the roses to see how wind direction and speed change throughout the year. Each month’s data are averaged over 35 years of observations (1980&ndash;2015).
+These wind roses are similar to the one shown above, except data are separated by month. Each rose shows the prevailing wind direction and speed for a given month. Compare the roses to see how wind direction and speed change throughout the year. Each month’s data are averaged over 35 years of observations (1980&ndash;2014).
      """,
                                             className="content is-size-6",
                                         ),
@@ -447,7 +447,7 @@ Explore how the length and intensity of wind events may change. To start, use th
 This chart shows how wind events may change over time.  Some types of wind events (low speed, long duration) may become more common, while others (high speed, high duration) become less common.  To start, choose a future decade to compare to the modeled historical baseline (ERA&ndash;Interim).
 
  * **Bubble size** corresponds to change in the number of events.
- * **Numbers** show the actual change in modeled events between 1980-2000 and 2080-2099.
+ * **Numbers** show the actual change in modeled events between 1980-2000 and the selected date interval.
  * **Hover** over points to see &percnt; change in number of events.
  * **&percnt;ile (percentile)** on the y–axis indicates percentile wind speeds which are based on the frequency of 1-hour wind events.
          """,
