@@ -223,9 +223,9 @@ def process_future_roses():
     Process wind roses for future data.
 
     We create the data with decadal groups this way for display:
-    0 = ERA
-    1 = CCSM4/CM3, 2031-2050
-    2 = CCSM4/CM3, 2080-2099
+    0 = ERA, 1980-2009
+    1 = CCSM4/CM3, 2025-2054
+    2 = CCSM4/CM3, 2070-2099
     """
 
     places = pd.read_csv("./places.csv")
@@ -241,6 +241,13 @@ def process_future_roses():
 
     future_roses = pd.DataFrame(columns=cols)
 
+    # Define date ranges to be consistent
+    era_end = 2009
+    start_mid_century = 2025
+    end_mid_century = 2054
+    start_late_century = 2070
+    end_late_century = 2099
+
     for index, place in places.iterrows():
         print("[future roses] starting " + place["sid"])
 
@@ -252,7 +259,7 @@ def process_future_roses():
         df = df.set_index(["gcm", "year"])
         df = df.reset_index()
 
-        dk = df.loc[(df.gcm == "ERA") & (df.year <= 2009)]
+        dk = df.loc[(df.gcm == "ERA") & (df.year <= era_end)]
         t = chunk_to_rose(dk, place["sid"])
         t["gcm"] = "ERA"
         t["decadal_group"] = 0
@@ -260,13 +267,13 @@ def process_future_roses():
 
         # For both CCSM4 and CM3, we need two buckets --
         # 2031 - 2050, and 2080-2099.
-        dk = df.loc[(df.gcm == "CCSM4") & (df.year >= 2025) & (df.year <= 2054)]
+        dk = df.loc[(df.gcm == "CCSM4") & (df.year >= start_mid_century) & (df.year <= start_late_century)]
         t = chunk_to_rose(dk, place["sid"])
         t["gcm"] = "CCSM4"
         t["decadal_group"] = 1
         future_roses = future_roses.append(t)
 
-        dk = df.loc[(df.gcm == "CCSM4") & (df.year >= 2070) & (df.year <= 2099)]
+        dk = df.loc[(df.gcm == "CCSM4") & (df.year >= start_late_century) & (df.year <= end_late_century)]
         dk = dk.reset_index()  # for performance.
         t = chunk_to_rose(dk, place["sid"])
         t["gcm"] = "CCSM4"
@@ -281,14 +288,14 @@ def process_future_roses():
         df = df.set_index(["gcm", "year"])
         df = df.reset_index()
 
-        dk = df.loc[(df.gcm == "CM3") & (df.year >= 2031) & (df.year <= 2050)]
+        dk = df.loc[(df.gcm == "CM3") & (df.year >= start_mid_century) & (df.year <= end_mid_century)]
         dk = dk.reset_index()  # for performance.
         t = chunk_to_rose(dk, place["sid"])
         t["gcm"] = "CM3"
         t["decadal_group"] = 1
         future_roses = future_roses.append(t)
 
-        dk = df.loc[(df.gcm == "CM3") & (df.year >= 2080) & (df.year <= 2099)]
+        dk = df.loc[(df.gcm == "CM3") & (df.year >= start_late_century) & (df.year <= end_late_century)]
         dk = dk.reset_index()  # for performance.
         t = chunk_to_rose(dk, place["sid"])
         t["gcm"] = "CM3"
