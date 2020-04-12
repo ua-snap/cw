@@ -688,7 +688,7 @@ def update_future_delta_percentiles(community, gcm, decade):
         )
     )
     figure_text = (
-        "Changes in Number of Wind Events Between ERA-Interim (1980-2000) and "
+        "Changes in Number of Wind Events Between ERA-Interim (1980-1999) and "
         + luts.gcms[gcm]
         + " ("
         + luts.decade_selections[decade]

@@ -447,7 +447,7 @@ Explore how the length and intensity of wind events may change. To start, use th
 This chart shows how wind events may change over time.  Some types of wind events (low speed, long duration) may become more common, while others (high speed, high duration) become less common.  To start, choose a future decade to compare to the modeled historical baseline (ERA&ndash;Interim).
 
  * **Bubble size** corresponds to change in the number of events.
- * **Numbers** show the actual change in modeled events between 1980-2000 and the selected date interval.
+ * **Numbers** show the actual change in modeled events between 1980&ndash;1999 and the selected date interval.
  * **Hover** over points to see &percnt; change in number of events.
  * **&percnt;ile (percentile)** on the y–axis indicates percentile wind speeds which are based on the frequency of 1-hour wind events.
          """,
