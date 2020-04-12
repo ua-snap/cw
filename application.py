@@ -520,7 +520,7 @@ def update_threshold_graph(community, duration, gcm):
     return go.Figure(
         layout=dict(
             title=dict(
-                text="Historical and Future Modeled Wind Event Frequency, 1980-2100, "
+                text="Historical and Future Modeled Wind Event Frequency, 1980-2099, "
                 + c_name
                 + "<br>"
                 + "ERA-Interim/"
@@ -832,7 +832,7 @@ def update_future_rose(community, gcm):
     )
     fig.update_layout(
         title=dict(
-            text="Modeled Wind Speed/Direction Distribution, 1980-2100, " + c_name,
+            text="Modeled Wind Speed/Direction Distribution, 1980-2099, " + c_name,
             font=dict(family="Open Sans", size=18),
             x=0.5,
         ),

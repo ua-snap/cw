@@ -32,7 +32,7 @@ toc = html.Div(
                 </ol>
             </li>
             <li>
-                <h3 class="title is-6">Explore modeled winds (1980-2100)</h3>
+                <h3 class="title is-6">Explore modeled winds (1980-2099)</h3>
                 <ol>
                     <li><a href="#toc_gcm">Choose a Global Climate Model</a></li>
                     <li><a href="#toc_g4">Modeled wind event duration</a></li>
@@ -212,7 +212,7 @@ form_fields = html.Div(
     children=[
         dcc.Markdown(
             """
-            Explore past and future wind data from 67 communities across Alaska. Start by choosing a specific community. Use the navigation menu on the left to explore observed wind patterns from the last 35 years (1980&ndash;2015) or past and future wind projections (1980&ndash;2100).
+            Explore past and future wind data from 67 communities across Alaska. Start by choosing a specific community. Use the navigation menu on the left to explore observed wind patterns from the last 35 years (1980&ndash;2015) or past and future wind projections (1980&ndash;2099).
 """,
             className="content is-size-5",
         ),
@@ -235,7 +235,7 @@ intro = html.Div(
                     className="survey-link",
                     children=[
                         html.P(
-                            "This tool displays recorded hourly wind data 1980-2015 and projected data 1980-2100 for 67 Alaska communities.",
+                            "This tool displays recorded hourly wind data 1980-2015 and projected data 1980-2099 for 67 Alaska communities.",
                             className="content is-size-4",
                         ),
                         html.A(
@@ -277,7 +277,8 @@ help_text = html.Div(
 
 #### About the modeled historical and future projections of wind
 
- * [WRF model data source](http://ckan.snap.uaf.edu/dataset/historical-and-projected-dynamically-downscaled-climate-data-for-the-state-of-alaska-and-surrou): Scenarios Network for Alaska + Arctic Planning, International Arctic Research Center, University of Alaska Fairbanks
+ * [WRF model data source](http://ckan.snap.uaf.edu/dataset/historical-and-projected-dynamically-downscaled-climate-data-for-the-state-of-alaska-and-surrou): Scenarios Network for Alaska + Arctic Planning, International Arctic Research Center, University of Alaska Fairbanks.
+ * Data spans from January 1, 1980 through December 31, 2099.
 
 ##### Data processing and quality control
 
@@ -396,12 +397,12 @@ These wind roses are similar to the one shown above, except data are separated b
                                     children=[
                                         html.A(id="toc_gcm"),
                                         html.H3(
-                                            "Explore modeled winds (1980-2100)",
+                                            "Explore modeled winds (1980-2099)",
                                             className="title is-4",
                                         ),
                                         dcc.Markdown(
                                             """
-        Explore these projected data to see how wind may change in the future. Wind data from 1980&ndash;2100 were simulated using two Global Climate Models (GCMs): NCAR&ndash;CCSM4 and GFDL&ndash;CM3. Switch between the two GCMs to explore possible futures.
+        Explore these projected data to see how wind may change in the future. Wind data from 1980&ndash;2099 were simulated using two Global Climate Models (GCMs): NCAR&ndash;CCSM4 and GFDL&ndash;CM3. Switch between the two GCMs to explore possible futures.
         """,
                                             className="content is-size-6",
                                         ),
@@ -446,7 +447,7 @@ Explore how the length and intensity of wind events may change. To start, use th
 This chart shows how wind events may change over time.  Some types of wind events (low speed, long duration) may become more common, while others (high speed, high duration) become less common.  To start, choose a future decade to compare to the modeled historical baseline (ERA&ndash;Interim).
 
  * **Bubble size** corresponds to change in the number of events.
- * **Numbers** show the actual change in modeled events between 1980-2000 and 2080-2100.
+ * **Numbers** show the actual change in modeled events between 1980-2000 and 2080-2099.
  * **Hover** over points to see &percnt; change in number of events.
  * **&percnt;ile (percentile)** on the y–axis indicates percentile wind speeds which are based on the frequency of 1-hour wind events.
          """,
