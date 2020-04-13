@@ -133,7 +133,7 @@ def update_export_filenames(community):
     c_name = luts.communities.loc[community]["place"]
     configs = luts.fig_configs
     i_configs = luts.fig_download_configs
-    i_configs["filename"] = c_name + " Average Wind Speeds, 1980-2015"
+    i_configs["filename"] = c_name + " Average Wind Speeds, 1980-2014"
     i_configs["height"] = "640"
     configs["toImageButtonOptions"] = i_configs
     return configs
@@ -146,7 +146,7 @@ def update_rose_export_filenames(community):
     configs = luts.fig_configs
     i_configs = luts.fig_download_configs
     i_configs["filename"] = (
-        c_name + " Wind Frequency and Strength by Direction, 1980-2015"
+        c_name + " Wind Frequency and Strength by Direction, 1980-2014"
     )
     i_configs["width"] = "1280"
     i_configs["height"] = "1280"
@@ -163,7 +163,7 @@ def update_monthly_rose_export_filenames(community):
     configs = luts.fig_configs
     i_configs = luts.fig_download_configs
     i_configs["filename"] = (
-        c_name + " Monthly Wind Frequency and Strength by Direction, 1980-2015"
+        c_name + " Monthly Wind Frequency and Strength by Direction, 1980-2014"
     )
     i_configs["width"] = "1024"
     i_configs["height"] = "1280"
@@ -233,7 +233,7 @@ def update_box_plots(community):
         layout=dict(
             font=dict(family="Open Sans", size=10),
             title=dict(
-                text="Average monthly wind speed, 1980-2015, " + c_name,
+                text="Average monthly wind speed, 1980-2014, " + c_name,
                 font=dict(size=18, family="Open Sans"),
                 x=0.5,
             ),
@@ -253,7 +253,7 @@ def update_box_plots(community):
         ),
         data=[
             go.Box(
-                name="Observed average wind speed, 1980-2015",
+                name="Observed average wind speed, 1980-2014",
                 fillcolor=luts.speed_ranges["10-14"]["color"],
                 x=d.month,
                 y=d.speed,
@@ -284,7 +284,7 @@ def update_rose(community):
 
     rose_layout = {
         "title": dict(
-            text="Annual Wind Speed/Direction Distribution, 1980-2015, " + c_name,
+            text="Annual Wind Speed/Direction Distribution, 1980-2014, " + c_name,
             font=dict(size=18),
         ),
         "height": 700,
@@ -431,7 +431,7 @@ def update_rose_monthly(community):
     )
     fig.update_layout(
         title=dict(
-            text="Monthly Wind Speed/Direction Distribution, 1980-2015, " + c_name,
+            text="Monthly Wind Speed/Direction Distribution, 1980-2014, " + c_name,
             font=dict(family="Open Sans", size=18),
             x=0.5,
         ),
@@ -520,7 +520,7 @@ def update_threshold_graph(community, duration, gcm):
     return go.Figure(
         layout=dict(
             title=dict(
-                text="Historical and Future Modeled Wind Event Frequency, 1980-2100, "
+                text="Historical and Future Modeled Wind Event Frequency, 1980-2099, "
                 + c_name
                 + "<br>"
                 + "ERA-Interim/"
@@ -555,9 +555,9 @@ def update_threshold_graph(community, duration, gcm):
 )
 def update_future_delta_percentiles(community, gcm, decade):
     """
-    Build chart / visualiztion of threshold/durations
-    from model data -- 3D Chart Attempt TODO FIXME better
-    description here please.
+    Build visualization that shows the number
+    of events, categorized by wind speed (y-axis)
+    and duration (x-axis).
     """
 
     c_name = luts.communities.loc[community]["place"]
@@ -688,7 +688,7 @@ def update_future_delta_percentiles(community, gcm, decade):
         )
     )
     figure_text = (
-        "Changes in Number of Wind Events Between ERA-Interim (1980-2000) and "
+        "Changes in Number of Wind Events Between ERA-Interim (1980-1999) and "
         + luts.gcms[gcm]
         + " ("
         + luts.decade_selections[decade]
@@ -832,7 +832,7 @@ def update_future_rose(community, gcm):
     )
     fig.update_layout(
         title=dict(
-            text="Modeled Wind Speed/Direction Distribution, 1980-2100, " + c_name,
+            text="Modeled Wind Speed/Direction Distribution, 1980-2099, " + c_name,
             font=dict(family="Open Sans", size=18),
             x=0.5,
         ),
