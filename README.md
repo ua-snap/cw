@@ -10,6 +10,7 @@ pipenv run python preprocess.py # takes a long time, 15+ minutes
 export FLASK_APP=application.py
 export FLASK_DEBUG=1
 export REQUESTS_PATHNAME_PREFIX='/'
+export GTAG_ID='' # can be set to anything
 pipenv run flask run
 ```
 
