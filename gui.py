@@ -286,6 +286,7 @@ help_text = html.Div(
 
  * [WRF model data source](http://ckan.snap.uaf.edu/dataset/historical-and-projected-dynamically-downscaled-climate-data-for-the-state-of-alaska-and-surrou): Scenarios Network for Alaska + Arctic Planning, International Arctic Research Center, University of Alaska Fairbanks.
  * Modeled data spans from January 1, 1980 through December 31, 2099.
+ * Download the wind event data used in this tool here: [doi:10.18739/A29Z90C2X](https://doi.org/10.18739/A29Z90C2X)
 
 ##### Data processing and quality control
 
