@@ -13,6 +13,41 @@ path_prefix = os.environ["REQUESTS_PATHNAME_PREFIX"]
 
 map_figure = go.Figure(data=luts.map_communities_trace, layout=luts.map_layout)
 
+# toc = html.Div(
+#     id="toc",
+#     children=[
+#         ddsih.DangerouslySetInnerHTML(
+#             """
+#         <h2 class="title is-5">Navigate the wind tool</h2>
+#         <ol>
+#             <li><a href="#toc_location">Choose a location</a></li>
+#             <li>
+#                 <h3 class="title is-6">Explore observed winds (1980-2014)</h3>
+#                 <ol>
+#                     <li><a href="#toc_g1">Monthly wind speeds</a></li>
+#                     <li><a href="#toc_g2">Annual wind speed/direction
+# </a></li>
+#                     <li><a href="#toc_g3">Monthly wind speed/direction
+# </a></li>
+#                 </ol>
+#             </li>
+#             <li>
+#                 <h3 class="title is-6">Explore modeled winds (1980-2099)</h3>
+#                 <ol>
+#                     <li><a href="#toc_gcm">Choose a Global Climate Model</a></li>
+#                     <li><a href="#toc_g4">Modeled wind event duration</a></li>
+#                     <li><a href="#toc_g5">Modeled past vs. future wind events</a></li>
+#                     <li><a href="#toc_g6">Modeled wind speed/direction</a></li>
+
+#                 </ol>
+#             </li>
+#             <li><a href="#toc_about">About these data</a></li>
+#         </ol>
+#     """
+#         )
+#     ],
+# )
+
 toc = html.Div(
     id="toc",
     children=[
@@ -29,16 +64,6 @@ toc = html.Div(
 </a></li>
                     <li><a href="#toc_g3">Monthly wind speed/direction
 </a></li>
-                </ol>
-            </li>
-            <li>
-                <h3 class="title is-6">Explore modeled winds (1980-2099)</h3>
-                <ol>
-                    <li><a href="#toc_gcm">Choose a Global Climate Model</a></li>
-                    <li><a href="#toc_g4">Modeled wind event duration</a></li>
-                    <li><a href="#toc_g5">Modeled past vs. future wind events</a></li>
-                    <li><a href="#toc_g6">Modeled wind speed/direction</a></li>
-
                 </ol>
             </li>
             <li><a href="#toc_about">About these data</a></li>
@@ -410,86 +435,92 @@ These wind roses are similar to the one shown above, except data are separated b
                                         ),
                                         dcc.Markdown(
                                             """
-        Explore these projected data to see how wind may change in the future. Wind data from 1980&ndash;2099 were simulated using two Global Climate Models (GCMs): NCAR&ndash;CCSM4 and GFDL&ndash;CM3. Switch between the two GCMs to explore possible futures.
+This section is currently disabled due to errors discovered in the underlying data. The SNAP team is working to address the issue. We apologize for the inconvenience.
         """,
                                             className="content is-size-6",
                                         ),
-                                        gcm_dropdown_field,
+        #                                 dcc.Markdown(
+        #                                     """
+        # Explore these projected data to see how wind may change in the future. Wind data from 1980&ndash;2099 were simulated using two Global Climate Models (GCMs): NCAR&ndash;CCSM4 and GFDL&ndash;CM3. Switch between the two GCMs to explore possible futures.
+        # """,
+        #                                     className="content is-size-6",
+        #                                 ),
+        #                                 gcm_dropdown_field,
                                     ],
                                 ),
-                                html.Div(
-                                    className="section",
-                                    children=[
-                                        html.A(id="toc_g4"),
-                                        html.H3(
-                                            "Modeled wind event duration",
-                                            className="title is-4",
-                                        ),
-                                        dcc.Markdown(
-                                            """
-Explore how the length and intensity of wind events may change. To start, use the &ldquo;duration threshold&rdquo; to choose the number of hours the storm will last. The graph compares the number of wind events of that duration projected during six time periods (1980&ndash;2099). The colors within each column show how many events may sustain winds of a specific speed, ranging from rare, high speed events to more common, low speed events.
+#                                 html.Div(
+#                                     className="section",
+#                                     children=[
+#                                         html.A(id="toc_g4"),
+#                                         html.H3(
+#                                             "Modeled wind event duration",
+#                                             className="title is-4",
+#                                         ),
+#                                         dcc.Markdown(
+#                                             """
+# Explore how the length and intensity of wind events may change. To start, use the &ldquo;duration threshold&rdquo; to choose the number of hours the storm will last. The graph compares the number of wind events of that duration projected during six time periods (1980&ndash;2099). The colors within each column show how many events may sustain winds of a specific speed, ranging from rare, high speed events to more common, low speed events.
 
- * **&percnt;ile (percentile)** on the y–axis indicates percentile wind speeds which are based on the frequency of 1-hour wind events.
+#  * **&percnt;ile (percentile)** on the y–axis indicates percentile wind speeds which are based on the frequency of 1-hour wind events.
 
-         """,
-                                            className="content is-size-6",
-                                        ),
-                                        duration_threshold_dropdown_field,
-                                        dcc.Graph(
-                                            id="threshold_graph",
-                                            figure=go.Figure(),
-                                            config=luts.fig_configs,
-                                        ),
-                                    ],
-                                ),
-                                html.Div(
-                                    className="section",
-                                    children=[
-                                        html.A(id="toc_g5"),
-                                        html.H3(
-                                            "Modeled past vs. future wind events",
-                                            className="title is-4",
-                                        ),
-                                        dcc.Markdown(
-                                            """
-This chart shows how wind events may change over time.  Some types of wind events (low speed, long duration) may become more common, while others (high speed, high duration) become less common.  To start, choose a future decade to compare to the modeled historical baseline (ERA&ndash;Interim).
+#          """,
+#                                             className="content is-size-6",
+#                                         ),
+#                                         duration_threshold_dropdown_field,
+#                                         dcc.Graph(
+#                                             id="threshold_graph",
+#                                             figure=go.Figure(),
+#                                             config=luts.fig_configs,
+#                                         ),
+#                                     ],
+#                                 ),
+#                                 html.Div(
+#                                     className="section",
+#                                     children=[
+#                                         html.A(id="toc_g5"),
+#                                         html.H3(
+#                                             "Modeled past vs. future wind events",
+#                                             className="title is-4",
+#                                         ),
+#                                         dcc.Markdown(
+#                                             """
+# This chart shows how wind events may change over time.  Some types of wind events (low speed, long duration) may become more common, while others (high speed, high duration) become less common.  To start, choose a future decade to compare to the modeled historical baseline (ERA&ndash;Interim).
 
- * **Bubble size** corresponds to change in the number of events.
- * **Numbers** show the actual change in modeled events between 1980&ndash;1999 and the selected date interval.
- * **Hover** over points to see &percnt; change in number of events.
- * **&percnt;ile (percentile)** on the y–axis indicates percentile wind speeds which are based on the frequency of 1-hour wind events.
-         """,
-                                            className="content is-size-6",
-                                        ),
-                                        decadal_radios_field,
-                                        dcc.Graph(
-                                            id="future_delta_percentiles",
-                                            figure=go.Figure(),
-                                            config=luts.fig_configs,
-                                        ),
-                                    ],
-                                ),
-                                html.Div(
-                                    className="section",
-                                    children=[
-                                        html.A(id="toc_g6"),
-                                        html.H3(
-                                            "Modeled wind speed/direction",
-                                            className="title is-4",
-                                        ),
-                                        dcc.Markdown(
-                                            """
-        These wind roses show prevailing wind direction and speed for the historic period (1980&ndash;2009), mid-century (2025&ndash;2054), and late-century (2070&ndash;2099). The modeled historical data uses ERA&ndash;Interim while the future projections use the GCM model output. This allows comparisons between the historical patterns and future projections.
-         """,
-                                            className="content help-text is-size-6",
-                                        ),
-                                        dcc.Graph(
-                                            id="future_rose",
-                                            figure=go.Figure(),
-                                            config=luts.fig_configs,
-                                        ),
-                                    ],
-                                ),
+#  * **Bubble size** corresponds to change in the number of events.
+#  * **Numbers** show the actual change in modeled events between 1980&ndash;1999 and the selected date interval.
+#  * **Hover** over points to see &percnt; change in number of events.
+#  * **&percnt;ile (percentile)** on the y–axis indicates percentile wind speeds which are based on the frequency of 1-hour wind events.
+#          """,
+#                                             className="content is-size-6",
+#                                         ),
+#                                         decadal_radios_field,
+#                                         dcc.Graph(
+#                                             id="future_delta_percentiles",
+#                                             figure=go.Figure(),
+#                                             config=luts.fig_configs,
+#                                         ),
+#                                     ],
+#                                 ),
+        #                         html.Div(
+        #                             className="section",
+        #                             children=[
+        #                                 html.A(id="toc_g6"),
+        #                                 html.H3(
+        #                                     "Modeled wind speed/direction",
+        #                                     className="title is-4",
+        #                                 ),
+        #                                 dcc.Markdown(
+        #                                     """
+        # These wind roses show prevailing wind direction and speed for the historic period (1980&ndash;2009), mid-century (2025&ndash;2054), and late-century (2070&ndash;2099). The modeled historical data uses ERA&ndash;Interim while the future projections use the GCM model output. This allows comparisons between the historical patterns and future projections.
+        #  """,
+        #                                     className="content help-text is-size-6",
+        #                                 ),
+        #                                 dcc.Graph(
+        #                                     id="future_rose",
+        #                                     figure=go.Figure(),
+        #                                     config=luts.fig_configs,
+        #                                 ),
+        #                             ],
+        #                         ),
                             ]
                         ),
                         help_text,

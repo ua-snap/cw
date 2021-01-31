@@ -461,14 +461,14 @@ def update_rose_monthly(community):
     return fig
 
 
-@app.callback(
-    Output("threshold_graph", "figure"),
-    [
-        Input("communities-dropdown", "value"),
-        Input("duration-dropdown", "value"),
-        Input("gcm-dropdown", "value"),
-    ],
-)
+# @app.callback(
+#     Output("threshold_graph", "figure"),
+#     [
+#         Input("communities-dropdown", "value"),
+#         Input("duration-dropdown", "value"),
+#         Input("gcm-dropdown", "value"),
+#     ],
+# )
 def update_threshold_graph(community, duration, gcm):
     """
     Build chart / visualiztion of threshold/durations
@@ -545,14 +545,14 @@ def update_threshold_graph(community, duration, gcm):
     )
 
 
-@app.callback(
-    Output("future_delta_percentiles", "figure"),
-    [
-        Input("communities-dropdown", "value"),
-        Input("gcm-dropdown", "value"),
-        Input("decadal_selector", "value"),
-    ],
-)
+# @app.callback(
+#     Output("future_delta_percentiles", "figure"),
+#     [
+#         Input("communities-dropdown", "value"),
+#         Input("gcm-dropdown", "value"),
+#         Input("decadal_selector", "value"),
+#     ],
+# )
 def update_future_delta_percentiles(community, gcm, decade):
     """
     Build visualization that shows the number
@@ -730,10 +730,10 @@ def update_future_delta_percentiles(community, gcm, decade):
     return fig
 
 
-@app.callback(
-    Output("future_rose", "figure"),
-    [Input("communities-dropdown", "value"), Input("gcm-dropdown", "value")],
-)
+# @app.callback(
+#     Output("future_rose", "figure"),
+#     [Input("communities-dropdown", "value"), Input("gcm-dropdown", "value")],
+# )
 def update_future_rose(community, gcm):
     """ Generate cumulative future wind rose for selected community
     this is very rough right now.
