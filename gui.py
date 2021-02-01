@@ -248,6 +248,12 @@ form_fields = html.Div(
 </span> icon in the upper&ndash;right of each chart to download it.</p>
             """
         ),
+        dcc.Markdown(
+            """
+**Note**: the future winds section is currently disabled due to errors discovered in the underlying data. The SNAP team is working to address the issue. We apologize for the inconvenience.
+""",
+            className="content is-size-5",
+        ),
         communities_dropdown_field,
         dcc.Graph(
             id="map",
@@ -317,12 +323,6 @@ help_text = html.Div(
 
  * The WRF model data used here are available as a gridded product covering Alaska. To display these data for individual communities, we extracted the model output from the grid cell overlapping the community location.
  * Modeled data, both historical and future, are inherently biased. We adjusted these data by quantile mapping the historical output to match the observed data, and applied those same adjustments to the future output. This assumes that the historical and future model output are biased in the same ways.
-
-#### Suggested citation
-
-If you want to cite this web site in a paper, we suggest this format:
-
- > J. Walsh, K. Redilla, B. Crevensten, T. Kurkowski. Alaska Community Wind Tool. 2019 (revised 2020) \[online tool\] Alaska Center for Climate Assessment and Policy, University of Alaska Fairbanks [http://windtool.accap.uaf.edu](http://windtool.accap.uaf.edu)
 
 #### Acknowledgements
 
