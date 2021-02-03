@@ -250,9 +250,9 @@ form_fields = html.Div(
         ),
         dcc.Markdown(
             """
-**Note**: the future winds section is currently disabled due to errors discovered in the underlying data. The SNAP team is working to address the issue. We apologize for the inconvenience.
+**Note**: The future-winds section is undergoing maintenance. We apologize for the inconvenience.
 """,
-            className="content is-size-5",
+            className="content is-size-5 has-background-notice",
         ),
         communities_dropdown_field,
         dcc.Graph(
@@ -435,7 +435,7 @@ These wind roses are similar to the one shown above, except data are separated b
                                         ),
                                         dcc.Markdown(
                                             """
-This section is currently disabled due to errors discovered in the underlying data. The SNAP team is working to address the issue. We apologize for the inconvenience.
+This section is undergoing maintenance. We apologize for the inconvenience.
         """,
                                             className="content is-size-6",
                                         ),

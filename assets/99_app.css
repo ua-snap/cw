@@ -32,6 +32,14 @@ div.Select-control {
 	bottom: 2px;
 	right: 5px;
 }
+/* fix background to "future disabled" text */
+.has-background-notice {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    background-color: #e6e6fa;
+    border-radius: 5px;
+    display:inline-block;
+}
 
 
 /* Header & intro styles */
