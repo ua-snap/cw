@@ -730,6 +730,30 @@ def update_future_delta_percentiles(community, gcm, decade):
     return fig
 
 
+def get_rose_calm_future_annotations(titles, calm):
+    """
+    Return a list of correctly-positioned %calm indicators
+    for the monthly wind rose charts.
+    Take the already-generated list of titles and use
+    that pixel geometry to position the %calm info.
+    """
+    calm_annotations = copy.deepcopy(titles)
+
+    k = 0
+    for anno in calm_annotations:
+        anno["y"] = anno["y"] - 0.56
+        anno["font"] = {"color": "#000", "size": 10}
+        calm_text = str(int(round(calm[k] * 100))) + "%"
+        if calm[k] > 0.2:
+            # If there's enough room, add the "calm" text fragment
+            calm_text += " calm"
+
+        anno["text"] = calm_text
+        k += 1
+
+    return calm_annotations
+
+
 @app.callback(
     Output("future_rose", "figure"),
     [Input("communities-dropdown", "value"), Input("gcm-dropdown", "value")],
@@ -806,6 +830,12 @@ def update_future_rose(community, gcm):
 
     c_name = luts.communities.loc[community]["place"]
 
+    # Get calms as annotations, then merge
+    # them into the subgraph title annotations
+    fig["layout"]["annotations"] = fig["layout"][
+        "annotations"
+    ] + get_rose_calm_future_annotations(fig["layout"]["annotations"], list(future_calms.values()))
+
     polar_props = dict(
         bgcolor="#fff",
         angularaxis=dict(
@@ -847,9 +877,9 @@ def update_future_rose(community, gcm):
         plot_bgcolor="#fff",
         # We need to explicitly define the rotations
         # we need for each named subplot.
-        polar1={**polar_props},
-        polar2={**polar_props},
-        polar3={**polar_props},
+        polar1={**polar_props, **{"hole": future_calms["ERA"]}},
+        polar2={**polar_props, **{"hole": future_calms["GCM1"]}},
+        polar3={**polar_props, **{"hole": future_calms["GCM2"]}},
     )
     return fig
 
