@@ -461,14 +461,14 @@ def update_rose_monthly(community):
     return fig
 
 
-# @app.callback(
-#     Output("threshold_graph", "figure"),
-#     [
-#         Input("communities-dropdown", "value"),
-#         Input("duration-dropdown", "value"),
-#         Input("gcm-dropdown", "value"),
-#     ],
-# )
+@app.callback(
+    Output("threshold_graph", "figure"),
+    [
+        Input("communities-dropdown", "value"),
+        Input("duration-dropdown", "value"),
+        Input("gcm-dropdown", "value"),
+    ],
+)
 def update_threshold_graph(community, duration, gcm):
     """
     Build chart / visualiztion of threshold/durations
@@ -545,14 +545,14 @@ def update_threshold_graph(community, duration, gcm):
     )
 
 
-# @app.callback(
-#     Output("future_delta_percentiles", "figure"),
-#     [
-#         Input("communities-dropdown", "value"),
-#         Input("gcm-dropdown", "value"),
-#         Input("decadal_selector", "value"),
-#     ],
-# )
+@app.callback(
+    Output("future_delta_percentiles", "figure"),
+    [
+        Input("communities-dropdown", "value"),
+        Input("gcm-dropdown", "value"),
+        Input("decadal_selector", "value"),
+    ],
+)
 def update_future_delta_percentiles(community, gcm, decade):
     """
     Build visualization that shows the number
@@ -730,10 +730,10 @@ def update_future_delta_percentiles(community, gcm, decade):
     return fig
 
 
-# @app.callback(
-#     Output("future_rose", "figure"),
-#     [Input("communities-dropdown", "value"), Input("gcm-dropdown", "value")],
-# )
+@app.callback(
+    Output("future_rose", "figure"),
+    [Input("communities-dropdown", "value"), Input("gcm-dropdown", "value")],
+)
 def update_future_rose(community, gcm):
     """ Generate cumulative future wind rose for selected community
     this is very rough right now.
@@ -756,10 +756,12 @@ def update_future_rose(community, gcm):
     max_axes = pd.DataFrame()
 
     # ERA
+    future_calms = {}
     traces = []
     d = future_rose.loc[
         (future_rose["sid"] == community) & (future_rose["gcm"] == "ERA")
     ]
+    future_calms["ERA"] = round(100 - d["frequency"].sum(), 1) / 100
     max_axes = max_axes.append(get_rose_traces(d, traces, "", True), ignore_index=True)
     for trace in traces:
         fig.add_trace(trace, row=1, col=1)
@@ -771,6 +773,7 @@ def update_future_rose(community, gcm):
         & (future_rose["gcm"] == gcm)
         & (future_rose["decadal_group"] == 1)
     ]
+    future_calms["GCM1"] = round(100 - d["frequency"].sum(), 1) / 100
     max_axes = max_axes.append(get_rose_traces(d, traces, "", False), ignore_index=True)
     for trace in traces:
         fig.add_trace(trace, row=1, col=2)
@@ -782,10 +785,10 @@ def update_future_rose(community, gcm):
         & (future_rose["gcm"] == gcm)
         & (future_rose["decadal_group"] == 2)
     ]
+    future_calms["GCM2"] = round(100 - d["frequency"].sum(), 1) / 100
     max_axes = max_axes.append(get_rose_traces(d, traces, "", False), ignore_index=True)
     for trace in traces:
         fig.add_trace(trace, row=1, col=3)
-
     # Determine maximum r-axis and r-step.
     # Adding one and using floor(/2.5) was the
     # result of experimenting with values that yielded
