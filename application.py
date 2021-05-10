@@ -513,6 +513,7 @@ def update_threshold_graph(community, duration, gcm):
                 y=k.events,
                 width=10,
                 marker=dict(color=luts.colors[index], line=dict(width=0)),
+                hovertemplate="%{y} events<extra></extra>",
             )
         )
         index += 1
