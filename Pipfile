@@ -5,9 +5,6 @@ name = "pypi"
 
 [packages]
 dash = "*"
-dash-renderer = "*"
-dash-html-components = "*"
-dash-core-components = "*"
 plotly = "*"
 dash_dangerously_set_inner_html = "*"
 pandas = "*"
@@ -17,4 +14,4 @@ dask = {extras = ["dataframe"],version = "*"}
 flask = "*"
 
 [requires]
-python_version = "3.6"
+python_version = "3.8"

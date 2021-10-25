@@ -4,12 +4,11 @@ GUI for Community Winds app
 # pylint: disable=invalid-name, import-error, line-too-long
 import os
 import plotly.graph_objs as go
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc, html
 import dash_dangerously_set_inner_html as ddsih
 import luts
 
-path_prefix = os.environ["REQUESTS_PATHNAME_PREFIX"]
+path_prefix = os.getenv("DASH_REQUESTS_PATHNAME_PREFIX")
 
 map_figure = go.Figure(data=luts.map_communities_trace, layout=luts.map_layout)
 
