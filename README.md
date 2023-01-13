@@ -2,15 +2,24 @@
 
 ## Data preprocessing & local development
 
-After cloning this template, obtain station data and place it in `data/stations` (create this directory if necessary), then run:
+First, clone the repo then 
 
 ```
 pipenv install
+```
+
+If you need to re-process the data, [obtain station data](https://mesonet.agron.iastate.edu/request/download.phtml) and place it in `data/stations` (create this directory if necessary), then run:
+
+```
 pipenv run python preprocess.py # takes a long time, 15+ minutes
+```
+
+For local development,
+
+```
 export FLASK_APP=application.py
 export FLASK_DEBUG=1
 export DASH_REQUESTS_PATHNAME_PREFIX='/'
-export GTAG_ID='' # can be set to anything
 pipenv run flask run
 ```
 
@@ -27,4 +36,4 @@ eb init
 eb deploy
 ```
 
-It'll be necessary to set the `REQUESTS_PATHNAME_PREFIX` and `GTAG_ID` as appropriate on the EB instance.
+It'll be necessary to set the `DASH_REQUESTS_PATHNAME_PREFIX` as appropriate on the EB instance.
