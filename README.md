@@ -26,4 +26,4 @@ eb init
 eb deploy
 ```
 
-It'll be necessary to set the `REQUESTS_PATHNAME_PREFIX` as appropriate on the EB instance.
+It'll be necessary to set the `DASH_REQUESTS_PATHNAME_PREFIX` as appropriate on the EB instance.
