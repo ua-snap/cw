@@ -29,19 +29,14 @@ app = dash.Dash(__name__)
 application = app.server
 
 # Customize this layout to include Google Analytics
-gtag_id = os.environ["GTAG_ID"]
 app.index_string = f"""
 <!DOCTYPE html>
 <html>
     <head>
-        <!-- Global site tag (gtag.js) - Google Analytics -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-3978613-12"></script>
-        <script>
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){{dataLayer.push(arguments);}}
-          gtag('js', new Date());
-
-          gtag('config', '{gtag_id}');
+        <script async defer 
+            data-website-id="5b8c93a9-52ec-4d9b-9bf9-e07001993e62"
+            src="http://umami.snap.uaf.edu/umami.js"
+            data-do-not-track="true">
         </script>
         {{%metas%}}
         <title>{{%title%}}</title>

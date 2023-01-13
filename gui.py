@@ -9,6 +9,7 @@ import dash_dangerously_set_inner_html as ddsih
 import luts
 
 path_prefix = os.getenv("DASH_REQUESTS_PATHNAME_PREFIX")
+assert path_prefix, f"DASH_REQUESTS_PATHNAME_PREFIX needs to be set!"
 
 map_figure = go.Figure(data=luts.map_communities_trace, layout=luts.map_layout)
 
@@ -124,6 +125,8 @@ footer = html.Footer(
         dcc.Markdown(
             """
 UA is an AA/EO employer and educational institution and prohibits illegal discrimination against any individual. [Statement of Nondiscrimination](https://www.alaska.edu/nondiscrimination/)
+
+UA is committed to providing accessible websites. [Learn more about UA&rsquo;s notice of web accessibility](https://www.alaska.edu/webaccessibility/).  If we can help you access this website&rsquo;s content, [email us](mailto:uaf-snap-data-tools@alaska.edu)!
             """,
             className="content is-size-6",
         ),
