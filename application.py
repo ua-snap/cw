@@ -37,7 +37,7 @@ app.index_string = f"""
             data-website-id="5b8c93a9-52ec-4d9b-9bf9-e07001993e62"
             src="https://umami.snap.uaf.edu/umami.js"
             data-do-not-track="true"
-            data-domains="snap.uaf.edu">
+            data-domains="windtool.accap.uaf.edu">
         </script>
         {{%metas%}}
         <title>{{%title%}}</title>
