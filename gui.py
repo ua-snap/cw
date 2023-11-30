@@ -240,22 +240,10 @@ intro = html.Div(
         html.Div(
             className="container",
             children=[
-                html.Div(
-                    className="survey-link",
-                    children=[
-                        html.P(
-                            "This tool displays recorded hourly wind data 1980-2014 and projected data 1980-2099 for 67 Alaska communities.",
-                            className="content is-size-4",
-                        ),
-                        html.A(
-                            "Let us know how we can make this tool better",
-                            className="button is-link is-medium",
-                            rel="external",
-                            target="_blank",
-                            href="https://uaf-iarc.typeform.com/to/hOnb5h",
-                        ),
-                    ],
-                )
+                html.P(
+                    "This tool displays recorded hourly wind data 1980-2014 and projected data 1980-2099 for 67 Alaska communities.",
+                    className="content is-size-4",
+                ),
             ],
         )
     ],
