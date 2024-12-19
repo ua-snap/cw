@@ -88,7 +88,7 @@ app.layout = layout
 
 @app.callback(Output("communities-dropdown", "value"), [Input("map", "clickData")])
 def update_place_dropdown(selected_on_map):
-    """ If user clicks on the map, update the drop down. """
+    """If user clicks on the map, update the drop down."""
 
     # Look up ID by name -- kind of backwards, but
     # it's because we can't bundle much data into
@@ -105,7 +105,7 @@ def update_place_dropdown(selected_on_map):
 
 @app.callback(Output("map", "figure"), [Input("communities-dropdown", "value")])
 def update_selected_community_on_map(community):
-    """ Draw a second trace on the map with one community highlighted. """
+    """Draw a second trace on the map with one community highlighted."""
     return {
         "data": [
             luts.map_communities_trace,
@@ -125,7 +125,7 @@ def update_selected_community_on_map(community):
 
 @app.callback(Output("means_box", "config"), [Input("communities-dropdown", "value")])
 def update_export_filenames(community):
-    """ Update filename for file exports """
+    """Update filename for file exports"""
     c_name = luts.communities.loc[community]["place"]
     configs = luts.fig_configs
     i_configs = luts.fig_download_configs
@@ -137,7 +137,7 @@ def update_export_filenames(community):
 
 @app.callback(Output("rose", "config"), [Input("communities-dropdown", "value")])
 def update_rose_export_filenames(community):
-    """ Update filename for file exports """
+    """Update filename for file exports"""
     c_name = luts.communities.loc[community]["place"]
     configs = luts.fig_configs
     i_configs = luts.fig_download_configs
@@ -154,7 +154,7 @@ def update_rose_export_filenames(community):
     Output("rose_monthly", "config"), [Input("communities-dropdown", "value")]
 )
 def update_monthly_rose_export_filenames(community):
-    """ Update filename for file exports """
+    """Update filename for file exports"""
     c_name = luts.communities.loc[community]["place"]
     configs = luts.fig_configs
     i_configs = luts.fig_download_configs
@@ -214,13 +214,14 @@ def get_rose_traces(d, traces, month, showlegend=False):
 
     # Compute the maximum extent of any particular
     # petal on the wind rose.
-    max_petal = d.groupby(["direction_class"]).sum().max()
+    frequencies = pd.DataFrame(d, columns=["frequency", "direction_class"])
+    max_petal = frequencies.groupby(["direction_class"]).sum().max()
     return max_petal
 
 
 @app.callback(Output("means_box", "figure"), [Input("communities-dropdown", "value")])
 def update_box_plots(community):
-    """ Generate box plot for monthly averages """
+    """Generate box plot for monthly averages"""
 
     d = monthly_means.loc[(monthly_means["sid"] == community)]
     c_name = luts.communities.loc[community]["place"]
@@ -264,7 +265,7 @@ def update_box_plots(community):
 
 @app.callback(Output("rose", "figure"), [Input("communities-dropdown", "value")])
 def update_rose(community):
-    """ Generate cumulative wind rose for selected community """
+    """Generate cumulative wind rose for selected community"""
     traces = []
 
     # Subset for community & 0=year
@@ -273,7 +274,7 @@ def update_rose(community):
 
     # Compute % calm, use this to modify the hole size
     c = calms[calms["sid"] == community]
-    c_mean = c.mean()
+    c_mean = c.mean(numeric_only=True)
     c_mean = int(round(c_mean["percent"]))
 
     c_name = luts.communities.loc[community]["place"]
@@ -361,8 +362,9 @@ def update_rose_monthly(community):
             if_show_legend = month == 1  # only show the first legend
             traces = []
             d = data.loc[(data["sid"] == community) & (data["month"] == month)]
-            max_axes = max_axes.append(
-                get_rose_traces(d, traces, month, if_show_legend), ignore_index=True
+            max_axes = pd.concat(
+                [max_axes, get_rose_traces(d, traces, month, if_show_legend)],
+                ignore_index=True,
             )
             for trace in traces:
                 fig.add_trace(trace, row=i, col=j)
@@ -373,8 +375,16 @@ def update_rose_monthly(community):
     # result of experimenting with values that yielded
     # about 3 steps in most cases, with a little headroom
     # for the r-axis outer ring.
-    rmax = max_axes.max()["frequency"] + 1
-    rstep = math.floor(rmax / 2.5)
+    print(max_axes)
+    print("ultra")
+    rmax = max_axes.max()
+    rmaxf = rmax.iloc[0] + 1
+    rstep = math.floor(rmaxf / 2.5)
+    # nuke
+    # rmax = max_axes.max()["frequency"] + 1
+    # rstep = math.floor(rmax / 2.5)
+    print(rmaxf)
+    print(rstep)
 
     # Apply formatting to subplot titles,
     # which are actually annotations.
@@ -441,6 +451,11 @@ def update_rose_monthly(community):
         # we need for each named subplot.
         # TODO is there a more elegant way to
         # generate this list of things?
+        polar=dict(
+            radialaxis=dict(
+                range=[0, rmax],
+            )
+        ),
         polar1={**polar_props, **{"hole": c.iloc[0]["percent"]}},
         polar2={**polar_props, **{"hole": c.iloc[1]["percent"]}},
         polar3={**polar_props, **{"hole": c.iloc[2]["percent"]}},
@@ -756,7 +771,7 @@ def get_rose_calm_future_annotations(titles, calm):
     [Input("communities-dropdown", "value"), Input("gcm-dropdown", "value")],
 )
 def update_future_rose(community, gcm):
-    """ Generate cumulative future wind rose for selected community
+    """Generate cumulative future wind rose for selected community
     this is very rough right now.
     """
 
@@ -783,7 +798,9 @@ def update_future_rose(community, gcm):
         (future_rose["sid"] == community) & (future_rose["gcm"] == "ERA")
     ]
     future_calms["ERA"] = round(100 - d["frequency"].sum(), 1) / 100
-    max_axes = max_axes.append(get_rose_traces(d, traces, "", True), ignore_index=True)
+    max_axes = pd.concat(
+        [max_axes, get_rose_traces(d, traces, "", True)], ignore_index=True
+    )
     for trace in traces:
         fig.add_trace(trace, row=1, col=1)
 
@@ -795,7 +812,9 @@ def update_future_rose(community, gcm):
         & (future_rose["decadal_group"] == 1)
     ]
     future_calms["GCM1"] = round(100 - d["frequency"].sum(), 1) / 100
-    max_axes = max_axes.append(get_rose_traces(d, traces, "", False), ignore_index=True)
+    max_axes = pd.concat(
+        [max_axes, get_rose_traces(d, traces, "", False)], ignore_index=True
+    )
     for trace in traces:
         fig.add_trace(trace, row=1, col=2)
 
@@ -807,7 +826,9 @@ def update_future_rose(community, gcm):
         & (future_rose["decadal_group"] == 2)
     ]
     future_calms["GCM2"] = round(100 - d["frequency"].sum(), 1) / 100
-    max_axes = max_axes.append(get_rose_traces(d, traces, "", False), ignore_index=True)
+    max_axes = pd.concat(
+        [max_axes, get_rose_traces(d, traces, "", False)], ignore_index=True
+    )
     for trace in traces:
         fig.add_trace(trace, row=1, col=3)
     # Determine maximum r-axis and r-step.
@@ -815,8 +836,9 @@ def update_future_rose(community, gcm):
     # result of experimenting with values that yielded
     # about 3 steps in most cases, with a little headroom
     # for the r-axis outer ring.
-    rmax = max_axes.max()["frequency"] + 1
-    rstep = math.floor(rmax / 2.5)
+    rmax = max_axes.max()
+    rmaxf = rmax.iloc[0] + 1
+    rstep = math.floor(rmaxf / 2.5)
 
     # Apply formatting to subplot titles,
     # which are actually annotations.
@@ -831,7 +853,9 @@ def update_future_rose(community, gcm):
     # them into the subgraph title annotations
     fig["layout"]["annotations"] = fig["layout"][
         "annotations"
-    ] + get_rose_calm_future_annotations(fig["layout"]["annotations"], list(future_calms.values()))
+    ] + get_rose_calm_future_annotations(
+        fig["layout"]["annotations"], list(future_calms.values())
+    )
 
     polar_props = dict(
         bgcolor="#fff",
