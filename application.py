@@ -420,7 +420,6 @@ def update_rose_monthly(community):
             gridcolor="#efefef",
             tickangle=0,
             range=[0, rmaxf],
-            # autorange=False,
             tick0=1,
             dtick=rstep,
             ticksuffix="%",
