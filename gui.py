@@ -201,6 +201,7 @@ decadal_radios_field = html.Div(
             id="decadal_selector",
             labelClassName="radio",
             className="control",
+            inline=True,
             options=[
                 {"label": decade, "value": group}
                 for group, decade in luts.decade_selections.items()
