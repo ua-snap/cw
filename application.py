@@ -375,16 +375,9 @@ def update_rose_monthly(community):
     # result of experimenting with values that yielded
     # about 3 steps in most cases, with a little headroom
     # for the r-axis outer ring.
-    print(max_axes)
-    print("ultra")
     rmax = max_axes.max()
     rmaxf = rmax.iloc[0] + 1
     rstep = math.floor(rmaxf / 2.5)
-    # nuke
-    # rmax = max_axes.max()["frequency"] + 1
-    # rstep = math.floor(rmax / 2.5)
-    print(rmaxf)
-    print(rstep)
 
     # Apply formatting to subplot titles,
     # which are actually annotations.
@@ -426,7 +419,8 @@ def update_rose_monthly(community):
             color="#888",
             gridcolor="#efefef",
             tickangle=0,
-            range=[0, rmax],
+            range=[0, rmaxf],
+            # autorange=False,
             tick0=1,
             dtick=rstep,
             ticksuffix="%",
@@ -451,11 +445,6 @@ def update_rose_monthly(community):
         # we need for each named subplot.
         # TODO is there a more elegant way to
         # generate this list of things?
-        polar=dict(
-            radialaxis=dict(
-                range=[0, rmax],
-            )
-        ),
         polar1={**polar_props, **{"hole": c.iloc[0]["percent"]}},
         polar2={**polar_props, **{"hole": c.iloc[1]["percent"]}},
         polar3={**polar_props, **{"hole": c.iloc[2]["percent"]}},
@@ -875,7 +864,7 @@ def update_future_rose(community, gcm):
             color="#888",
             gridcolor="#efefef",
             tickangle=0,
-            range=[0, rmax],
+            range=[0, rmaxf],
             tick0=1,
             dtick=rstep,
             ticksuffix="%",
