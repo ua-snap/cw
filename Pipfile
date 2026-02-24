@@ -6,12 +6,11 @@ name = "pypi"
 [packages]
 dash = "*"
 plotly = "*"
-dash_dangerously_set_inner_html = "*"
 pandas = "*"
 dask = {extras = ["dataframe"],version = "*"}
+flask = "*"
 
 [dev-packages]
-flask = "*"
 
 [requires]
 python_version = "3.11"
