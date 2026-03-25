@@ -132,7 +132,8 @@ header_section = html.Div(
                                     children=[
                                         html.Img(
                                             src=path_prefix
-                                            + "assets/ACCAP_full_wide.svg"
+                                            + "assets/ACCAP_full_wide.svg",
+                                            alt="Alaska Center for Climate Assessment and Policy logo",
                                         )
                                     ],
                                 )
@@ -166,19 +167,34 @@ footer = html.Footer(
                     href="https://accap.uaf.edu",
                     target="_blank",
                     className="level-item",
-                    children=[html.Img(src=path_prefix + "assets/ACCAP_full_wide.svg")],
+                    children=[
+                        html.Img(
+                            src=path_prefix + "assets/ACCAP_full_wide.svg",
+                            alt="Alaska Center for Climate Assessment and Policy logo",
+                        )
+                    ],
                 ),
                 html.A(
                     href="https://snap.uaf.edu",
                     target="_blank",
                     className="level-item",
-                    children=[html.Img(src=path_prefix + "assets/SNAP_color_all.svg")],
+                    children=[
+                        html.Img(
+                            src=path_prefix + "assets/SNAP_color_all.svg",
+                            alt="Scenarios Network for Alaska and Arctic Planning logo",
+                        )
+                    ],
                 ),
                 html.A(
                     href="https://uaf.edu/uaf/",
                     target="_blank",
                     className="level-item",
-                    children=[html.Img(src=path_prefix + "assets/UAF.svg")],
+                    children=[
+                        html.Img(
+                            src=path_prefix + "assets/UAF.svg",
+                            alt="University of Alaska Fairbanks logo",
+                        )
+                    ],
                 ),
             ]
         ),
