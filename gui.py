@@ -284,6 +284,7 @@ decadal_radios_field = html.Div(
             value=2080,
         )
     ],
+    **{"aria-label": "Select future decade to compare"}
 )
 
 form_fields = html.Div(

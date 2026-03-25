@@ -31,7 +31,7 @@ application = app.server
 # Customize this layout to include Google Analytics
 app.index_string = f"""
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <script async defer 
             data-website-id="5b8c93a9-52ec-4d9b-9bf9-e07001993e62"
