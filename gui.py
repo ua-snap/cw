@@ -133,7 +133,7 @@ header_section = html.Div(
                                         html.Img(
                                             src=path_prefix
                                             + "assets/ACCAP_full_wide.svg",
-                                            alt="Alaska Center for Climate Assessment and Policy logo",
+                                            alt="Alaska Center for Climate Assessment and Preparedness logo",
                                         )
                                     ],
                                 )
@@ -170,7 +170,7 @@ footer = html.Footer(
                     children=[
                         html.Img(
                             src=path_prefix + "assets/ACCAP_full_wide.svg",
-                            alt="Alaska Center for Climate Assessment and Policy logo",
+                            alt="Alaska Center for Climate Assessment and Preparedness logo",
                         )
                     ],
                 ),
