@@ -1,81 +1,83 @@
-@import url('https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&family=Open+Sans:wght@400;600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&family=Open+Sans:wght@400;600&display=swap");
 
 body {
-	font-family: 'Cardo', serif;
+  font-family: "Cardo", serif;
 }
 
 /* Tweaks to Bulma / Plotly control/form elements */
 /* Slightly boost font size for body text. */
 .is-size-6 {
-	font-size: 1.2rem!important;
+  font-size: 1.2rem !important;
 }
 a {
-	color: #0570b0;
+  color: #0570b0;
+}
+.anchor-link-size {
+  font-size: 1rem;
 }
 /* Styling the dropdown selectors */
 .dropdown-selector {
-	width: 20em;
+  width: 20em;
 }
 div.Select-control {
-	border: 1px solid #888;
-	box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+  border: 1px solid #888;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
 }
 .section + .section {
-	border-top: 1px solid #eee;
+  border-top: 1px solid #eee;
 }
 /* Fix up horizontal radio buttons, they're janky */
 .field .control label {
-	margin-right: 1rem;
+  margin-right: 1rem;
 }
 .field .control input[type="radio"] {
-	position: relative;
-	bottom: 2px;
-	right: 5px;
+  position: relative;
+  bottom: 2px;
+  right: 5px;
 }
 /* fix background to "future disabled" text */
 .has-background-notice {
-    padding-left: 1rem;
-    padding-right: 1rem;
-    background-color: #e6e6fa;
-    border-radius: 5px;
-    display:inline-block;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  background-color: #e6e6fa;
+  border-radius: 5px;
+  display: inline-block;
 }
-
 
 /* Header & intro styles */
 .header {
-	background-color: #DDE4F2;
-	padding: 0;
+  background-color: #dde4f2;
+  padding: 0;
 }
 .header--section {
-	margin-top: -1rem;
+  margin-top: -1rem;
 }
 .header--section h1 {
-	padding-top: .8rem;
+  padding-top: 0.8rem;
 }
 .header--logo {
-	float: left;
-	padding-right: 2rem;
+  float: left;
+  padding-right: 2rem;
 }
 .header--snap-link a {
-	height: 5.4em;
-	display: block;
-	z-index: 1000;
+  height: 5.4em;
+  display: block;
+  z-index: 1000;
 }
 .header--snap-link img {
-	height: 5.4em;
+  height: 5.4em;
 }
 .camera-icon {
-	padding-bottom: 2rem;
+  padding-bottom: 2rem;
 }
 .camera-icon span {
-	display: inline-block;
-	position: relative;
-	top: 0.25rem;
-	padding: 0 3px;
+  display: inline-block;
+  position: relative;
+  top: 0.25rem;
+  padding: 0 3px;
 }
 .camera-icon span path {
-	fill: #ccc;
+  fill: #ccc;
 }
 
 /* Chart layout/padding styles.
@@ -85,35 +87,35 @@ when the page is loading.
 
 */
 .section.charts {
-	padding-top: 0;
+  padding-top: 0;
 }
 #map {
-	max-width: 500px;
-	height: 400px;
+  max-width: 500px;
+  height: 400px;
 }
 #means_box {
-	max-width: 970px;
-	height: 500px;
+  max-width: 970px;
+  height: 500px;
 }
 #rose {
-	max-width: 970px;
-	height: 700px;
+  max-width: 970px;
+  height: 700px;
 }
 #rose_monthly {
-	max-width: 970px;
-	height: 1500px;
+  max-width: 970px;
+  height: 1500px;
 }
 #threshold_graph {
-	max-width: 970px;
-	height: 400px;
+  max-width: 970px;
+  height: 400px;
 }
 #future_delta_percentiles {
-	max-width: 970px;
-	height: 600px;
+  max-width: 970px;
+  height: 600px;
 }
 #future_rose {
-	max-width: 970px;
-	height: 550px;
+  max-width: 970px;
+  height: 550px;
 }
 
 /*
@@ -124,64 +126,63 @@ unwanted background from being shown behind the
 wind roses in Plotly.
 */
 g.bglayer {
-	display: none !important;
+  display: none !important;
 }
 /*
 Hide 'Aa' from legends in bubble plot.
 https://github.com/plotly/plotly.js/issues/2967#
 */
 g.pointtext {
-	display: none;
+  display: none;
 }
 
 /* Footer! */
 .footer p {
-	width: 50%;
-	margin: 1em auto;
+  width: 50%;
+  margin: 1em auto;
 }
 .footer a {
-	display: inline-block;
+  display: inline-block;
 }
 .footer a img {
-	height: 5em;
-	margin: 1em 1.5em;
+  height: 5em;
+  margin: 1em 1.5em;
 }
-
 
 /* Table of contents! */
 #toc {
-	position: sticky;
-	top: 0;
-	padding-top: 3rem;
+  position: sticky;
+  top: 0;
+  padding-top: 3rem;
 }
 #toc ol {
-    counter-reset: item
+  counter-reset: item;
 }
 #toc li {
-    display: block;
-    padding-bottom: 0.25rem;
+  display: block;
+  padding-bottom: 0.25rem;
 }
 #toc li h3 {
-	display: inline-block;
-	font-size: 1.1rem;
-	margin-bottom: 0.5rem;
-	margin-top: 0.5rem;
+  display: inline-block;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
 }
 #toc ol li {
-	font-size: 1.1rem;
-	list-style-type: none;
-	line-height: 1.2;
-	margin-top: 0;
-	margin-bottom: 0;
+  font-size: 1.1rem;
+  list-style-type: none;
+  line-height: 1.2;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 #toc ol ol {
-	margin-left: 1rem;
+  margin-left: 1rem;
 }
 #toc a {
-	display: inline-block;
-	padding: 0.25rem;
-	margin-left: -0.25rem;
+  display: inline-block;
+  padding: 0.25rem;
+  margin-left: -0.25rem;
 }
 #toc a:hover {
-	background-color: #FDFACC;
+  background-color: #fdfacc;
 }

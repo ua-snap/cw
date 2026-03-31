@@ -1,50 +1,110 @@
 """
-GUI for Community Winds app 
+GUI for Community Winds app
 """
+
 # pylint: disable=invalid-name, import-error, line-too-long
 import os
 import plotly.graph_objs as go
 from dash import dcc, html
-import dash_dangerously_set_inner_html as ddsih
 import luts
 
-path_prefix = os.getenv("DASH_REQUESTS_PATHNAME_PREFIX")
-assert path_prefix, f"DASH_REQUESTS_PATHNAME_PREFIX needs to be set!"
+path_prefix = os.getenv("DASH_REQUESTS_PATHNAME_PREFIX", "/")
 
 map_figure = go.Figure(data=luts.map_communities_trace, layout=luts.map_layout)
 
 toc = html.Div(
     id="toc",
     children=[
-        ddsih.DangerouslySetInnerHTML(
-            """
-        <h2 class="title is-5">Navigate the wind tool</h2>
-        <ol>
-            <li><a href="#toc_location">Choose a location</a></li>
-            <li>
-                <h3 class="title is-6">Explore observed winds (1980-2014)</h3>
-                <ol>
-                    <li><a href="#toc_g1">Monthly wind speeds</a></li>
-                    <li><a href="#toc_g2">Annual wind speed/direction
-</a></li>
-                    <li><a href="#toc_g3">Monthly wind speed/direction
-</a></li>
-                </ol>
-            </li>
-            <li>
-                <h3 class="title is-6">Explore modeled winds (1980-2099)</h3>
-                <ol>
-                    <li><a href="#toc_gcm">Choose a Global Climate Model</a></li>
-                    <li><a href="#toc_g4">Modeled wind event duration</a></li>
-                    <li><a href="#toc_g5">Modeled past vs. future wind events</a></li>
-                    <li><a href="#toc_g6">Modeled wind speed/direction</a></li>
-
-                </ol>
-            </li>
-            <li><a href="#toc_about">About these data</a></li>
-        </ol>
-    """
-        )
+        html.H3("Navigate the wind tool", className="title is-5"),
+        html.Ol(
+            [
+                html.Li(
+                    html.A(
+                        "Choose a location",
+                        href="#toc_location",
+                        className="anchor-link-size",
+                    )
+                ),
+                html.Li(
+                    [
+                        html.H4(
+                            "Explore observed winds (1980-2014)", className="title is-6"
+                        ),
+                        html.Ol(
+                            [
+                                html.Li(
+                                    html.A(
+                                        "Monthly wind speeds",
+                                        href="#toc_g1",
+                                        className="anchor-link-size",
+                                    )
+                                ),
+                                html.Li(
+                                    html.A(
+                                        "Annual wind speed/direction",
+                                        href="#toc_g2",
+                                        className="anchor-link-size",
+                                    )
+                                ),
+                                html.Li(
+                                    html.A(
+                                        "Monthly wind speed/direction",
+                                        href="#toc_g3",
+                                        className="anchor-link-size",
+                                    )
+                                ),
+                            ]
+                        ),
+                    ]
+                ),
+                html.Li(
+                    [
+                        html.H4(
+                            "Explore modeled winds (1980-2099)", className="title is-6"
+                        ),
+                        html.Ol(
+                            [
+                                html.Li(
+                                    html.A(
+                                        "Choose a Global Climate Model",
+                                        href="#toc_gcm",
+                                        className="anchor-link-size",
+                                    )
+                                ),
+                                html.Li(
+                                    html.A(
+                                        "Modeled wind event duration",
+                                        href="#toc_g4",
+                                        className="anchor-link-size",
+                                    )
+                                ),
+                                html.Li(
+                                    html.A(
+                                        "Modeled past vs. future wind events",
+                                        href="#toc_g5",
+                                        className="anchor-link-size",
+                                    )
+                                ),
+                                html.Li(
+                                    html.A(
+                                        "Modeled wind speed/direction",
+                                        href="#toc_g6",
+                                        className="anchor-link-size",
+                                    )
+                                ),
+                            ]
+                        ),
+                    ]
+                ),
+                html.Li(
+                    html.A(
+                        "About these data",
+                        href="#toc_about",
+                        className="anchor-link-size",
+                    )
+                ),
+            ]
+        ),
     ],
 )
 
@@ -72,7 +132,8 @@ header_section = html.Div(
                                     children=[
                                         html.Img(
                                             src=path_prefix
-                                            + "assets/ACCAP_full_wide.svg"
+                                            + "assets/ACCAP_full_wide.svg",
+                                            alt="Alaska Center for Climate Assessment and Preparedness logo",
                                         )
                                     ],
                                 )
@@ -106,19 +167,34 @@ footer = html.Footer(
                     href="https://accap.uaf.edu",
                     target="_blank",
                     className="level-item",
-                    children=[html.Img(src=path_prefix + "assets/ACCAP_full_wide.svg")],
+                    children=[
+                        html.Img(
+                            src=path_prefix + "assets/ACCAP_full_wide.svg",
+                            alt="Alaska Center for Climate Assessment and Preparedness logo",
+                        )
+                    ],
                 ),
                 html.A(
                     href="https://snap.uaf.edu",
                     target="_blank",
                     className="level-item",
-                    children=[html.Img(src=path_prefix + "assets/SNAP_color_all.svg")],
+                    children=[
+                        html.Img(
+                            src=path_prefix + "assets/SNAP_color_all.svg",
+                            alt="Scenarios Network for Alaska and Arctic Planning logo",
+                        )
+                    ],
                 ),
                 html.A(
                     href="https://uaf.edu/uaf/",
                     target="_blank",
                     className="level-item",
-                    children=[html.Img(src=path_prefix + "assets/UAF.svg")],
+                    children=[
+                        html.Img(
+                            src=path_prefix + "assets/UAF.svg",
+                            alt="University of Alaska Fairbanks logo",
+                        )
+                    ],
                 ),
             ]
         ),
@@ -208,6 +284,7 @@ decadal_radios_field = html.Div(
             value=2080,
         )
     ],
+    **{"aria-label": "Select future decade to compare"}
 )
 
 form_fields = html.Div(
@@ -219,12 +296,9 @@ form_fields = html.Div(
 """,
             className="content is-size-5",
         ),
-        ddsih.DangerouslySetInnerHTML(
-            """
-<p class="content is-size-5 camera-icon">Click the <span>
-<svg viewBox="0 0 1000 1000" class="icon" height="1em" width="1em"><path d="m500 450c-83 0-150-67-150-150 0-83 67-150 150-150 83 0 150 67 150 150 0 83-67 150-150 150z m400 150h-120c-16 0-34 13-39 29l-31 93c-6 15-23 28-40 28h-340c-16 0-34-13-39-28l-31-94c-6-15-23-28-40-28h-120c-55 0-100-45-100-100v-450c0-55 45-100 100-100h800c55 0 100 45 100 100v450c0 55-45 100-100 100z m-400-550c-138 0-250 112-250 250 0 138 112 250 250 250 138 0 250-112 250-250 0-138-112-250-250-250z m365 380c-19 0-35 16-35 35 0 19 16 35 35 35 19 0 35-16 35-35 0-19-16-35-35-35z" transform="matrix(1 0 0 -1 0 850)"></path></svg>
-</span> icon in the upper&ndash;right of each chart to download it.</p>
-            """
+        dcc.Markdown(
+            dangerously_allow_html=True,
+            children='<p class="content is-size-5 camera-icon">Click the <span><svg viewBox="0 0 1000 1000" class="icon" height="1em" width="1em"><path d="m500 450c-83 0-150-67-150-150 0-83 67-150 150-150 83 0 150 67 150 150 0 83-67 150-150 150z m400 150h-120c-16 0-34 13-39 29l-31 93c-6 15-23 28-40 28h-340c-16 0-34-13-39-28l-31-94c-6-15-23-28-40-28h-120c-55 0-100-45-100-100v-450c0-55 45-100 100-100h800c55 0 100 45 100 100v450c0 55-45 100-100 100z m-400-550c-138 0-250 112-250 250 0 138 112 250 250 250 138 0 250-112 250-250 0-138-112-250-250-250z m365 380c-19 0-35 16-35 35 0 19 16 35 35 35 19 0 35-16 35-35 0-19-16-35-35-35z" transform="matrix(1 0 0 -1 0 850)"></path></svg></span> icon in the upper&ndash;right of each chart to download it.</p>',
         ),
         communities_dropdown_field,
         dcc.Graph(
